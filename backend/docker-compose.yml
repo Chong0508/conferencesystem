@@ -1,0 +1,40 @@
+services:
+  db:
+    image: mysql:8.1
+    container_name: assignment-2-webcrafters-db-1
+    environment:
+      MYSQL_ROOT_PASSWORD: root12345
+      MYSQL_DATABASE: cmsdb
+      # Only define MYSQL_USER/MYSQL_PASSWORD if you want a separate user
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: apppassword
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot12345"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: assignment-2-webcrafters-backend-1
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/cmsdb?allowPublicKeyRetrieval=true&useSSL=false
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root12345
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      java -jar /app.jar
+
+volumes:
+  mysql_data:

@@ -1,0 +1,79 @@
+############################
+### Spring Boot / Maven ###
+############################
+
+target/
+build/
+
+# Maven Wrapper
+.mvn/wrapper/maven-wrapper.jar
+
+# Allow target folder inside src (rare cases)
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+############################
+### Spring Tool Suite (STS)
+############################
+
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+
+############################
+### IntelliJ IDEA ###
+############################
+
+.idea/
+*.iws
+*.iml
+*.ipr
+
+############################
+### NetBeans ###
+############################
+
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# Allow embedded build folders
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+############################
+### VS Code ###
+############################
+
+.vscode/
+
+############################
+### Logs ###
+############################
+
+*.log
+
+############################
+### OS Files ###
+############################
+
+.DS_Store
+Thumbs.db
+
+############################
+### Docker ###
+############################
+
+docker-compose.override.yml
+
+############################
+### Sensitive env files ###
+############################
+
+.env
