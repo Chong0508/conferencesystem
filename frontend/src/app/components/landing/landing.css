@@ -1,8 +1,8 @@
-/* --- 复用 Login 的动态绿色背景 (作为首页的头部 Hero 区域) --- */
+
 .hero-section {
   position: relative;
   width: 100%;
-  height: 85vh; /* 占据屏幕 85% 的高度 */
+  height: 85vh;
   background: linear-gradient(150deg, #11998e 0%, #38ef7d 100%);
   overflow: hidden;
   display: flex;
@@ -12,7 +12,7 @@
   color: white;
 }
 
-/* 动态背景动画 */
+
 .area {
   position: absolute;
   top: 0;
@@ -43,23 +43,22 @@
   border-radius: 10px;
 }
 
-/* 定义方块位置 (复制自 Login CSS) */
 .circles li:nth-child(1) { left: 25%; width: 80px; height: 80px; animation-delay: 0s; }
 .circles li:nth-child(2) { left: 10%; width: 20px; height: 20px; animation-delay: 2s; animation-duration: 12s; }
 .circles li:nth-child(3) { left: 70%; width: 20px; height: 20px; animation-delay: 4s; }
 .circles li:nth-child(4) { left: 40%; width: 60px; height: 60px; animation-delay: 0s; animation-duration: 18s; }
 .circles li:nth-child(5) { left: 65%; width: 20px; height: 20px; animation-delay: 0s; }
-/* ... (可以根据需要复制更多) */
+
 
 @keyframes animate {
   0% { transform: translateY(0) rotate(0deg); opacity: 1; border-radius: 0; }
   100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; border-radius: 50%; }
 }
 
-/* --- Hero 内容样式 --- */
+
 .hero-content {
   position: relative;
-  z-index: 1; /* 确保文字在动画上面 */
+  z-index: 1;
 }
 
 .hero-title {
@@ -75,7 +74,7 @@
   opacity: 0.9;
 }
 
-/* 首页的大按钮 */
+
 .btn-light-pill {
   background-color: white;
   color: #11998e;
@@ -110,10 +109,10 @@
   transform: translateY(-3px);
 }
 
-/* --- Features 功能区样式 --- */
+
 .features-section {
   padding: 5rem 0;
-  background-color: #f9fbfd; /* 极淡的灰蓝色背景 */
+  background-color: #f9fbfd;
 }
 
 .feature-card {
@@ -128,7 +127,7 @@
 
 .feature-card:hover {
   transform: translateY(-10px);
-  box-shadow: 0 20px 40px rgba(17, 153, 142, 0.15); /* 悬浮时有绿色光晕 */
+  box-shadow: 0 20px 40px rgba(17, 153, 142, 0.15);
 }
 
 .feature-icon {
@@ -143,7 +142,7 @@
   margin-bottom: 1rem;
 }
 
-/* --- Footer 页脚 --- */
+
 footer {
   background-color: #333;
   color: white;
