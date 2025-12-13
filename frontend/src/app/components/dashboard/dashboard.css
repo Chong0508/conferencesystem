@@ -1,0 +1,122 @@
+/* --- Global Layout Configuration --- */
+.dashboard-container {
+  display: flex;
+  height: 100vh;
+  background-color: #f4f7f6; /* Very pale grey-green background, easy on the eyes */
+  padding: 1rem; /* Padding around the page to create the "floating" effect */
+  gap: 1rem;
+  overflow: hidden; /* Prevent double scrollbars */
+}
+
+/* --- Left Sidebar (Floating Style) --- */
+.sidebar {
+  width: 260px;
+  background: white;
+  border-radius: 20px; /* Large border radius for modern look */
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05); /* Soft shadow */
+  height: calc(100vh - 2rem); /* Full height minus padding */
+  flex-shrink: 0; /* Prevent sidebar from shrinking when screen is small */
+}
+
+/* Sidebar Header (Logo Area) */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.brand-icon {
+  font-size: 1.8rem;
+  color: #11998e; /* Theme Green */
+}
+
+.brand-text {
+  font-weight: 800;
+  color: #333;
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+/* --- Navigation Links --- */
+.nav-link {
+  color: #6c757d;
+  font-weight: 600;
+  padding: 12px 15px;
+  border-radius: 15px; /* Pill shape */
+  transition: all 0.3s;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.nav-link:hover {
+  background-color: #e0f2f1; /* Light green on hover */
+  color: #11998e;
+}
+
+/* Active State */
+.nav-link.active {
+  background: linear-gradient(to right, #11998e, #38ef7d); /* Green Gradient */
+  color: white;
+  box-shadow: 0 5px 15px rgba(17, 153, 142, 0.3);
+}
+
+/* Logout Button */
+.btn-logout {
+  color: #dc3545;
+  background-color: #fff0f1;
+  border: none;
+  border-radius: 15px;
+  padding: 10px;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.btn-logout:hover {
+  background-color: #dc3545;
+  color: white;
+}
+
+/* --- Right Side: Main Content --- */
+.main-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden; /* Hide overflow to allow inner scrolling */
+}
+
+/* Top Navbar */
+.custom-navbar {
+  background: white;
+  border-radius: 20px;
+  padding: 10px 20px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border: 2px solid #38ef7d; /* Green border around avatar */
+}
+
+/* Content Wrapper (Where child pages load) */
+.content-wrapper {
+  flex-grow: 1;
+  overflow-y: auto; /* Enable vertical scrolling for content only */
+  padding-top: 1rem;
+  padding-bottom: 2rem;
+}
+
+/* Scrollbar Customization */
+.content-wrapper::-webkit-scrollbar {
+  width: 8px;
+}
+.content-wrapper::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 10px;
+}

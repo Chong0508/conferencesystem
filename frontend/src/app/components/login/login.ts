@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-login',
@@ -16,17 +17,37 @@ export class Login {
     password: ''
   };
 
-  constructor(private router: Router) {}
+  isLoading: boolean = false;
+
+  // Inject AuthService
+  constructor(private router: Router, private authService: AuthService) {}
 
   onLogin() {
-
     if (this.loginObj.email && this.loginObj.password) {
+      this.isLoading = true;
 
-      alert("Login Success！Welcome to G5ConfEase");
-      this.router.navigateByUrl('/dashboard');
+      // 👇 THIS IS THE FINAL CODE.
+      this.authService.login(this.loginObj).subscribe({
+
+        next: (res) => {
+          this.isLoading = false;
+
+          // Save the "real" user data from the response
+          localStorage.setItem('loggedUser', JSON.stringify(res.user));
+
+          alert("Login Successful! Welcome " + res.user.firstName);
+          this.router.navigateByUrl('/dashboard');
+        },
+
+        error: (err) => {
+          this.isLoading = false;
+          // 'err' here simulates an HTTP error object
+          alert("Login Failed: " + (err.message || "Server Error"));
+        }
+      });
+
     } else {
-
-      alert("Please enter your Email and Password");
+      alert("Please enter email and password");
     }
   }
 }

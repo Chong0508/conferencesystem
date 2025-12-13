@@ -1,1 +1,78 @@
-<p>dashboard works!</p>
+<div class="dashboard-container">
+
+  <nav class="sidebar custom-card animate__animated animate__fadeInLeft">
+    <div class="sidebar-header">
+      <i class="bi bi-grid-1x2-fill brand-icon"></i>
+      <h4 class="brand-text">G5ConfEase</h4>
+    </div>
+
+    <ul class="nav flex-column mt-4">
+
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+          <i class="bi bi-speedometer2 me-2"></i> Overview
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/dashboard/conferences" routerLinkActive="active">
+          <i class="bi bi-calendar-event me-2"></i> Conferences
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/dashboard/submit-paper" routerLinkActive="active">
+          <i class="bi bi-file-earmark-arrow-up me-2"></i> Submit Paper
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/dashboard/reviews" routerLinkActive="active">
+          <i class="bi bi-star me-2"></i> My Reviews
+        </a>
+      </li>
+
+      <li class="nav-item mt-4">
+        <p class="text-muted small ms-3 mb-2 fw-bold">SETTINGS</p>
+        <a class="nav-link" routerLink="/dashboard/profile" routerLinkActive="active">
+          <i class="bi bi-person-circle me-2"></i> My Profile
+        </a>
+      </li>
+    </ul>
+
+    <div class="mt-auto mb-3">
+      <button class="btn btn-logout w-100" (click)="onLogout()">
+        <i class="bi bi-box-arrow-left me-2"></i> Logout
+      </button>
+    </div>
+  </nav>
+
+  <main class="main-content">
+
+    <header class="navbar custom-navbar shadow-sm mb-4 animate__animated animate__fadeInDown">
+      <div class="container-fluid">
+        <span class="navbar-brand mb-0 h1 text-secondary">Dashboard</span>
+
+        <div class="d-flex align-items-center">
+          <div class="text-end me-3">
+            <p class="mb-0 fw-bold text-dark">
+              {{ loggedUser.firstName }} {{ loggedUser.lastName }}
+            </p>
+            <small class="text-muted">{{ loggedUser.role }}</small>
+          </div>
+
+          <img [src]="'https://ui-avatars.com/api/?name=' + loggedUser.firstName + '+' + loggedUser.lastName + '&background=' + (loggedUser.avatarColor || '11998e') + '&color=fff'"
+               class="rounded-circle avatar"
+               alt="Avatar">
+        </div>
+      </div>
+    </header>
+
+    <div class="content-wrapper animate__animated animate__fadeIn">
+
+      <router-outlet></router-outlet>
+
+    </div>
+
+  </main>
+</div>
