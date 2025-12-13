@@ -1,0 +1,105 @@
+<div class="container mt-4 mb-5 animate__animated animate__fadeIn">
+
+  <button class="btn btn-link text-decoration-none text-muted mb-3 ps-0" (click)="onCancel()">
+    <i class="bi bi-arrow-left me-1"></i> Back to List
+  </button>
+
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <div *ngIf="!isLoading && paperData" class="row">
+
+    <div class="col-lg-7 mb-4">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-body p-4">
+          <span class="badge bg-light text-primary border mb-3">Paper ID: {{ paperData.id }}</span>
+
+          <h3 class="fw-bold text-dark mb-3">{{ paperData.title }}</h3>
+
+          <div class="d-flex align-items-center mb-4">
+            <div class="d-flex align-items-center me-4">
+              <i class="bi bi-person-circle text-muted fs-5 me-2"></i>
+              <span class="text-dark fw-medium">{{ paperData.authorName }}</span>
+            </div>
+            <div class="d-flex align-items-center">
+              <i class="bi bi-calendar3 text-muted fs-5 me-2"></i>
+              <span class="text-muted small">{{ paperData.submittedAt | date:'mediumDate' }}</span>
+            </div>
+          </div>
+
+          <h6 class="text-uppercase text-muted small fw-bold ls-1 mb-3">Abstract</h6>
+          <p class="text-secondary leading-relaxed abstract-text">
+            {{ paperData.abstract }}
+          </p>
+
+          <h6 class="text-uppercase text-muted small fw-bold ls-1 mb-2 mt-4">Keywords</h6>
+          <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-secondary-subtle text-secondary fw-normal px-3 py-2">
+                            {{ paperData.keywords || 'No keywords' }}
+                        </span>
+          </div>
+
+          <hr class="my-4">
+
+          <div class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 border">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-file-earmark-pdf-fill text-danger fs-3 me-3"></i>
+              <div>
+                <h6 class="mb-0 fw-bold">{{ paperData.fileName }}</h6>
+                <small class="text-muted">PDF Document</small>
+              </div>
+            </div>
+            <button class="btn btn-sm btn-outline-dark">
+              <i class="bi bi-download me-1"></i> Download
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-5 mb-4">
+      <div class="card shadow border-0 grading-card">
+        <div class="card-header bg-white border-bottom-0 pt-4 px-4 pb-0">
+          <h5 class="fw-bold text-dark mb-0">Evaluation Form</h5>
+        </div>
+
+        <div class="card-body p-4">
+          <form>
+            <div class="mb-4">
+              <label class="form-label fw-bold">Overall Score (0-100)</label>
+              <div class="input-group">
+                <input type="number" class="form-control form-control-lg fw-bold text-primary" [(ngModel)]="reviewObj.score" name="score" min="0" max="100" placeholder="0">
+                <span class="input-group-text fw-bold">/ 100</span>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-bold">Recommendation</label>
+              <select class="form-select form-select-lg" [(ngModel)]="reviewObj.recommendation" name="rec">
+                <option value="" disabled selected>Select Verdict...</option>
+                <option value="Accept" class="text-success fw-bold">✅ Accept Submission</option>
+                <option value="Revision" class="text-warning fw-bold">⚠️ Major Revision Required</option>
+                <option value="Reject" class="text-danger fw-bold">❌ Reject Submission</option>
+              </select>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-bold">Reviewer Comments</label>
+              <textarea class="form-control" rows="6" [(ngModel)]="reviewObj.comments" name="comments" placeholder="Provide constructive feedback for the author..."></textarea>
+            </div>
+
+            <div class="d-grid">
+              <button type="button" class="btn btn-primary btn-lg" (click)="onSubmitReview()" [disabled]="isSubmitting">
+                <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+                {{ isSubmitting ? 'Submitting...' : 'Submit Evaluation' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

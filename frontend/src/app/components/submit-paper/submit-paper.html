@@ -1,1 +1,89 @@
-<p>submit-paper works!</p>
+<div class="container mt-4 mb-5 animate__animated animate__fadeInUp">
+
+  <div class="card">
+    <div class="card-header-modern">
+      <div class="d-flex align-items-center">
+        <div class="header-icon-box me-3 animate__animated animate__bounceIn">
+          <i class="bi bi-cloud-arrow-up-fill"></i>
+        </div>
+        <div>
+          <h4 class="text-dark fw-bold mb-1">Submit New Paper</h4>
+          <p class="text-muted mb-0 small">Ready to share your research? Fill in the details below.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-body p-4 p-md-5">
+
+      <form>
+        <div class="row g-4 mb-4">
+          <div class="col-md-7">
+            <div class="form-floating">
+              <input type="text" class="form-control" id="paperTitle" [(ngModel)]="paperObj.title" name="title" placeholder="Paper Title">
+              <label for="paperTitle">Paper Title <span class="text-danger">*</span></label>
+            </div>
+          </div>
+
+          <div class="col-md-5">
+            <div class="form-floating">
+              <select class="form-select" id="trackSelect" [(ngModel)]="paperObj.trackId" name="track">
+                <option value="" disabled selected>Choose track...</option>
+                <option *ngFor="let track of tracks" [value]="track.id">{{ track.name }}</option>
+              </select>
+              <label for="trackSelect">Select Track <span class="text-danger">*</span></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-floating mb-4">
+          <textarea class="form-control" placeholder="Leave a comment here" id="abstractText" style="height: 150px" [(ngModel)]="paperObj.abstract" name="abstract"></textarea>
+          <label for="abstractText">Abstract (Max 300 words) <span class="text-danger">*</span></label>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label small text-muted text-uppercase ls-1">Keywords</label>
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-tags"></i></span>
+            <input type="text" class="form-control border-start-0 ps-0" [(ngModel)]="paperObj.keywords" name="keywords" placeholder="e.g. Machine Learning, IoT, Security">
+          </div>
+          <div class="form-text small ms-2">Separate multiple keywords with commas.</div>
+        </div>
+
+        <div class="mb-5">
+          <label class="form-label small text-muted text-uppercase ls-1 mb-3">Upload Manuscript <span class="text-danger">*</span></label>
+
+          <div class="file-upload-wrapper">
+            <input type="file" class="file-upload-input" (change)="onFileSelected($event)" accept=".pdf,.doc,.docx">
+
+            <div class="file-upload-zone">
+              <div *ngIf="!paperObj.fileName">
+                <i class="bi bi-file-earmark-pdf animate__animated animate__pulse infinite upload-icon"></i>
+                <h6 class="fw-bold mt-3">Drag & drop your file here OR click to browse</h6>
+                <p class="text-muted small mb-0">Supported formats: PDF, DOCX (Max 10MB)</p>
+              </div>
+
+              <div *ngIf="paperObj.fileName" class="file-selected-box animate__animated animate__fadeIn">
+                <i class="bi bi-check-circle-fill me-2 fs-4"></i>
+                <span class="text-truncate">{{ paperObj.fileName }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="my-4 text-muted opacity-25">
+
+        <div class="d-flex justify-content-end gap-3 align-items-center">
+          <button type="button" class="btn btn-light px-4" (click)="resetForm()">
+            <i class="bi bi-arrow-counterclockwise me-2"></i>Reset
+          </button>
+          <button type="button" class="btn btn-gradient-success px-5 py-3" (click)="onSubmit()" [disabled]="isLoading">
+            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+            <span *ngIf="!isLoading"><i class="bi bi-send-fill me-2"></i>Submit Paper</span>
+            <span *ngIf="isLoading">Submitting...</span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>

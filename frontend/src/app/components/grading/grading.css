@@ -1,0 +1,50 @@
+.leading-relaxed {
+  line-height: 1.8;
+}
+
+.abstract-text {
+  font-size: 1.05rem;
+  color: #495057;
+  text-align: justify;
+}
+
+.ls-1 {
+  letter-spacing: 1px;
+}
+
+/* Grading Card Styling */
+.grading-card {
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+  position: sticky;
+  top: 20px; /* 让评分卡片在滚动时吸附在顶部 (Sticky) */
+}
+
+.bg-secondary-subtle {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+.form-control-lg, .form-select-lg {
+  border-radius: 10px;
+  font-size: 1rem;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+  border: none;
+  font-weight: 600;
+  padding: 14px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(13, 110, 253, 0.4);
+}
