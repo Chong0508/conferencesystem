@@ -1,1 +1,52 @@
-<p>login works!</p>
+<div class="context">
+
+  <div class="login-container">
+    <div class="card custom-card animate__animated animate__zoomIn">
+      <div class="card-body text-center">
+
+        <div class="mb-4">
+          <i class="bi bi-grid-1x2-fill" style="font-size: 3rem; color: #11998e;"></i>
+          <h2 class="brand-title mt-2">G5ConfEase</h2>
+          <p class="text-muted small">Conference Management System</p>
+        </div>
+
+        <div class="mb-3 text-start">
+          <label class="form-label ms-3 fw-bold text-secondary small">Email Address</label>
+          <div class="input-group">
+            <input type="email" class="form-control" [(ngModel)]="loginObj.email" placeholder="name@example.com">
+          </div>
+        </div>
+
+        <div class="mb-4 text-start">
+          <label class="form-label ms-3 fw-bold text-secondary small">Password</label>
+          <input type="password" class="form-control" [(ngModel)]="loginObj.password" placeholder="Enter your password">
+        </div>
+
+        <div class="d-grid mb-3">
+          <button class="btn btn-green btn-lg" (click)="onLogin()">Login to Dashboard</button>
+        </div>
+
+        <div class="mt-4">
+          <p class="mb-0 text-muted">Don't have an account?</p>
+          <a routerLink="/register">Create New Account</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="area" >
+  <ul class="circles">
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+  </ul>
+</div >

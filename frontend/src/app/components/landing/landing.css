@@ -1,0 +1,152 @@
+/* --- 复用 Login 的动态绿色背景 (作为首页的头部 Hero 区域) --- */
+.hero-section {
+  position: relative;
+  width: 100%;
+  height: 85vh; /* 占据屏幕 85% 的高度 */
+  background: linear-gradient(150deg, #11998e 0%, #38ef7d 100%);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: white;
+}
+
+/* 动态背景动画 */
+.area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.circles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.circles li {
+  position: absolute;
+  display: block;
+  list-style: none;
+  width: 20px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  animation: animate 25s linear infinite;
+  bottom: -150px;
+  border-radius: 10px;
+}
+
+/* 定义方块位置 (复制自 Login CSS) */
+.circles li:nth-child(1) { left: 25%; width: 80px; height: 80px; animation-delay: 0s; }
+.circles li:nth-child(2) { left: 10%; width: 20px; height: 20px; animation-delay: 2s; animation-duration: 12s; }
+.circles li:nth-child(3) { left: 70%; width: 20px; height: 20px; animation-delay: 4s; }
+.circles li:nth-child(4) { left: 40%; width: 60px; height: 60px; animation-delay: 0s; animation-duration: 18s; }
+.circles li:nth-child(5) { left: 65%; width: 20px; height: 20px; animation-delay: 0s; }
+/* ... (可以根据需要复制更多) */
+
+@keyframes animate {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; border-radius: 0; }
+  100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; border-radius: 50%; }
+}
+
+/* --- Hero 内容样式 --- */
+.hero-content {
+  position: relative;
+  z-index: 1; /* 确保文字在动画上面 */
+}
+
+.hero-title {
+  font-size: 4rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  text-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.hero-subtitle {
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+}
+
+/* 首页的大按钮 */
+.btn-light-pill {
+  background-color: white;
+  color: #11998e;
+  border-radius: 50px;
+  padding: 15px 40px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  border: none;
+  transition: all 0.3s;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.btn-light-pill:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+  color: #0e8278;
+}
+
+.btn-outline-pill {
+  border: 2px solid white;
+  color: white;
+  border-radius: 50px;
+  padding: 13px 38px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  background: transparent;
+  transition: all 0.3s;
+}
+
+.btn-outline-pill:hover {
+  background-color: rgba(255,255,255,0.1);
+  transform: translateY(-3px);
+}
+
+/* --- Features 功能区样式 --- */
+.features-section {
+  padding: 5rem 0;
+  background-color: #f9fbfd; /* 极淡的灰蓝色背景 */
+}
+
+.feature-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  text-align: center;
+  transition: all 0.3s;
+  height: 100%;
+}
+
+.feature-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(17, 153, 142, 0.15); /* 悬浮时有绿色光晕 */
+}
+
+.feature-icon {
+  font-size: 3rem;
+  color: #11998e;
+  margin-bottom: 1.5rem;
+}
+
+.feature-title {
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+/* --- Footer 页脚 --- */
+footer {
+  background-color: #333;
+  color: white;
+  padding: 2rem 0;
+  text-align: center;
+}

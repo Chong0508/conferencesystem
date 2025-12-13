@@ -1,0 +1,143 @@
+/* --- 1. 核心容器与背景 --- */
+.context {
+  width: 100%;
+  position: absolute;
+  top: 50vh; /* 垂直居中 */
+  left: 50%; /* 水平居中 */
+  transform: translate(-50%, -50%);
+  z-index: 2; /* 确保卡片在动画之上 */
+}
+
+/* 背景区域：带有动态流动的绿色渐变 */
+.area {
+  background: linear-gradient(to left, #8f94fb, #4e54c8); /* 备用色 */
+  background: -webkit-linear-gradient(to left, #8f94fb, #4e54c8);
+  background: linear-gradient(150deg, #11998e 0%, #38ef7d 100%); /* 你的清新绿 */
+  width: 100%;
+  height: 100vh;
+  background-size: 400% 400%; /* 拉大背景实现流动效果 */
+  animation: gradientBG 15s ease infinite; /* 背景色呼吸动画 */
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden; /* 防止方块飘出屏幕出现滚动条 */
+}
+
+/* --- 2. 登录卡片样式 (保持你喜欢的圆角) --- */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.custom-card {
+  width: 100%;
+  max-width: 400px;
+  background: rgba(255, 255, 255, 0.9); /* 90%不透明度，产生毛玻璃感 */
+  backdrop-filter: blur(10px); /* 背景模糊，提升高级感 */
+  border-radius: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  padding: 2.5rem;
+}
+
+.brand-title {
+  color: #11998e;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.form-control {
+  border-radius: 50px;
+  padding: 12px 20px;
+  border: 1px solid #e0e0e0;
+  background-color: rgba(247, 251, 249, 0.8);
+  transition: all 0.3s;
+}
+
+.form-control:focus {
+  border-color: #38ef7d;
+  box-shadow: 0 0 0 0.2rem rgba(56, 239, 125, 0.25);
+  background-color: #fff;
+}
+
+.btn-green {
+  background: linear-gradient(to right, #11998e, #38ef7d);
+  border: none;
+  color: white;
+  border-radius: 50px;
+  padding: 12px;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.btn-green:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(17, 153, 142, 0.4);
+}
+
+a {
+  color: #11998e;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+/* --- 3. 动画定义区域 (Magic Happens Here) --- */
+
+/* 背景色流动动画 */
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* 飘动方块的容器 */
+.circles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+/* 每一个方块的共同样式 */
+.circles li {
+  position: absolute;
+  display: block;
+  list-style: none;
+  width: 20px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.2); /* 半透明白色 */
+  animation: animate 25s linear infinite; /* 上浮动画 */
+  bottom: -150px; /* 从屏幕底部下方开始 */
+  border-radius: 10px; /* 稍微有点圆角 */
+}
+
+/* 分别定义10个方块的大小、位置和速度，制造随机感 */
+.circles li:nth-child(1) { left: 25%; width: 80px; height: 80px; animation-delay: 0s; }
+.circles li:nth-child(2) { left: 10%; width: 20px; height: 20px; animation-delay: 2s; animation-duration: 12s; }
+.circles li:nth-child(3) { left: 70%; width: 20px; height: 20px; animation-delay: 4s; }
+.circles li:nth-child(4) { left: 40%; width: 60px; height: 60px; animation-delay: 0s; animation-duration: 18s; }
+.circles li:nth-child(5) { left: 65%; width: 20px; height: 20px; animation-delay: 0s; }
+.circles li:nth-child(6) { left: 75%; width: 110px; height: 110px; animation-delay: 3s; }
+.circles li:nth-child(7) { left: 35%; width: 150px; height: 150px; animation-delay: 7s; }
+.circles li:nth-child(8) { left: 50%; width: 25px; height: 25px; animation-delay: 15s; animation-duration: 45s; }
+.circles li:nth-child(9) { left: 20%; width: 15px; height: 15px; animation-delay: 2s; animation-duration: 35s; }
+.circles li:nth-child(10){ left: 85%; width: 150px; height: 150px; animation-delay: 0s; animation-duration: 11s; }
+
+/* 上浮和旋转的关键帧 */
+@keyframes animate {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+    border-radius: 0;
+  }
+  100% {
+    transform: translateY(-1000px) rotate(720deg);
+    opacity: 0;
+    border-radius: 50%;
+  }
+}
