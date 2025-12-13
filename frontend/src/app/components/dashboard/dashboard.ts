@@ -1,17 +1,22 @@
-import { Component, OnInit } from '@angular/core'; // 👈 Import OnInit
-import {Router, RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterLink, RouterOutlet, RouterLinkActive],
+
+  imports: [
+    CommonModule,
+    RouterLink,
+    RouterLinkActive,
+    RouterOutlet
+  ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
-// 👇 Implement OnInit to run code when page opens
 export class Dashboard implements OnInit {
 
-  // Default value (Placeholder) in case no one is logged in
   loggedUser: any = {
     firstName: 'Guest',
     lastName: 'User',
@@ -21,25 +26,17 @@ export class Dashboard implements OnInit {
 
   constructor(private router: Router) {}
 
-  // 👇 This runs automatically when Dashboard loads
   ngOnInit() {
-    // 1. Try to get data from Local Storage
+    // 1. 读取用户信息
     const localData = localStorage.getItem('loggedUser');
-
-    // 2. If data exists, replace the Guest placeholder
     if (localData != null) {
       this.loggedUser = JSON.parse(localData);
-      console.log('Dashboard loaded user:', this.loggedUser);
-    } else {
-      // Optional: If not logged in, kick back to login page
-      // this.router.navigateByUrl('/login');
     }
   }
 
   onLogout() {
     const confirmLogout = confirm("Are you sure you want to logout?");
     if (confirmLogout) {
-      // Clear the saved data
       localStorage.removeItem('loggedUser');
       this.router.navigateByUrl('/login');
     }

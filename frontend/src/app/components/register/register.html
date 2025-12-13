@@ -27,6 +27,14 @@
       </div>
 
       <div class="mb-3 text-start">
+        <label class="form-label ms-2 fw-bold text-secondary small">I am a...</label>
+        <select class="form-control form-select rounded-pill" [(ngModel)]="registerObj.role">
+          <option value="Author">Author (Student/Researcher)</option>
+          <option value="Reviewer">Reviewer (Professor/Lecturer)</option>
+        </select>
+      </div>
+
+      <div class="mb-3 text-start">
         <label class="form-label ms-2">Affiliation / University</label>
         <input type="text" class="form-control" [(ngModel)]="registerObj.affiliation" placeholder="e.g. Universiti Utara Malaysia">
       </div>

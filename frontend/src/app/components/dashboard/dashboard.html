@@ -14,19 +14,19 @@
         </a>
       </li>
 
-      <li class="nav-item">
+      <li class="nav-item" *ngIf="loggedUser.role === 'Admin'">
         <a class="nav-link" routerLink="/dashboard/conferences" routerLinkActive="active">
-          <i class="bi bi-calendar-event me-2"></i> Conferences
+          <i class="bi bi-calendar-event me-2"></i> Manage Conferences
         </a>
       </li>
 
-      <li class="nav-item">
+      <li class="nav-item" *ngIf="loggedUser.role === 'Author' || loggedUser.role === 'Admin'">
         <a class="nav-link" routerLink="/dashboard/submit-paper" routerLinkActive="active">
           <i class="bi bi-file-earmark-arrow-up me-2"></i> Submit Paper
         </a>
       </li>
 
-      <li class="nav-item">
+      <li class="nav-item" *ngIf="loggedUser.role === 'Reviewer' || loggedUser.role === 'Admin'">
         <a class="nav-link" routerLink="/dashboard/reviews" routerLinkActive="active">
           <i class="bi bi-star me-2"></i> My Reviews
         </a>
@@ -69,9 +69,7 @@
     </header>
 
     <div class="content-wrapper animate__animated animate__fadeIn">
-
       <router-outlet></router-outlet>
-
     </div>
 
   </main>

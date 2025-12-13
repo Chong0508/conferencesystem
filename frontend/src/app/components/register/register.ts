@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../services/auth';
+import { AuthService } from '../../services/auth'; // Ensure path is correct based on your file structure
 
 @Component({
   selector: 'app-register',
@@ -12,42 +12,41 @@ import { AuthService } from '../../services/auth';
 })
 export class Register {
 
+  // Added 'role' with a default value
   registerObj: any = {
     firstName: '',
     lastName: '',
     email: '',
     password: '',
     confirmPassword: '',
-    affiliation: ''
+    affiliation: '',
+    role: 'Author' // Default role
   };
 
-  isLoading: boolean = false; // To show a loading spinner (optional)
+  isLoading: boolean = false;
 
-  // Inject AuthService
   constructor(private router: Router, private authService: AuthService) {}
 
   onRegister() {
+    // 1. Validate Passwords
     if (this.registerObj.password !== this.registerObj.confirmPassword) {
       alert("Error: Passwords do not match!");
       return;
     }
 
-    if (this.registerObj.email && this.registerObj.password) {
-      this.isLoading = true; // Start loading
+    // 2. Check Required Fields
+    if (this.registerObj.email && this.registerObj.password && this.registerObj.firstName) {
+      this.isLoading = true;
 
-      // 👇 THIS IS THE FINAL CODE. No changes needed later.
+      // 3. Call Service to Register
       this.authService.register(this.registerObj).subscribe({
-
         next: (res) => {
-          // Success Callback
           this.isLoading = false;
           console.log('Server response:', res);
-          alert("Registration Successful! Please login.");
+          alert("Registration Successful! Please login with your new account.");
           this.router.navigateByUrl('/login');
         },
-
         error: (err) => {
-          // Error Callback
           this.isLoading = false;
           console.error(err);
           alert("Registration failed. Please try again.");
