@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-conference-list',
-  imports: [],
+  standalone: true,
+  imports: [RouterLink],
   templateUrl: './conference-list.html',
   styleUrl: './conference-list.css',
 })

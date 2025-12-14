@@ -1,1 +1,63 @@
-<p>create-conference works!</p>
+<div class="container mt-4 mb-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="form-card">
+        <div class="form-header">
+          <h3 class="fw-bold">Create New Conference</h3>
+          <p class="text-muted mb-0">Fill in the details below to create a new academic conference.</p>
+        </div>
+
+        <form>
+          <div class="mb-3">
+            <label for="confName" class="form-label">Conference Name</label>
+            <input type="text" class="form-control" id="confName" placeholder="e.g., International Symposium on AI">
+          </div>
+
+          <div class="mb-3">
+            <label for="confDescription" class="form-label">Description</label>
+            <textarea class="form-control" id="confDescription" rows="4" placeholder="Provide a brief description of the conference..."></textarea>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="startDate" class="form-label">Start Date</label>
+              <input type="date" class="form-control" id="startDate">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="endDate" class="form-label">End Date</label>
+              <input type="date" class="form-control" id="endDate">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="location" class="form-label">Location</label>
+            <input type="text" class="form-control" id="location" placeholder="e.g., Kuala Lumpur Convention Centre">
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="category" class="form-label">Category</label>
+              <select class="form-select" id="category">
+                <option selected>Select a category</option>
+                <option value="1">Computer Science</option>
+                <option value="2">Engineering</option>
+                <option value="3">Business</option>
+                <option value="4">Medicine</option>
+                <option value="5">Other</option>
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="deadline" class="form-label">Submission Deadline</label>
+              <input type="date" class="form-control" id="deadline">
+            </div>
+          </div>
+
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <a routerLink="/conference-list" class="btn btn-secondary-custom me-md-2">Cancel</a>
+            <button type="submit" class="btn btn-primary-custom">Create Conference</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

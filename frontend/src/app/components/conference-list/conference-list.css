@@ -1,0 +1,90 @@
+.container {
+  max-width: 1200px;
+}
+
+.btn-primary-custom {
+  background-color: #11998e;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 10px 25px;
+  font-weight: bold;
+  transition: all 0.3s;
+  box-shadow: 0 5px 15px rgba(17, 153, 142, 0.2);
+}
+
+.btn-primary-custom:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(17, 153, 142, 0.3);
+  color: white;
+}
+
+.btn-outline-primary-custom {
+  border: 2px solid #11998e;
+  color: #11998e;
+  border-radius: 50px;
+  padding: 8px 20px;
+  font-weight: bold;
+  background: transparent;
+  transition: all 0.3s;
+}
+
+.btn-outline-primary-custom:hover {
+  background-color: rgba(17, 153, 142, 0.1);
+  transform: translateY(-2px);
+  color: #0e8278;
+}
+
+.conference-card {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  overflow: hidden;
+  transition: all 0.3s;
+  height: 100%;
+}
+
+.conference-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(17, 153, 142, 0.15);
+}
+
+.card-header-custom {
+  background-color: rgba(17, 153, 142, 0.05);
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-header-custom .card-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #333;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.card-body .card-text {
+  margin-bottom: 0.5rem;
+}
+
+.input-group-text {
+  background-color: #11998e;
+  color: white;
+  border: 1px solid #11998e;
+}
+
+.form-control, .form-select {
+  border-radius: 10px;
+  border: 1px solid #ced4da;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #11998e;
+  box-shadow: 0 0 0 0.25rem rgba(17, 153, 142, 0.25);
+}

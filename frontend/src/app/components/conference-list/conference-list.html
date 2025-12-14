@@ -1,1 +1,82 @@
-<p>conference-list works!</p>
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold text-secondary">Academic Conferences</h2>
+    <a routerLink="/create-conference" class="btn btn-primary-custom">
+      <i class="bi bi-plus-circle me-2"></i>Create New Conference
+    </a>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input type="text" class="form-control" placeholder="Search conferences...">
+      </div>
+    </div>
+    <div class="col-md-3">
+      <select class="form-select">
+        <option selected>All Categories</option>
+        <option value="1">Computer Science</option>
+        <option value="2">Engineering</option>
+        <option value="3">Business</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <select class="form-select">
+        <option selected>Upcoming</option>
+        <option value="1">Past</option>
+        <option value="2">Ongoing</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Conference Card 1 -->
+    <div class="col-md-4">
+      <div class="conference-card">
+        <div class="card-header-custom">
+          <h5 class="card-title">International Conference on AI</h5>
+          <span class="badge bg-success">Upcoming</span>
+        </div>
+        <div class="card-body">
+          <p class="card-text text-muted"><i class="bi bi-calendar-event me-2"></i>July 15-17, 2025</p>
+          <p class="card-text text-muted"><i class="bi bi-geo-alt me-2"></i>Kuala Lumpur, Malaysia</p>
+          <p class="card-text">A premier conference showcasing the latest advancements in Artificial Intelligence.</p>
+          <a href="#" class="btn btn-outline-primary-custom">View Details</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conference Card 2 -->
+    <div class="col-md-4">
+      <div class="conference-card">
+        <div class="card-header-custom">
+          <h5 class="card-title">Global Engineering Summit</h5>
+          <span class="badge bg-warning text-dark">Ongoing</span>
+        </div>
+        <div class="card-body">
+          <p class="card-text text-muted"><i class="bi bi-calendar-event me-2"></i>June 1-30, 2025</p>
+          <p class="card-text text-muted"><i class="bi bi-geo-alt me-2"></i>Singapore</p>
+          <p class="card-text">A month-long summit with workshops and talks on various engineering fields.</p>
+          <a href="#" class="btn btn-outline-primary-custom">View Details</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conference Card 3 -->
+    <div class="col-md-4">
+      <div class="conference-card">
+        <div class="card-header-custom">
+          <h5 class="card-title">Web Development Symposium</h5>
+          <span class="badge bg-secondary">Past</span>
+        </div>
+        <div class="card-body">
+          <p class="card-text text-muted"><i class="bi bi-calendar-event me-2"></i>May 10, 2025</p>
+          <p class="card-text text-muted"><i class="bi bi-geo-alt me-2"></i>Virtual Event</p>
+          <p class="card-text">Exploring the latest trends in modern web development and design.</p>
+          <a href="#" class="btn btn-outline-primary-custom">View Details</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
