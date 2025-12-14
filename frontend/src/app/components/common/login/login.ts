@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../services/auth'; // Ensure path is correct
+import { AuthService } from '../../../services/auth'; // Ensure path is correct
 
 @Component({
   selector: 'app-login',

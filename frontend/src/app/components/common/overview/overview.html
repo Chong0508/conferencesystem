@@ -1,0 +1,164 @@
+<div class="container-fluid p-0 animate__animated animate__fadeIn" *ngIf="loggedUser">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold text-dark">Welcome back, {{ loggedUser.firstName }}!</h2>
+      <p class="text-muted">Here is what's happening with your conference dashboard today.</p>
+    </div>
+    <div class="text-end">
+      <span class="badge bg-primary px-3 py-2 rounded-pill shadow-sm">{{ loggedUser.role }} Account</span>
+    </div>
+  </div>
+
+  <div *ngIf="loggedUser.role === 'Admin'">
+
+    <div class="row g-4 mb-4">
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100 bg-primary-subtle">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div class="icon-box bg-white text-primary rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                <i class="bi bi-people-fill fs-4"></i>
+              </div>
+              <span class="badge bg-white text-primary">Total</span>
+            </div>
+            <h2 class="fw-bold mb-0">{{ stats.totalUsers }}</h2>
+            <p class="text-muted small mb-0">Registered Users</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100 bg-success-subtle">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div class="icon-box bg-white text-success rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                <i class="bi bi-file-earmark-text-fill fs-4"></i>
+              </div>
+              <span class="badge bg-white text-success">Submissions</span>
+            </div>
+            <h2 class="fw-bold mb-0">{{ stats.totalPapers }}</h2>
+            <p class="text-muted small mb-0">Total Papers</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100 bg-warning-subtle">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div class="icon-box bg-white text-warning rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                <i class="bi bi-calendar-event-fill fs-4"></i>
+              </div>
+              <span class="badge bg-white text-dark">Active</span>
+            </div>
+            <h2 class="fw-bold mb-0">{{ stats.totalConferences }}</h2>
+            <p class="text-muted small mb-0">Conferences</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+          <div class="card-header bg-white border-0 pt-4 px-4 pb-0 d-flex justify-content-between">
+            <h5 class="fw-bold mb-0">Recent Activity</h5>
+            <a routerLink="/dashboard/activity-logs" class="text-decoration-none small">View All</a>
+          </div>
+          <div class="card-body px-4 pb-4">
+            <div class="list-group list-group-flush mt-3">
+              <div class="list-group-item px-0 py-3 border-bottom-0" *ngFor="let log of recentLogs">
+                <div class="d-flex align-items-center">
+                  <div class="me-3">
+                    <i class="bi bi-circle-fill small"
+                       [ngClass]="{
+                         'text-success': log.type === 'success',
+                         'text-warning': log.type === 'warning',
+                         'text-danger': log.type === 'danger',
+                         'text-info': log.type === 'info'
+                       }"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0 fw-bold">{{ log.action }} <span class="text-muted fw-normal">by {{ log.user }}</span></h6>
+                    <small class="text-muted">{{ log.timestamp }}</small>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="recentLogs.length === 0" class="text-center text-muted py-4">
+                No recent activity found.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+          <div class="card-body p-4">
+            <h5 class="fw-bold mb-4">Quick Actions</h5>
+            <div class="d-grid gap-3">
+              <button class="btn btn-outline-primary py-2 text-start" routerLink="/dashboard/create-conference">
+                <i class="bi bi-plus-circle me-2"></i> Create Conference
+              </button>
+              <button class="btn btn-outline-secondary py-2 text-start" routerLink="/dashboard/user-management">
+                <i class="bi bi-people me-2"></i> Manage Users
+              </button>
+              <button class="btn btn-outline-success py-2 text-start" routerLink="/dashboard/schedule">
+                <i class="bi bi-calendar-plus me-2"></i> Update Schedule
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div *ngIf="loggedUser.role === 'Author'">
+    <div class="row g-4 mb-4">
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 bg-primary text-white p-4 h-100">
+          <h3>Ready to submit?</h3>
+          <p>Submit your research paper to the upcoming conference.</p>
+          <button class="btn btn-light text-primary fw-bold mt-auto" style="width: fit-content;" routerLink="/dashboard/submit-paper">
+            Submit New Paper
+          </button>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+          <div class="d-flex align-items-center">
+            <div class="icon-box bg-light text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+              <i class="bi bi-file-earmark-text fs-3"></i>
+            </div>
+            <div>
+              <h2 class="fw-bold mb-0">{{ stats.mySubmissions }}</h2>
+              <p class="text-muted mb-0">My Submissions</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div *ngIf="loggedUser.role === 'Reviewer'">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+          <h5 class="text-muted mb-2">Pending Reviews</h5>
+          <h2 class="fw-bold text-warning">{{ stats.pendingReviews }}</h2>
+        </div>
+      </div>
+      <div class="col-md-8">
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-light">
+          <h5><i class="bi bi-info-circle me-2"></i>Reviewer Guidelines</h5>
+          <p class="small text-muted mb-0">Please complete all assigned reviews before the deadline. Ensure your comments are constructive.</p>
+          <button class="btn btn-primary btn-sm mt-3" routerLink="/dashboard/reviews">Go to Reviews</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
