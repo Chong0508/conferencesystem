@@ -1,18 +1,17 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-submit-paper',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, RouterLink],
   templateUrl: './submit-paper.html',
   styleUrl: './submit-paper.css'
 })
 export class SubmitPaper {
 
-  // Mock Data for Tracks
   tracks = [
     { id: 1, name: 'Artificial Intelligence (AI) & Machine Learning' },
     { id: 2, name: 'Software Engineering (SE) & Architecture' },
@@ -33,11 +32,9 @@ export class SubmitPaper {
 
   constructor(private router: Router) {}
 
-  // Handle File Selection
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
-      // Simple Validation for demo (e.g., max size 10MB)
       if (file.size > 10 * 1024 * 1024) {
         alert("File is too large! Max size is 10MB.");
         return;
@@ -47,7 +44,6 @@ export class SubmitPaper {
   }
 
   onSubmit() {
-    // Basic Validation
     if (!this.paperObj.title || !this.paperObj.abstract || !this.paperObj.trackId || !this.paperObj.fileName) {
       alert("Please fill in all required fields (*) and upload a file.");
       return;
@@ -55,11 +51,11 @@ export class SubmitPaper {
 
     this.isLoading = true;
 
-    // --- SIMULATION START ---
+    // --- 模拟保存数据 ---
     const currentUser = JSON.parse(localStorage.getItem('loggedUser') || '{}');
 
     const newPaper = {
-      id: Date.now(), // Generate a unique ID
+      id: Date.now(),
       ...this.paperObj,
       authorEmail: currentUser.email,
       authorName: currentUser.firstName + ' ' + currentUser.lastName,
@@ -70,15 +66,12 @@ export class SubmitPaper {
     const existingPapers = JSON.parse(localStorage.getItem('mock_papers') || '[]');
     existingPapers.push(newPaper);
     localStorage.setItem('mock_papers', JSON.stringify(existingPapers));
-    // --- SIMULATION END ---
+    // -------------------
 
-    // Simulate network delay
     setTimeout(() => {
       this.isLoading = false;
       alert("🎉 Paper Submitted Successfully! \nStatus: Pending Review");
       this.resetForm();
-      // Optional: Navigate somewhere else
-      // this.router.navigateByUrl('/dashboard');
     }, 1500);
   }
 

@@ -1,0 +1,39 @@
+
+.table thead th {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(17, 153, 142, 0.02);
+  cursor: pointer;
+}
+
+
+.badge {
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+
+.bg-success-subtle { background-color: #d1e7dd; }
+.bg-danger-subtle { background-color: #f8d7da; }
+.bg-warning-subtle { background-color: #fff3cd; }
+
+
+.btn-primary {
+  background: #11998e;
+  border-color: #11998e;
+}
+
+.btn-primary:hover {
+  background: #0e857b;
+}
+
+.text-light {
+  color: #e9ecef !important;
+}

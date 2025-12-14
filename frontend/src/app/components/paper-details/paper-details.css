@@ -1,0 +1,11 @@
+.text-justify { text-align: justify; }
+.leading-relaxed { line-height: 1.7; }
+.ls-1 { letter-spacing: 1px; }
+
+/* Background helpers */
+.bg-secondary-subtle { background-color: #f8f9fa; color: #6c757d; }
+.hover-bg-light:hover { background-color: #f8f9fa; cursor: pointer; }
+
+/* Review Card Styles */
+.bg-primary-subtle { background-color: #f0f7ff; }
+.border-dashed { border: 2px dashed #dee2e6; }

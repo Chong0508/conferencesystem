@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router'; // 👈 Import ActivatedRoute
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-grading',
@@ -13,83 +13,87 @@ import { ActivatedRoute, Router } from '@angular/router'; // 👈 Import Activat
 export class Grading implements OnInit {
 
   paperId: any;
-  paperData: any = null; // To store the paper details
+  paper: any = null;
+  currentUser: any = {};
 
-  // Review Object (Matches ERD 'Review' table)
-  reviewObj: any = {
-    score: null,
-    comments: '',
-    recommendation: '' // 'Accept', 'Reject', 'Revision'
+  // Form Data
+  scoreCriteria: any = {
+    originality: 0,
+    relevance: 0,
+    quality: 0,
+    presentation: 0
   };
+  comments: string = '';
+  recommendation: string = 'Accept';
 
-  isLoading: boolean = true;
-  isSubmitting: boolean = false;
+  // Helper to calculate total
+  get totalScore(): number {
+    return this.scoreCriteria.originality +
+      this.scoreCriteria.relevance +
+      this.scoreCriteria.quality +
+      this.scoreCriteria.presentation;
+  }
 
   constructor(private route: ActivatedRoute, private router: Router) {}
 
   ngOnInit() {
-    // 1. Get the Paper ID from the URL (e.g. /dashboard/review/123)
     this.paperId = this.route.snapshot.paramMap.get('id');
 
-    // 2. Load the specific paper details
-    this.loadPaperDetails();
+    // Get Current User (Reviewer)
+    const userJson = localStorage.getItem('loggedUser');
+    if (userJson) {
+      this.currentUser = JSON.parse(userJson);
+    }
+
+    this.loadPaper();
   }
 
-  loadPaperDetails() {
-    // Simulate fetching from backend
-    setTimeout(() => {
-      const allPapers = JSON.parse(localStorage.getItem('mock_papers') || '[]');
-
-      // Find the paper with the matching ID
-      // Note: We use '==' because ID from URL is string, ID in JSON might be number
-      this.paperData = allPapers.find((p: any) => p.id == this.paperId);
-
-      this.isLoading = false;
-    }, 500);
+  loadPaper() {
+    // Find paper by ID
+    const allPapers = JSON.parse(localStorage.getItem('mock_papers') || '[]');
+    this.paper = allPapers.find((p: any) => p.id == this.paperId);
   }
 
-  onSubmitReview() {
-    if (!this.reviewObj.score || !this.reviewObj.recommendation || !this.reviewObj.comments) {
-      alert("Please complete all fields (Score, Recommendation, Comments).");
+  // 👇 FIXED: Ensure data is saved to LocalStorage
+  submitReview() {
+    // 1. Validation
+    if (this.totalScore === 0) {
+      alert("Please score the paper before submitting.");
       return;
     }
 
-    this.isSubmitting = true;
-
-    // --- SIMULATION START ---
-
-    // 1. Save the Review
+    // 2. Create Review Object
     const newReview = {
-      reviewId: Date.now(),
+      id: Date.now(),
       paperId: this.paperId,
-      reviewer: JSON.parse(localStorage.getItem('loggedUser') || '{}').firstName,
-      ...this.reviewObj,
-      submittedAt: new Date()
+      reviewerEmail: this.currentUser.email, // Important for History
+      score: this.totalScore,
+      breakdown: this.scoreCriteria,
+      recommendation: this.recommendation,
+      comments: this.comments,
+      date: new Date()
     };
 
+    // 3. Save to 'mock_reviews'
     const existingReviews = JSON.parse(localStorage.getItem('mock_reviews') || '[]');
     existingReviews.push(newReview);
     localStorage.setItem('mock_reviews', JSON.stringify(existingReviews));
 
-    // 2. Update Paper Status (e.g., from 'Pending' to 'Reviewed')
+    // 4. Update Paper Status to 'Reviewed' in 'mock_papers'
     const allPapers = JSON.parse(localStorage.getItem('mock_papers') || '[]');
     const paperIndex = allPapers.findIndex((p: any) => p.id == this.paperId);
 
-    if (paperIndex !== -1) {
-      allPapers[paperIndex].status = 'Reviewed'; // Update status
+    if (paperIndex > -1) {
+      allPapers[paperIndex].status = 'Reviewed'; // Change Status
       localStorage.setItem('mock_papers', JSON.stringify(allPapers));
     }
 
-    // --- SIMULATION END ---
-
-    setTimeout(() => {
-      this.isSubmitting = false;
-      alert("Review Submitted Successfully!");
-      this.router.navigateByUrl('/dashboard/reviews'); // Go back to list
-    }, 1500);
+    // 5. Success & Redirect
+    alert("✅ Review Submitted Successfully!");
+    this.router.navigate(['/dashboard/review-history']); // Go to History to verify
   }
 
-  onCancel() {
-    this.router.navigateByUrl('/dashboard/reviews');
+  cancel() {
+    this.router.navigate(['/dashboard/reviews']);
   }
 }

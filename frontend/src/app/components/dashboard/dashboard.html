@@ -1,6 +1,7 @@
 <div class="dashboard-container">
 
   <nav class="sidebar custom-card animate__animated animate__fadeInLeft">
+
     <div class="sidebar-header">
       <i class="bi bi-grid-1x2-fill brand-icon"></i>
       <h4 class="brand-text">G5ConfEase</h4>
@@ -26,9 +27,21 @@
         </a>
       </li>
 
+      <li class="nav-item" *ngIf="loggedUser.role === 'Author' || loggedUser.role === 'Admin'">
+        <a class="nav-link" routerLink="/dashboard/my-submissions" routerLinkActive="active">
+          <i class="bi bi-folder2-open me-2"></i> My Submissions
+        </a>
+      </li>
+
       <li class="nav-item" *ngIf="loggedUser.role === 'Reviewer' || loggedUser.role === 'Admin'">
         <a class="nav-link" routerLink="/dashboard/reviews" routerLinkActive="active">
           <i class="bi bi-star me-2"></i> My Reviews
+        </a>
+      </li>
+
+      <li class="nav-item" *ngIf="loggedUser.role === 'Reviewer' || loggedUser.role === 'Admin'">
+        <a class="nav-link" routerLink="/dashboard/review-history" routerLinkActive="active">
+          <i class="bi bi-clock-history me-2"></i> Review History
         </a>
       </li>
 
