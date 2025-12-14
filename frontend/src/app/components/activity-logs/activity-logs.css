@@ -1,0 +1,9 @@
+
+.bg-success { background-color: #198754 !important; }
+.bg-info { background-color: #0dcaf0 !important; }
+.bg-warning { background-color: #ffc107 !important; }
+.bg-danger { background-color: #dc3545 !important; }
+
+.table-hover tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}

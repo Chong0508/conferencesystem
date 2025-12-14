@@ -1,0 +1,91 @@
+<div class="container mt-4 animate__animated animate__fadeIn">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="fw-bold text-dark mb-1">Paper Master List</h4>
+      <p class="text-muted small mb-0">Manage all submissions, statuses, and decisions.</p>
+    </div>
+
+    <select class="form-select w-auto shadow-sm" [(ngModel)]="statusFilter" (change)="applyFilter()">
+      <option value="All">All Statuses</option>
+      <option value="Pending Review">Pending Review</option>
+      <option value="Reviewed">Reviewed</option>
+      <option value="Accepted">Accepted</option>
+      <option value="Rejected">Rejected</option>
+      <option value="Registered">Registered</option>
+    </select>
+  </div>
+
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+
+  <div *ngIf="!isLoading && filteredPapers.length === 0" class="text-center py-5 bg-white rounded-4 shadow-sm">
+    <i class="bi bi-inbox display-1 text-muted opacity-25"></i>
+    <h5 class="mt-3 text-secondary">No Papers Found</h5>
+    <p class="text-muted small">Try changing the filter or wait for new submissions.</p>
+  </div>
+
+  <div *ngIf="!isLoading && filteredPapers.length > 0" class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="bg-light">
+        <tr>
+          <th class="ps-4 py-3">Paper Info</th>
+          <th class="py-3">Author</th>
+          <th class="py-3">Track</th>
+          <th class="py-3">Status</th>
+          <th class="text-end pe-4 py-3">Decision / Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let paper of filteredPapers">
+          <td class="ps-4">
+            <div class="fw-bold text-dark text-truncate" style="max-width: 200px;">{{ paper.title }}</div>
+            <small class="text-muted">ID: #{{ paper.trackId }}</small>
+          </td>
+
+          <td>
+            <div class="text-dark">{{ paper.authorName }}</div>
+            <small class="text-muted">{{ paper.authorEmail }}</small>
+          </td>
+
+          <td>
+            <span class="badge bg-light text-dark border fw-normal">Track {{ paper.trackId }}</span>
+          </td>
+
+          <td>
+                            <span class="badge rounded-pill border px-3 py-2" [ngClass]="getStatusClass(paper.status)">
+                                {{ paper.status }}
+                            </span>
+          </td>
+
+          <td class="text-end pe-4">
+            <div class="btn-group shadow-sm">
+              <button class="btn btn-sm btn-light border" (click)="viewDetails(paper.id)" title="View Details">
+                <i class="bi bi-eye text-primary"></i>
+              </button>
+
+              <button *ngIf="paper.status === 'Reviewed' || paper.status === 'Pending Review'"
+                      class="btn btn-sm btn-success text-white"
+                      (click)="acceptPaper(paper)" title="Accept Paper">
+                <i class="bi bi-check-lg"></i>
+              </button>
+
+              <button *ngIf="paper.status === 'Reviewed' || paper.status === 'Pending Review'"
+                      class="btn btn-sm btn-danger text-white"
+                      (click)="rejectPaper(paper)" title="Reject Paper">
+                <i class="bi bi-x-lg"></i>
+              </button>
+
+              <button class="btn btn-sm btn-light border" (click)="deletePaper(paper.id)" title="Delete">
+                <i class="bi bi-trash text-danger"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -9,23 +9,37 @@ import { delay } from 'rxjs/operators';
 export class AuthService {
 
   private baseUrl = 'http://localhost:8080/api/auth';
+  private userStorageKey = 'mock_db_users';
+  private logStorageKey = 'mock_activity_logs'; // 👈 新增：日志的存储 Key
 
   constructor(private http: HttpClient) { }
 
   // ==========================================================
-  // 1. REGISTER FUNCTION
+  // 1. 注册功能 (已连接日志)
   // ==========================================================
   register(userData: any): Observable<any> {
 
-    // MOCK SIMULATION
-    // Get existing users or empty array
-    const users = JSON.parse(localStorage.getItem('mock_db_users') || '[]');
+    const users = JSON.parse(localStorage.getItem(this.userStorageKey) || '[]');
 
-    // Add the new user (including their selected Role!)
+    const userExists = users.find((u: any) => u.email === userData.email);
+    if (userExists) {
+      return throwError(() => new Error('Email already exists!'));
+    }
+
+    userData.id = users.length + 1;
+    userData.joinDate = new Date().toISOString().split('T')[0];
+
     users.push(userData);
+    localStorage.setItem(this.userStorageKey, JSON.stringify(users));
 
-    // Save back to Local Storage
-    localStorage.setItem('mock_db_users', JSON.stringify(users));
+    // 👇👇👇【新增】记录真实日志 👇👇👇
+    this.logActivity(
+      userData.firstName + ' ' + userData.lastName, // User Name
+      userData.role,                                // Role
+      'Register',                                   // Action
+      'New account created',                        // Details
+      'success'                                     // Type
+    );
 
     return of({
       message: 'Registration successful',
@@ -35,39 +49,77 @@ export class AuthService {
 
 
   // ==========================================================
-  // 2. LOGIN FUNCTION
+  // 2. 登录功能 (已连接日志)
   // ==========================================================
   login(loginData: any): Observable<any> {
 
-    // MOCK SIMULATION
-    const users = JSON.parse(localStorage.getItem('mock_db_users') || '[]');
+    // 特殊后门：Admin 登录
+    if (loginData.email === 'admin@test.com' && loginData.password === '123') {
+      const adminUser = {
+        firstName: 'System', lastName: 'Admin', email: 'admin@test.com', role: 'Admin', avatarColor: 'dc3545'
+      };
 
-    // Find the user
+      // 👇👇👇【新增】记录 Admin 登录日志
+      this.logActivity('System Admin', 'Admin', 'Login', 'Admin login successful', 'warning');
+
+      return of({ token: 'admin-token', user: adminUser }).pipe(delay(500));
+    }
+
+    // 普通用户登录
+    const users = JSON.parse(localStorage.getItem(this.userStorageKey) || '[]');
     const foundUser = users.find((u: any) =>
       u.email === loginData.email && u.password === loginData.password
     );
 
     if (foundUser) {
-      // SUCCESS
       const response = {
         token: 'fake-jwt-token-123456',
         user: {
           firstName: foundUser.firstName,
           lastName: foundUser.lastName,
           email: foundUser.email,
-
-          // 👇👇👇 关键修改在这里！FIX IS HERE! 👇👇👇
-          // 以前这里写死是 'Author'，现在我们读取数据库里存的 role
           role: foundUser.role || 'Author',
-
-          // 如果是 Author 给绿色，如果是 Reviewer 给黄色
           avatarColor: foundUser.role === 'Reviewer' ? 'ffc107' : '11998e'
         }
       };
+
+      // 👇👇👇【新增】记录普通用户登录日志
+      this.logActivity(
+        foundUser.firstName + ' ' + foundUser.lastName,
+        foundUser.role || 'Author',
+        'Login',
+        'Login successful',
+        'success'
+      );
+
       return of(response).pipe(delay(800));
     } else {
-      // ERROR
       return throwError(() => new Error('Invalid email or password'));
     }
+  }
+
+  // ==========================================================
+  // 3. 【新功能】通用日志记录函数
+  // ==========================================================
+  private logActivity(user: string, role: string, action: string, details: string, type: string) {
+    // 1. 读取现有日志
+    const logs = JSON.parse(localStorage.getItem(this.logStorageKey) || '[]');
+
+    // 2. 创建新日志对象
+    const newLog = {
+      id: Date.now(), // 使用时间戳作为唯一 ID
+      user: user,
+      role: role,
+      action: action,
+      details: details,
+      type: type,
+      timestamp: new Date().toLocaleString() // 当前时间
+    };
+
+    // 3. 加到最前面 (最新的在上面)
+    logs.unshift(newLog);
+
+    // 4. 存回 Local Storage
+    localStorage.setItem(this.logStorageKey, JSON.stringify(logs));
   }
 }

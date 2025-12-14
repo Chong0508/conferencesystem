@@ -1,80 +1,111 @@
-/* --- Global Layout Configuration --- */
+/* 1. Dashboard 整体容器 */
 .dashboard-container {
   display: flex;
-  height: 100vh;
-  background-color: #f4f7f6; /* Very pale grey-green background, easy on the eyes */
-  padding: 1rem; /* Padding around the page to create the "floating" effect */
-  gap: 1rem;
-  overflow: hidden; /* Prevent double scrollbars */
+  min-height: 100vh;
+  background-color: #f8f9fa; /* 浅灰背景 */
 }
 
-/* --- Left Sidebar (Floating Style) --- */
+/* 2. Sidebar (侧边栏) 核心布局 */
 .sidebar {
   width: 260px;
+  height: 100vh; /* 占满全屏高度 */
   background: white;
-  border-radius: 20px; /* Large border radius for modern look */
+  padding: 20px;
+  position: fixed; /* 固定在左侧 */
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+
+  /* ✨ 关键 Flexbox 布局 ✨ */
   display: flex;
-  flex-direction: column;
-  padding: 1.5rem;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.05); /* Soft shadow */
-  height: calc(100vh - 2rem); /* Full height minus padding */
-  flex-shrink: 0; /* Prevent sidebar from shrinking when screen is small */
+  flex-direction: column; /* 垂直排列 */
 }
 
-/* Sidebar Header (Logo Area) */
+/* 3. Sidebar Header (Logo) */
 .sidebar-header {
+  flex-shrink: 0; /* 头部不可压缩 */
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding-bottom: 1.5rem;
+  gap: 12px;
+  padding-bottom: 20px;
   border-bottom: 1px solid #f0f0f0;
 }
 
 .brand-icon {
   font-size: 1.8rem;
-  color: #11998e; /* Theme Green */
+  color: #11998e;
 }
 
 .brand-text {
   font-weight: 800;
-  color: #333;
+  color: #2c3e50;
+  font-size: 1.25rem;
   margin: 0;
-  font-size: 1.2rem;
 }
 
-/* --- Navigation Links --- */
+/* 4. Navigation Menu (中间菜单) - 也就是你要滚动的区域 */
+.sidebar .nav {
+  flex-grow: 1;    /* ✨ 占据所有剩余空间 */
+  overflow-y: auto; /* ✨ 内容溢出时，只有这里会出现滚动条 */
+  margin-top: 1rem;
+  padding-right: 5px; /* 给滚动条留点位置 */
+  flex-wrap: nowrap; /* 防止换行 */
+}
+
+/* (可选) 美化滚动条 */
+.sidebar .nav::-webkit-scrollbar {
+  width: 5px;
+}
+.sidebar .nav::-webkit-scrollbar-thumb {
+  background-color: #e0e0e0;
+  border-radius: 10px;
+}
+
+/* 5. 菜单项样式 */
+.nav-item {
+  margin-bottom: 4px;
+}
+
 .nav-link {
   color: #6c757d;
-  font-weight: 600;
-  padding: 12px 15px;
-  border-radius: 15px; /* Pill shape */
-  transition: all 0.3s;
-  margin-bottom: 5px;
+  font-weight: 500;
+  padding: 10px 15px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
 }
 
 .nav-link:hover {
-  background-color: #e0f2f1; /* Light green on hover */
+  background-color: #f1fdfb;
   color: #11998e;
+  transform: translateX(3px);
 }
 
-/* Active State */
 .nav-link.active {
-  background: linear-gradient(to right, #11998e, #38ef7d); /* Green Gradient */
+  background: linear-gradient(45deg, #11998e, #38ef7d);
   color: white;
-  box-shadow: 0 5px 15px rgba(17, 153, 142, 0.3);
+  box-shadow: 0 4px 10px rgba(17, 153, 142, 0.3);
 }
 
-/* Logout Button */
+/* 6. Logout Button (底部区域) */
+.mt-auto {
+  margin-top: auto; /* Bootstrap 类，但在 Flex 容器里这个其实是辅助 */
+  flex-shrink: 0;   /* 底部不可压缩 */
+  padding-top: 15px;
+  border-top: 1px solid #f0f0f0;
+  background: white; /* 防止滚动内容透视 */
+}
+
 .btn-logout {
+  background-color: #fff5f5;
   color: #dc3545;
-  background-color: #fff0f1;
   border: none;
-  border-radius: 15px;
-  padding: 10px;
   font-weight: 600;
-  transition: all 0.3s;
+  padding: 12px;
+  border-radius: 8px;
+  transition: all 0.2s;
 }
 
 .btn-logout:hover {
@@ -82,41 +113,18 @@
   color: white;
 }
 
-/* --- Right Side: Main Content --- */
+/* 7. 右侧主内容区域 */
 .main-content {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden; /* Hide overflow to allow inner scrolling */
+  margin-left: 260px; /* 留出侧边栏宽度 */
+  width: calc(100% - 260px);
+  padding: 30px;
+  min-height: 100vh;
 }
 
-/* Top Navbar */
-.custom-navbar {
-  background: white;
-  border-radius: 20px;
-  padding: 10px 20px;
-}
-
+/* Avatar */
 .avatar {
   width: 40px;
   height: 40px;
-  border: 2px solid #38ef7d; /* Green border around avatar */
-}
-
-/* Content Wrapper (Where child pages load) */
-.content-wrapper {
-  flex-grow: 1;
-  overflow-y: auto; /* Enable vertical scrolling for content only */
-  padding-top: 1rem;
-  padding-bottom: 2rem;
-}
-
-/* Scrollbar Customization */
-.content-wrapper::-webkit-scrollbar {
-  width: 8px;
-}
-.content-wrapper::-webkit-scrollbar-thumb {
-  background-color: #ccc;
-  border-radius: 10px;
+  border: 2px solid white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }

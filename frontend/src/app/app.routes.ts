@@ -15,39 +15,57 @@ import { ConferenceRegistration } from './components/conference-registration/con
 // 3. Reviewer Features
 import { ReviewList } from './components/review-list/review-list';
 import { Grading } from './components/grading/grading';
-import { ReviewHistory } from './components/review-history/review-history'; // 👈 NEW Import
+import { ReviewHistory } from './components/review-history/review-history';
 
 // 4. Admin Features
 import { ConferenceList } from './components/conference-list/conference-list';
 import { CreateConference } from './components/create-conference/create-conference';
+import { ManageTracks } from './components/manage-tracks/manage-tracks';
+import { PaperMaster } from './components/paper-master/paper-master';
+
+// 5. User Management, Schedule & Activity Logs
+// Note: Ensure these file paths match your actual file names (e.g., if you used CLI, it might be .component)
+import { UserListComponent } from './components/user-list/user-list';
+import { ScheduleComponent } from './components/schedule/schedule';
+import { ActivityLogsComponent } from './components/activity-logs/activity-logs';
 
 export const routes: Routes = [
-  // Public Routes
+  // --- Public Routes ---
   { path: '', component: Landing },
   { path: 'login', component: Login },
   { path: 'register', component: Register },
 
-  // Dashboard Routes
+  // --- Dashboard Routes ---
   {
     path: 'dashboard',
     component: Dashboard,
     children: [
-      // --- Author Routes ---
+      // 1. Author Routes
       { path: 'submit-paper', component: SubmitPaper },
       { path: 'my-submissions', component: MySubmissions },
       { path: 'paper-details/:id', component: PaperDetails },
       { path: 'registration/:paperId', component: ConferenceRegistration },
 
-      // --- Reviewer Routes ---
-      { path: 'reviews', component: ReviewList },         // 待评审
-      { path: 'review/:id', component: Grading },         // 评分页面
-      { path: 'review-history', component: ReviewHistory }, // 👈 NEW: 历史记录
+      // 2. Reviewer Routes
+      { path: 'reviews', component: ReviewList },
+      { path: 'review/:id', component: Grading },
+      { path: 'review-history', component: ReviewHistory },
 
-      // --- Admin / Conference Routes ---
+      // 3. Admin / Conference Routes
       { path: 'conferences', component: ConferenceList },
-      { path: 'create-conference', component: CreateConference }
+      { path: 'create-conference', component: CreateConference },
+      { path: 'tracks', component: ManageTracks },
+      { path: 'all-papers', component: PaperMaster },
+
+      // 4. New Admin Features
+      { path: 'user-management', component: UserListComponent },
+      { path: 'schedule', component: ScheduleComponent },
+
+      // 👇 Added Activity Logs Route
+      { path: 'activity-logs', component: ActivityLogsComponent }
     ]
   },
 
+  // --- Fallback Route ---
   { path: '**', redirectTo: '' }
 ];

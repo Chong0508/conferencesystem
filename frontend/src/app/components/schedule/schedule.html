@@ -1,0 +1,124 @@
+<div class="container mt-4 animate__animated animate__fadeIn">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold text-secondary">Schedule & Sessions</h2>
+      <p class="text-muted small mb-0">Manage conference timeline and tracks.</p>
+    </div>
+    <button class="btn btn-primary-custom shadow-sm" (click)="toggleForm()">
+      <i class="bi" [ngClass]="showForm ? 'bi-x-lg' : 'bi-plus-lg'"></i>
+      {{ showForm ? 'Close Form' : 'Add Session' }}
+    </button>
+  </div>
+
+  <div *ngIf="showForm" class="card border-0 shadow-sm rounded-4 mb-4 bg-light">
+    <div class="card-body p-4">
+      <h5 class="fw-bold mb-3 text-primary">Add New Session</h5>
+      <form (ngSubmit)="addSession()">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label class="form-label small fw-bold">Day</label>
+            <select class="form-select" [(ngModel)]="newSession.day" name="day">
+              <option *ngFor="let d of days" [value]="d">{{ d }}</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small fw-bold">Start Time</label>
+            <input type="time" class="form-control" [(ngModel)]="newSession.timeStart" name="timeStart" required>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small fw-bold">End Time</label>
+            <input type="time" class="form-control" [(ngModel)]="newSession.timeEnd" name="timeEnd">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small fw-bold">Type</label>
+            <select class="form-select" [(ngModel)]="newSession.type" name="type">
+              <option>Keynote</option>
+              <option>Workshop</option>
+              <option>Panel</option>
+              <option>Break</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-bold">Title</label>
+            <input type="text" class="form-control" [(ngModel)]="newSession.title" name="title" placeholder="Session Title" required>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small fw-bold">Speaker</label>
+            <input type="text" class="form-control" [(ngModel)]="newSession.speaker" name="speaker" placeholder="Speaker Name">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small fw-bold">Venue</label>
+            <input type="text" class="form-control" [(ngModel)]="newSession.venue" name="venue" placeholder="Room/Hall">
+          </div>
+          <div class="col-12 text-end">
+            <button type="submit" class="btn btn-success text-white">Save Session</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <ul class="nav nav-pills mb-4 gap-2">
+    <li class="nav-item" *ngFor="let day of days">
+      <button class="nav-link rounded-pill px-4"
+              [class.active]="selectedDay === day"
+              [class.bg-white]="selectedDay !== day"
+              [class.text-dark]="selectedDay !== day"
+              [class.shadow-sm]="selectedDay !== day"
+              (click)="selectDay(day)">
+        {{ day }}
+      </button>
+    </li>
+  </ul>
+
+  <div class="row g-3">
+    <div class="col-12" *ngFor="let session of filteredSessions">
+      <div class="card border-0 shadow-sm rounded-4 hover-card">
+        <div class="card-body p-3">
+          <div class="row align-items-center">
+
+            <div class="col-md-2 border-end text-center">
+              <h5 class="mb-0 fw-bold text-dark">{{ session.timeStart }}</h5>
+              <small class="text-muted">{{ session.timeEnd }}</small>
+            </div>
+
+            <div class="col-md-8 ps-md-4 py-2 py-md-0">
+              <div class="d-flex align-items-center mb-1">
+                <span class="badge rounded-pill me-2"
+                      [ngClass]="{
+                    'bg-primary': session.type === 'Keynote',
+                    'bg-success': session.type === 'Workshop',
+                    'bg-warning text-dark': session.type === 'Panel',
+                    'bg-secondary': session.type === 'Break'
+                  }">
+                  {{ session.type }}
+                </span>
+                <span class="text-muted small"><i class="bi bi-geo-alt-fill me-1"></i>{{ session.venue }}</span>
+              </div>
+              <h5 class="fw-bold mb-1">{{ session.title }}</h5>
+              <p class="text-muted small mb-0" *ngIf="session.speaker !== '-'">
+                <i class="bi bi-person-fill me-1"></i> {{ session.speaker }}
+              </p>
+            </div>
+
+            <div class="col-md-2 text-end">
+              <button class="btn btn-outline-danger btn-sm rounded-circle" (click)="deleteSession(session.id)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12" *ngIf="filteredSessions.length === 0">
+      <div class="text-center py-5 text-muted">
+        <i class="bi bi-calendar-x fs-1 mb-2 d-block"></i>
+        No sessions scheduled for {{ selectedDay }}.
+      </div>
+    </div>
+  </div>
+
+</div>
