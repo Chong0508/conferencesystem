@@ -1,0 +1,117 @@
+/* --- Modern Card Container --- */
+.modern-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+/* --- Table Styling --- */
+.table-modern { margin-bottom: 0; }
+.table-modern thead th {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #edf2f7;
+  padding: 16px 24px;
+}
+.table-modern td {
+  padding: 16px 24px;
+  vertical-align: middle;
+  border-bottom: 1px solid #edf2f7;
+}
+.table-modern tbody tr:hover { background-color: #f8fbff; }
+
+/* --- Text Styles --- */
+.paper-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 4px;
+  display: block;
+}
+.track-badge {
+  background-color: #f3e8ff; /* Light Purple */
+  color: #805ad5;            /* Dark Purple */
+  font-weight: 600;
+  font-size: 0.7rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+.meta-text { font-size: 0.8rem; color: #a0aec0; font-family: monospace; }
+.author-name { font-weight: 600; color: #4a5568; font-size: 0.95rem; }
+.author-email { font-size: 0.8rem; color: #718096; }
+
+/* --- Avatars with Colorful Ring --- */
+.avatar-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #fff;
+  /* 给头像加一个彩色的阴影光圈 */
+  box-shadow: 0 0 0 2px #e2e8f0;
+}
+
+/* --- Status Badges (Vibrant Dots) --- */
+.badge-modern {
+  padding: 6px 12px;
+  border-radius: 30px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Status Colors */
+.status-pending { background-color: #fff8e1; color: #b7791f; } /* Orange/Yellow */
+.status-review { background-color: #e3f2fd; color: #1976d2; } /* Blue */
+.status-accepted { background-color: #e8f5e9; color: #2e7d32; } /* Green */
+.status-rejected { background-color: #ffebee; color: #c62828; } /* Red */
+
+/* --- Dropdown --- */
+.select-modern {
+  background-color: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  color: #4a5568;
+  cursor: pointer;
+}
+.select-modern:focus { border-color: #3182ce; outline: none; box-shadow: 0 0 0 3px rgba(49,130,206,0.1); }
+
+/* --- 🔥 COLORFUL ACTION BUTTONS (重点修改) --- */
+.action-btn {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px; /* Slightly squarer */
+  border: none;
+  transition: all 0.2s;
+  margin-left: 4px;
+  cursor: pointer;
+}
+
+/* 1. View Button (Blue) */
+.btn-view { background-color: #edf2f7; color: #4a5568; }
+.btn-view:hover { background-color: #e2e8f0; color: #2d3748; transform: translateY(-2px); }
+
+/* 2. Accept Button (Green) - 这是你要的青色 */
+.btn-accept { background-color: #def7ec; color: #046c4e; }
+.btn-accept:hover { background-color: #31c48d; color: #ffffff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(49, 196, 141, 0.4); }
+
+/* 3. Reject Button (Red) */
+.btn-reject { background-color: #fde8e8; color: #c81e1e; }
+.btn-reject:hover { background-color: #f05252; color: #ffffff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(240, 82, 82, 0.4); }
+
+/* 4. Delete Button (Gray/Red Hover) */
+.btn-delete { background-color: #fff; border: 1px solid #edf2f7; color: #a0aec0; }
+.btn-delete:hover { background-color: #fff5f5; border-color: #feb2b2; color: #e53e3e; transform: translateY(-2px); }

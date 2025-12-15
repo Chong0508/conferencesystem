@@ -16,6 +16,9 @@ export class PaperMaster implements OnInit {
   filteredPapers: any[] = [];
   isLoading: boolean = true;
 
+  // add and save reviewers
+  reviewers: any[] = [];
+
   // Filter
   statusFilter: string = 'All';
 
@@ -23,6 +26,7 @@ export class PaperMaster implements OnInit {
 
   ngOnInit() {
     this.loadPapers();
+    this.loadReviewers(); // load  Reviewer name list
   }
 
   loadPapers() {
@@ -32,6 +36,13 @@ export class PaperMaster implements OnInit {
       this.applyFilter();
       this.isLoading = false;
     }, 500);
+  }
+
+  // add and loading Reviewer
+  loadReviewers() {
+    const users = JSON.parse(localStorage.getItem('mock_db_users') || '[]');
+    // choosing role is Reviewer user
+    this.reviewers = users.filter((u: any) => u.role === 'Reviewer');
   }
 
   // Filter Logic
@@ -51,13 +62,32 @@ export class PaperMaster implements OnInit {
       case 'Revision': return 'bg-warning-subtle text-warning border-warning';
       case 'Reviewed': return 'bg-info-subtle text-info border-info';
       case 'Registered': return 'bg-success text-white';
+      case 'Under Review': return 'bg-primary-subtle text-primary border-primary'; // 新增一个状态颜色
       default: return 'bg-light text-secondary border-secondary';
     }
   }
 
   // --- Admin Actions ---
 
-  // 1. Accept Paper (This enables Registration for Author)
+  assignReviewer(paper: any) {
+
+
+
+    if (paper.status === 'Pending Review') {
+      paper.status = 'Under Review';
+    }
+
+    // save to Local Storage
+    localStorage.setItem('mock_papers', JSON.stringify(this.allPapers));
+
+
+    this.applyFilter();
+
+
+    // alert(`Reviewer assigned to paper: ${paper.title}`);
+  }
+
+  // 1. Accept Paper
   acceptPaper(paper: any) {
     if (confirm(`Are you sure you want to ACCEPT "${paper.title}"?`)) {
       this.updateStatus(paper.id, 'Accepted');
@@ -71,7 +101,7 @@ export class PaperMaster implements OnInit {
     }
   }
 
-  // 3. Delete Paper (Cleanup)
+  // 3. Delete Paper
   deletePaper(paperId: number) {
     if (confirm("⚠️ Warning: This will permanently delete the paper. Continue?")) {
       this.allPapers = this.allPapers.filter(p => p.id !== paperId);
@@ -80,9 +110,8 @@ export class PaperMaster implements OnInit {
     }
   }
 
-  // View Details (Reuse Author's detail page or Reviewer's)
+  // View Details
   viewDetails(paperId: number) {
-    // For Admin, we can reuse the Paper Details page
     this.router.navigate(['/dashboard/paper-details', paperId]);
   }
 
@@ -92,7 +121,7 @@ export class PaperMaster implements OnInit {
     if (index !== -1) {
       this.allPapers[index].status = newStatus;
       localStorage.setItem('mock_papers', JSON.stringify(this.allPapers));
-      this.applyFilter(); // Refresh list
+      this.applyFilter();
     }
   }
 }

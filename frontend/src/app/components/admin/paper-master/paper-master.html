@@ -1,88 +1,127 @@
 <div class="container mt-4 animate__animated animate__fadeIn">
 
-  <div class="d-flex justify-content-between align-items-center mb-4">
+  <div class="d-flex justify-content-between align-items-end mb-4">
     <div>
-      <h4 class="fw-bold text-dark mb-1">Paper Master List</h4>
-      <p class="text-muted small mb-0">Manage all submissions, statuses, and decisions.</p>
+      <h2 class="fw-bold text-dark mb-1">Paper Management</h2>
+      <p class="text-muted mb-0">Overview of all submissions and review assignments.</p>
     </div>
 
-    <select class="form-select w-auto shadow-sm" [(ngModel)]="statusFilter" (change)="applyFilter()">
-      <option value="All">All Statuses</option>
-      <option value="Pending Review">Pending Review</option>
-      <option value="Reviewed">Reviewed</option>
-      <option value="Accepted">Accepted</option>
-      <option value="Rejected">Rejected</option>
-      <option value="Registered">Registered</option>
-    </select>
+    <div class="d-flex align-items-center gap-2">
+      <span class="text-muted small fw-bold">FILTER:</span>
+      <select class="form-select border-0 shadow-sm bg-white text-secondary"
+              style="min-width: 180px; font-weight: 500;"
+              [(ngModel)]="statusFilter" (change)="applyFilter()">
+        <option value="All">All Statuses</option>
+        <option value="Pending Review">Pending Review</option>
+        <option value="Under Review">Under Review</option>
+        <option value="Reviewed">Reviewed</option>
+        <option value="Accepted">Accepted</option>
+        <option value="Rejected">Rejected</option>
+      </select>
+    </div>
   </div>
 
-  <div *ngIf="isLoading" class="text-center py-5">
-    <div class="spinner-border text-primary" role="status"></div>
+  <div *ngIf="!isLoading && filteredPapers.length === 0" class="text-center py-5 modern-card">
+    <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" alt="Empty" width="80" class="opacity-50 mb-3">
+    <h5 class="text-secondary fw-bold">No Papers Found</h5>
   </div>
 
-  <div *ngIf="!isLoading && filteredPapers.length === 0" class="text-center py-5 bg-white rounded-4 shadow-sm">
-    <i class="bi bi-inbox display-1 text-muted opacity-25"></i>
-    <h5 class="mt-3 text-secondary">No Papers Found</h5>
-    <p class="text-muted small">Try changing the filter or wait for new submissions.</p>
-  </div>
-
-  <div *ngIf="!isLoading && filteredPapers.length > 0" class="card border-0 shadow-sm rounded-4 overflow-hidden">
+  <div *ngIf="!isLoading && filteredPapers.length > 0" class="modern-card">
     <div class="table-responsive">
-      <table class="table table-hover align-middle mb-0">
-        <thead class="bg-light">
+      <table class="table table-modern">
+        <thead>
         <tr>
-          <th class="ps-4 py-3">Paper Info</th>
-          <th class="py-3">Author</th>
-          <th class="py-3">Track</th>
-          <th class="py-3">Status</th>
-          <th class="text-end pe-4 py-3">Decision / Actions</th>
+          <th class="ps-4">Paper Details</th>
+          <th>Author</th>
+          <th>Status</th>
+          <th>Reviewer</th>
+          <th class="text-end pe-4">Actions</th>
         </tr>
         </thead>
         <tbody>
         <tr *ngFor="let paper of filteredPapers">
+
           <td class="ps-4">
-            <div class="fw-bold text-dark text-truncate" style="max-width: 200px;">{{ paper.title }}</div>
-            <small class="text-muted">ID: #{{ paper.trackId }}</small>
+            <div class="d-flex flex-column">
+                <span class="paper-title text-truncate" style="max-width: 250px;" title="{{ paper.title }}">
+                  {{ paper.title }}
+                </span>
+              <div class="d-flex align-items-center gap-2">
+                <span class="track-badge">Track {{ paper.trackId }}</span>
+                <span class="meta-text">#{{ paper.id }}</span>
+              </div>
+            </div>
           </td>
 
           <td>
-            <div class="text-dark">{{ paper.authorName }}</div>
-            <small class="text-muted">{{ paper.authorEmail }}</small>
+            <div class="d-flex align-items-center">
+              <img [src]="'https://ui-avatars.com/api/?name=' + paper.authorName + '&background=random&color=fff&size=64'"
+                   class="avatar-circle me-3" alt="Avatar">
+              <div class="d-flex flex-column">
+                <span class="author-name">{{ paper.authorName }}</span>
+                <span class="author-email">{{ paper.authorEmail }}</span>
+              </div>
+            </div>
           </td>
 
           <td>
-            <span class="badge bg-light text-dark border fw-normal">Track {{ paper.trackId }}</span>
+              <span class="badge-modern"
+                    [ngClass]="{
+                  'status-pending': paper.status === 'Pending Review',
+                  'status-review': paper.status === 'Under Review' || paper.status === 'Reviewed',
+                  'status-accepted': paper.status === 'Accepted' || paper.status === 'Registered',
+                  'status-rejected': paper.status === 'Rejected'
+                }">
+                <i class="bi me-1"
+                   [ngClass]="{
+                     'bi-circle-fill': true,
+                     'small': true
+                   }"></i>
+                {{ paper.status }}
+              </span>
           </td>
 
           <td>
-                            <span class="badge rounded-pill border px-3 py-2" [ngClass]="getStatusClass(paper.status)">
-                                {{ paper.status }}
-                            </span>
+            <div class="d-flex flex-column" style="max-width: 200px;">
+              <select class="select-modern w-100"
+                      [(ngModel)]="paper.assignedReviewer"
+                      (change)="assignReviewer(paper)">
+                <option [ngValue]="undefined" disabled selected>Assign...</option>
+                <option *ngFor="let r of reviewers" [value]="r.email">
+                  {{ r.firstName }} {{ r.lastName }}
+                </option>
+              </select>
+              <div *ngIf="paper.assignedReviewer" class="mt-1 d-flex align-items-center text-success small fw-bold">
+                <i class="bi bi-check2 me-1"></i> Assigned
+              </div>
+            </div>
           </td>
 
           <td class="text-end pe-4">
-            <div class="btn-group shadow-sm">
-              <button class="btn btn-sm btn-light border" (click)="viewDetails(paper.id)" title="View Details">
-                <i class="bi bi-eye text-primary"></i>
+            <div class="d-flex justify-content-end align-items-center">
+
+              <button class="action-btn btn-view" (click)="viewDetails(paper.id)" title="View Details">
+                <i class="bi bi-eye-fill"></i>
               </button>
 
-              <button *ngIf="paper.status === 'Reviewed' || paper.status === 'Pending Review'"
-                      class="btn btn-sm btn-success text-white"
-                      (click)="acceptPaper(paper)" title="Accept Paper">
-                <i class="bi bi-check-lg"></i>
-              </button>
+              <ng-container *ngIf="['Pending Review', 'Under Review', 'Reviewed'].includes(paper.status)">
 
-              <button *ngIf="paper.status === 'Reviewed' || paper.status === 'Pending Review'"
-                      class="btn btn-sm btn-danger text-white"
-                      (click)="rejectPaper(paper)" title="Reject Paper">
-                <i class="bi bi-x-lg"></i>
-              </button>
+                <button class="action-btn btn-accept" (click)="acceptPaper(paper)" title="Accept">
+                  <i class="bi bi-check-lg fw-bold"></i>
+                </button>
 
-              <button class="btn btn-sm btn-light border" (click)="deletePaper(paper.id)" title="Delete">
-                <i class="bi bi-trash text-danger"></i>
+                <button class="action-btn btn-reject" (click)="rejectPaper(paper)" title="Reject">
+                  <i class="bi bi-x-lg fw-bold"></i>
+                </button>
+
+              </ng-container>
+
+              <button class="action-btn btn-delete" (click)="deletePaper(paper.id)" title="Delete">
+                <i class="bi bi-trash"></i>
               </button>
             </div>
           </td>
+
         </tr>
         </tbody>
       </table>
