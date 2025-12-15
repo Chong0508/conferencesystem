@@ -2,7 +2,7 @@
 .modern-card {
   background: #ffffff;
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03); /* 极柔和阴影 */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
   border: 1px solid rgba(0, 0, 0, 0.04);
   height: 100%;
   overflow: hidden;
@@ -11,7 +11,7 @@
 /* --- Left Side: Create Form (New Look) --- */
 .create-card {
   padding: 32px;
-  /* 顶部青色装饰线，呼应你的主题 */
+
   border-top: 4px solid #10b981;
 }
 

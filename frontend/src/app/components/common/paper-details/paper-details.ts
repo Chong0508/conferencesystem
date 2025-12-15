@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+// 👇 Import Services
+import { PaperService } from '../../../services/paper';
+import { ReviewService } from '../../../services/review';
 
 @Component({
   selector: 'app-paper-details',
@@ -12,44 +15,50 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class PaperDetails implements OnInit {
 
   paperId: any;
-  paper: any = null;   // To store paper metadata
-  review: any = null;  // To store reviewer's feedback
+  paper: any = null;
+  review: any = null;
   isLoading: boolean = true;
 
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private paperService: PaperService,
+    private reviewService: ReviewService
+  ) {}
 
   ngOnInit() {
-    // 1. Get the Paper ID from the URL (e.g., /dashboard/paper-details/123)
     this.paperId = this.route.snapshot.paramMap.get('id');
     this.loadData();
   }
 
   loadData() {
-    setTimeout(() => {
-      // 2. Fetch paper details from LocalStorage (Mock DB)
-      const allPapers = JSON.parse(localStorage.getItem('mock_papers') || '[]');
-      this.paper = allPapers.find((p: any) => p.id == this.paperId);
+    this.isLoading = true;
 
-      // 3. Fetch review data for this specific paper (if it exists)
-      const allReviews = JSON.parse(localStorage.getItem('mock_reviews') || '[]');
-      this.review = allReviews.find((r: any) => r.paperId == this.paperId);
+    // 1. Fetch paper details
+    this.paperService.getPaperById(this.paperId).subscribe((data: any) => {
+      this.paper = data;
 
-      this.isLoading = false;
-    }, 500);
+      // 2. Fetch reviews
+      this.reviewService.getReviewsByPaperId(this.paperId).subscribe((reviews: any[]) => {
+        // Take the first review found (or improve logic if multiple reviews)
+        this.review = reviews.length > 0 ? reviews[0] : null;
+        this.isLoading = false;
+      });
+    });
   }
 
-  // Navigate back to the list
   goBack() {
+    // Ideally check role to decide where to go back
     this.router.navigate(['/dashboard/my-submissions']);
   }
 
-  // Helper to get CSS class based on status
   getStatusClass(status: string): string {
     switch (status) {
       case 'Accepted': return 'bg-success text-white';
       case 'Rejected': return 'bg-danger text-white';
       case 'Reviewed': return 'bg-info text-white';
-      default: return 'bg-secondary text-white'; // Pending
+      case 'Registered': return 'bg-success text-white'; // Added
+      default: return 'bg-secondary text-white';
     }
   }
 }

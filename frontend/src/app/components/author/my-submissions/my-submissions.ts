@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router'; // Ensure RouterLink is imported
+import { Router, RouterLink } from '@angular/router';
+// 👇 Import Services
+import { PaperService } from '../../../services/paper';
+import { AuthService } from '../../../services/auth';
 
 @Component({
   selector: 'app-my-submissions',
@@ -14,40 +17,45 @@ export class MySubmissions implements OnInit {
   myPapers: any[] = [];
   isLoading: boolean = true;
 
-  // Inject Router for navigation
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private paperService: PaperService, // 👈 Inject PaperService
+    private authService: AuthService    // 👈 Inject AuthService
+  ) {}
 
   ngOnInit() {
     this.loadMyPapers();
   }
 
   loadMyPapers() {
-    // Simulate network delay
-    setTimeout(() => {
-      // 1. Get current logged-in user
-      const currentUser = JSON.parse(localStorage.getItem('loggedUser') || '{}');
+    this.isLoading = true;
 
-      // 2. Fetch all papers from mock database (LocalStorage)
-      const allPapers = JSON.parse(localStorage.getItem('mock_papers') || '[]');
+    // 1. Get current logged-in user from AuthService
+    const currentUser = this.authService.getLoggedUser();
+
+    // 2. Fetch all papers from Service
+    this.paperService.getAllPapers().subscribe((allPapers: any[]) => {
 
       // 3. Filter: Show only papers belonging to the current user
-      if (currentUser.email) {
+      if (currentUser && currentUser.email) {
         this.myPapers = allPapers.filter((p: any) => p.authorEmail === currentUser.email);
+      } else {
+        this.myPapers = [];
       }
 
       this.isLoading = false;
-    }, 500);
+    });
   }
 
   // Helper function to return CSS classes based on status
   getStatusClass(status: string): string {
     switch (status) {
-      case 'Accepted': return 'bg-success-subtle text-success border-success'; // Green
-      case 'Rejected': return 'bg-danger-subtle text-danger border-danger';   // Red
-      case 'Revision': return 'bg-warning-subtle text-warning border-warning'; // Yellow
-      case 'Reviewed': return 'bg-info-subtle text-info border-info';          // Blue
-      case 'Registered': return 'bg-success text-white border-0 shadow-sm';    // Solid Green (Paid)
-      default: return 'bg-light text-secondary border-secondary';              // Grey (Pending)
+      case 'Accepted': return 'bg-success-subtle text-success border-success';
+      case 'Rejected': return 'bg-danger-subtle text-danger border-danger';
+      case 'Revision': return 'bg-warning-subtle text-warning border-warning';
+      case 'Reviewed': return 'bg-info-subtle text-info border-info';
+      case 'Registered': return 'bg-success text-white border-0 shadow-sm';
+      default: return 'bg-light text-secondary border-secondary';
     }
   }
 
@@ -65,7 +73,6 @@ export class MySubmissions implements OnInit {
     const date = new Date().toLocaleDateString();
     const amount = '150.00';
 
-    // Show receipt in an alert (You can upgrade this to a modal later)
     alert(
       `🧾 OFFICIAL RECEIPT\n` +
       `--------------------------------\n` +

@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+// 👇 Import AuthService
+import { AuthService } from '../../../services/auth';
 
 interface ActivityLog {
   id: number;
@@ -25,26 +27,20 @@ export class ActivityLogsComponent implements OnInit {
   filteredLogs: ActivityLog[] = [];
   searchTerm: string = '';
 
-  // 必须和 AuthService 里的 logStorageKey 保持一致
-  private storageKey = 'mock_activity_logs';
-
-  constructor() { }
+  // 👇 Inject AuthService
+  constructor(private authService: AuthService) { }
 
   ngOnInit(): void {
     this.loadLogs();
   }
 
   loadLogs() {
-    const data = localStorage.getItem(this.storageKey);
-
-    if (data) {
-      this.logs = JSON.parse(data);
+    // 👇 Use Service to get logs
+    // Note: You need to ensure getActivityLogs() exists in AuthService
+    this.authService.getActivityLogs().subscribe(data => {
+      this.logs = data;
       this.filteredLogs = [...this.logs];
-    } else {
-      // 👇 只有这一句：如果没有数据，就是空数组。绝不生成假数据。
-      this.logs = [];
-      this.filteredLogs = [];
-    }
+    });
   }
 
   // Search Logic
@@ -60,9 +56,11 @@ export class ActivityLogsComponent implements OnInit {
   // Clear Logs
   clearLogs() {
     if(confirm('Are you sure you want to clear ALL activity logs? This cannot be undone.')) {
-      this.logs = [];
-      this.filteredLogs = [];
-      localStorage.removeItem(this.storageKey);
+      // 👇 Use Service to clear logs
+      this.authService.clearActivityLogs().subscribe(() => {
+        this.logs = [];
+        this.filteredLogs = [];
+      });
     }
   }
 }

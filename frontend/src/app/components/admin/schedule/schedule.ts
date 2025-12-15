@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+// 👇 Import ConferenceService (Assuming sessions are part of conference)
+import { ConferenceService } from '../../../services/conference';
 
-// 定义 Session 结构
+// Define Session Interface
 interface Session {
   id: number;
   timeStart: string; // e.g., "09:00"
@@ -19,21 +21,21 @@ interface Session {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './schedule.html',
-  styleUrls: ['./schedule.css'] // 确保有一个空的 CSS 文件
+  styleUrls: ['./schedule.css']
 })
 export class ScheduleComponent implements OnInit {
 
   sessions: Session[] = [];
   filteredSessions: Session[] = [];
 
-  // 当前选中的天 (默认 Day 1)
+  // Currently selected day (Default Day 1)
   selectedDay: string = 'Day 1';
   days: string[] = ['Day 1', 'Day 2', 'Day 3'];
 
-  // 控制 "Add Session" 表单的显示
+  // Control "Add Session" form visibility
   showForm: boolean = false;
 
-  // 新建 Session 的模型
+  // Model for new Session
   newSession: Session = {
     id: 0,
     day: 'Day 1',
@@ -45,72 +47,54 @@ export class ScheduleComponent implements OnInit {
     type: 'Keynote'
   };
 
-  private storageKey = 'mock_sessions';
-
-  constructor() { }
+  // 👇 Inject Service
+  constructor(private conferenceService: ConferenceService) { }
 
   ngOnInit(): void {
     this.loadSessions();
   }
 
-  // --- 读取数据 ---
+  // --- Load Data ---
   loadSessions() {
-    const data = localStorage.getItem(this.storageKey);
-    if (data) {
-      this.sessions = JSON.parse(data);
-    } else {
-      // 如果没有数据，初始化一些假数据
-      this.initializeDemoSessions();
-    }
-    this.filterByDay();
+    // 👇 Use Service to get sessions
+    // Note: Ensure getAllSessions() exists in ConferenceService
+    this.conferenceService.getAllSessions().subscribe((data: any[]) => {
+      this.sessions = data;
+      this.filterByDay();
+    });
   }
 
-  // --- 初始化 Demo 数据 ---
-  initializeDemoSessions() {
-    this.sessions = [
-      { id: 1, day: 'Day 1', timeStart: '08:00', timeEnd: '09:00', title: 'Registration & Breakfast', speaker: '-', venue: 'Main Hall', type: 'Break' },
-      { id: 2, day: 'Day 1', timeStart: '09:00', timeEnd: '10:30', title: 'Opening Keynote: The Future of AI', speaker: 'Dr. Sarah Connor', venue: 'Auditorium A', type: 'Keynote' },
-      { id: 3, day: 'Day 1', timeStart: '11:00', timeEnd: '12:30', title: 'Web Development Trends 2026', speaker: 'John Doe', venue: 'Room 101', type: 'Workshop' },
-      { id: 4, day: 'Day 2', timeStart: '09:00', timeEnd: '10:00', title: 'Cloud Computing Security', speaker: 'Alice Smith', venue: 'Room 202', type: 'Panel' },
-    ];
-    this.saveToStorage();
-  }
-
-  // --- 按天筛选 ---
+  // --- Filter by Day ---
   selectDay(day: string) {
     this.selectedDay = day;
     this.filterByDay();
   }
 
   filterByDay() {
-    // 简单的排序：按开始时间排序
+    // Simple sort: sort by start time
     this.filteredSessions = this.sessions
       .filter(s => s.day === this.selectedDay)
       .sort((a, b) => a.timeStart.localeCompare(b.timeStart));
   }
 
-  // --- 添加 Session ---
+  // --- Add Session ---
   toggleForm() {
     this.showForm = !this.showForm;
   }
 
   addSession() {
     if (this.newSession.title && this.newSession.timeStart) {
-      // 1. Assign ID
-      this.newSession.id = Date.now(); // 使用时间戳作为简单ID
 
-      // 2. Push to array
-      this.sessions.push({ ...this.newSession }); // 使用 spread operator 复制对象
+      // 👇 Use Service to add session
+      this.conferenceService.addSession(this.newSession).subscribe(() => {
+        this.loadSessions(); // Refresh list
 
-      // 3. Save & Refresh
-      this.saveToStorage();
-      this.filterByDay();
+        // Reset Form
+        this.showForm = false;
+        this.resetForm();
+        alert('Session added successfully!');
+      });
 
-      // 4. Reset Form
-      this.showForm = false;
-      this.resetForm();
-
-      alert('Session added successfully!');
     } else {
       alert('Please fill in Title and Start Time.');
     }
@@ -120,16 +104,13 @@ export class ScheduleComponent implements OnInit {
     this.newSession = { id: 0, day: this.selectedDay, timeStart: '', timeEnd: '', title: '', speaker: '', venue: '', type: 'Keynote' };
   }
 
-  // --- 删除 Session ---
+  // --- Delete Session ---
   deleteSession(id: number) {
     if (confirm('Delete this session?')) {
-      this.sessions = this.sessions.filter(s => s.id !== id);
-      this.saveToStorage();
-      this.filterByDay();
+      // 👇 Use Service to delete session
+      this.conferenceService.deleteSession(id).subscribe(() => {
+        this.loadSessions(); // Refresh list
+      });
     }
-  }
-
-  saveToStorage() {
-    localStorage.setItem(this.storageKey, JSON.stringify(this.sessions));
   }
 }

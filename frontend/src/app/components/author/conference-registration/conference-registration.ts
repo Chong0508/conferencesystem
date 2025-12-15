@@ -2,6 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+// 👇 Import Services
+import { PaperService } from '../../../services/paper';
+import { ConferenceService } from '../../../services/conference';
+import { AuthService } from '../../../services/auth';
 
 @Component({
   selector: 'app-conference-registration',
@@ -25,18 +29,24 @@ export class ConferenceRegistration implements OnInit {
   };
 
   // Fees
-  registrationFee: number = 150; // Standard fee
+  registrationFee: number = 150;
   isLoading: boolean = false;
 
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private paperService: PaperService,          // 👈 Inject PaperService
+    private conferenceService: ConferenceService,// 👈 Inject ConferenceService
+    private authService: AuthService             // 👈 Inject AuthService
+  ) {}
 
   ngOnInit() {
     this.paperId = this.route.snapshot.paramMap.get('paperId');
 
-    // Load User Data
-    const localUser = localStorage.getItem('loggedUser');
+    // Load User Data via AuthService
+    const localUser = this.authService.getLoggedUser();
     if (localUser) {
-      this.currentUser = JSON.parse(localUser);
+      this.currentUser = localUser;
       this.regForm.fullName = this.currentUser.firstName + ' ' + this.currentUser.lastName;
     }
 
@@ -44,9 +54,12 @@ export class ConferenceRegistration implements OnInit {
   }
 
   loadPaper() {
-    // Fetch paper to display details
-    const allPapers = JSON.parse(localStorage.getItem('mock_papers') || '[]');
-    this.paper = allPapers.find((p: any) => p.id == this.paperId);
+    // Fetch paper details via Service
+    if (this.paperId) {
+      this.paperService.getPaperById(this.paperId).subscribe((data: any) => {
+        this.paper = data;
+      });
+    }
   }
 
   // Handle Payment & Registration
@@ -58,35 +71,30 @@ export class ConferenceRegistration implements OnInit {
 
     this.isLoading = true;
 
-    // Simulate Processing
-    setTimeout(() => {
-      // 1. Save Registration Record
-      const newRegistration = {
-        id: Date.now(),
-        paperId: this.paperId,
-        userEmail: this.currentUser.email,
-        amount: this.registrationFee,
-        details: this.regForm,
-        date: new Date(),
-        status: 'Confirmed'
-      };
+    // 1. Prepare Registration Object
+    const newRegistration = {
+      paperId: this.paperId,
+      userEmail: this.currentUser.email,
+      amount: this.registrationFee,
+      details: this.regForm
+      // id, date, status will be handled by Service
+    };
 
-      const registrations = JSON.parse(localStorage.getItem('mock_registrations') || '[]');
-      registrations.push(newRegistration);
-      localStorage.setItem('mock_registrations', JSON.stringify(registrations));
+    // 2. Call ConferenceService to save registration
+    this.conferenceService.createRegistration(newRegistration).subscribe(() => {
 
-      // 2. Update Paper Status to 'Registered' (Optional, for UI feedback)
-      const allPapers = JSON.parse(localStorage.getItem('mock_papers') || '[]');
-      const paperIndex = allPapers.findIndex((p: any) => p.id == this.paperId);
-      if (paperIndex > -1) {
-        allPapers[paperIndex].status = 'Registered'; // Update status
-        localStorage.setItem('mock_papers', JSON.stringify(allPapers));
+      // 3. Update Paper Status to 'Registered' via PaperService
+      if (this.paper) {
+        this.paper.status = 'Registered';
+        this.paperService.updatePaper(this.paper).subscribe(() => {
+
+          this.isLoading = false;
+          alert("✅ Payment Successful! You are officially registered.");
+          this.router.navigate(['/dashboard/my-submissions']); // Go back
+
+        });
       }
-
-      this.isLoading = false;
-      alert("✅ Payment Successful! You are officially registered.");
-      this.router.navigate(['/dashboard/my-submissions']); // Go back
-    }, 2000);
+    });
   }
 
   goBack() {

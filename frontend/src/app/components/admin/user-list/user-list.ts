@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+// 👇 Import UserService
+import { UserService } from '../../../services/user';
 
-// 定义 Interface 匹配 Register 的数据结构
+// Define Interface matching Register data structure
 interface User {
   id?: number;
   firstName: string;
@@ -26,45 +28,38 @@ export class UserListComponent implements OnInit {
   searchTerm: string = '';
   selectedRole: string = 'All';
 
-  // 必须和 AuthService 里的 key 一样
-  private storageKey = 'mock_db_users';
-
-  constructor() { }
+  // 👇 Inject UserService
+  constructor(private userService: UserService) { }
 
   ngOnInit(): void {
-    this.loadUsersFromLocalStorage();
+    this.loadUsers();
   }
 
-  // --- 读取真实数据 ---
-  loadUsersFromLocalStorage() {
-    const storedUsers = localStorage.getItem(this.storageKey);
-
-    if (storedUsers) {
-      this.users = JSON.parse(storedUsers);
+  // --- Load Real Data ---
+  loadUsers() {
+    // 👇 Use Service to get users
+    this.userService.getAllUsers().subscribe(data => {
+      this.users = data;
       this.filteredUsers = [...this.users];
-    } else {
-      console.log('No registered users found.');
-      this.users = [];
-      this.filteredUsers = [];
-    }
+    });
   }
 
-  // --- 搜索 ---
+  // --- Search ---
   searchUsers() {
     this.applyFilters();
   }
 
-  // --- 筛选 ---
+  // --- Filter ---
   filterByRole() {
     this.applyFilters();
   }
 
-  // --- 核心筛选逻辑 ---
+  // --- Core Filter Logic ---
   applyFilters() {
     this.filteredUsers = this.users.filter(user => {
       const term = this.searchTerm.toLowerCase();
 
-      // 拼接全名进行搜索
+      // Concatenate full name for search
       const fullName = `${user.firstName || ''} ${user.lastName || ''}`.toLowerCase();
       const email = (user.email || '').toLowerCase();
 
@@ -75,26 +70,22 @@ export class UserListComponent implements OnInit {
     });
   }
 
-  // --- 删除用户 ---
+  // --- Delete User ---
   deleteUser(email: string) {
     if (confirm(`Are you sure you want to delete user: ${email}?`)) {
-      // 1. 从内存移除
-      this.users = this.users.filter(u => u.email !== email);
-
-      // 2. 更新 Local Storage (永久删除)
-      localStorage.setItem(this.storageKey, JSON.stringify(this.users));
-
-      // 3. 刷新页面
-      this.applyFilters();
+      // 👇 Use Service to delete user
+      this.userService.deleteUser(email).subscribe(() => {
+        this.loadUsers(); // Refresh list
+      });
     }
   }
 
-  // (可选) 这是一个方便调试的函数，如果你想清空所有用户
+  // (Optional) Debug function to clear all users
   clearAllUsers() {
     if(confirm('Warning: This will delete ALL users. Continue?')) {
-      localStorage.removeItem(this.storageKey);
-      this.users = [];
-      this.filteredUsers = [];
+      // Assuming you might add this method to UserService later
+      // this.userService.deleteAllUsers().subscribe(...)
+      alert('Function not implemented in service yet.');
     }
   }
 }

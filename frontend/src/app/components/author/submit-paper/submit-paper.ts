@@ -1,55 +1,49 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router'; // Removed RouterLink based on your previous check
+// 👇 Import Services
+import { ConferenceService } from '../../../services/conference';
+import { PaperService } from '../../../services/paper';
+import { AuthService } from '../../../services/auth';
 
 @Component({
   selector: 'app-submit-paper',
   standalone: true,
-  imports: [FormsModule, CommonModule, RouterLink],
+  imports: [FormsModule, CommonModule],
   templateUrl: './submit-paper.html',
   styleUrl: './submit-paper.css'
 })
 export class SubmitPaper implements OnInit {
 
-  // 1. Tracks are now loaded dynamically, not hardcoded here
   tracks: any[] = [];
 
   paperObj: any = {
     title: '',
     abstract: '',
-    trackId: '', // This will store the selected Track ID
+    trackId: '',
     keywords: '',
     fileName: ''
   };
 
   isLoading: boolean = false;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private conferenceService: ConferenceService, // 👈 Inject ConferenceService
+    private paperService: PaperService,           // 👈 Inject PaperService
+    private authService: AuthService              // 👈 Inject AuthService
+  ) {}
 
-  // 2. Load Tracks on initialization
   ngOnInit() {
     this.loadTracks();
   }
 
   loadTracks() {
-    const storedTracks = localStorage.getItem('mock_tracks');
-
-    if (storedTracks) {
-      // If tracks exist in DB (managed by Admin), use them
-      this.tracks = JSON.parse(storedTracks);
-    } else {
-      // Fallback: Initialize default tracks if DB is empty
-      this.tracks = [
-        { id: 1, name: 'Artificial Intelligence (AI) & Machine Learning' },
-        { id: 2, name: 'Software Engineering (SE) & Architecture' },
-        { id: 3, name: 'Cybersecurity & Network Defense' },
-        { id: 4, name: 'Internet of Things (IoT) & Smart Systems' },
-        { id: 5, name: 'Data Science & Big Data Analytics' }
-      ];
-      // Save these defaults to storage so Admin can see/edit them later
-      localStorage.setItem('mock_tracks', JSON.stringify(this.tracks));
-    }
+    // 👇 Use Service to get tracks
+    this.conferenceService.getAllTracks().subscribe((data: any[]) => {
+      this.tracks = data;
+    });
   }
 
   // Handle file selection
@@ -61,7 +55,6 @@ export class SubmitPaper implements OnInit {
         alert("File is too large! Max size is 10MB.");
         return;
       }
-      // We only store the name for this mockup
       this.paperObj.fileName = file.name;
     }
   }
@@ -76,33 +69,31 @@ export class SubmitPaper implements OnInit {
 
     this.isLoading = true;
 
-    // 2. Get Current User info
-    const currentUser = JSON.parse(localStorage.getItem('loggedUser') || '{}');
+    // 2. Get Current User info from AuthService
+    const currentUser = this.authService.getLoggedUser();
+
+    if (!currentUser) {
+      alert("Session expired. Please login again.");
+      this.router.navigate(['/login']);
+      return;
+    }
 
     // 3. Create the Paper Object
     const newPaper = {
-      id: Date.now(), // Generate a unique ID
       ...this.paperObj,
       authorEmail: currentUser.email,
       authorName: currentUser.firstName + ' ' + currentUser.lastName,
-      status: 'Pending Review', // Default status
-      submittedAt: new Date()
+      // 'id' and 'status' will be handled by the Service
     };
 
-    // 4. Save to LocalStorage (Mock Database)
-    const existingPapers = JSON.parse(localStorage.getItem('mock_papers') || '[]');
-    existingPapers.push(newPaper);
-    localStorage.setItem('mock_papers', JSON.stringify(existingPapers));
-
-    // 5. Simulate Network Delay & Success
-    setTimeout(() => {
+    // 4. Use Service to Submit Paper
+    this.paperService.createPaper(newPaper).subscribe(() => {
       this.isLoading = false;
       alert("🎉 Paper Submitted Successfully! \nStatus: Pending Review");
       this.resetForm();
-
-      // Optional: Navigate to 'My Submissions' after success
+      // Optional: Navigate to 'My Submissions'
       // this.router.navigate(['/dashboard/my-submissions']);
-    }, 1500);
+    });
   }
 
   // Reset the form

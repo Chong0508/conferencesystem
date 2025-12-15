@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
+// 👇 Import AuthService
+import { AuthService } from '../../../services/auth';
 
 @Component({
   selector: 'app-dashboard',
@@ -11,38 +13,39 @@ import { CommonModule } from '@angular/common';
 })
 export class Dashboard implements OnInit {
 
-  // 🔴 FIX: 默认不要写死成 Admin，防止权限泄露
   loggedUser: any = {
     firstName: 'Guest',
     lastName: '',
-    role: 'Guest', // 默认是访客，没有任何权限
+    role: 'Guest',
     avatarColor: 'cccccc'
   };
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService // 👈 Inject
+  ) {}
 
   ngOnInit() {
     this.loadUser();
   }
 
   loadUser() {
-    // 1. 从 LocalStorage 获取当前登录用户
-    const userJson = localStorage.getItem('loggedUser');
+    // 👇 Use Service instead of localStorage
+    const user = this.authService.getLoggedUser();
 
-    if (userJson) {
-      this.loggedUser = JSON.parse(userJson);
-      // 调试用：在 Console 打印当前身份，方便你检查
+    if (user) {
+      this.loggedUser = user;
       console.log('Current Dashboard User:', this.loggedUser.role);
     } else {
-      // 2. 如果没登录，踢回登录页
+      // If not logged in, redirect to log in
       this.router.navigate(['/login']);
     }
   }
 
   onLogout() {
-    // 清除登录信息
+    // 👇 Optional: You can add a logout method in AuthService too
     localStorage.removeItem('loggedUser');
-    // 跳转回 Landing Page 或 Login
+    localStorage.removeItem('token');
     this.router.navigate(['/login']);
   }
 }
