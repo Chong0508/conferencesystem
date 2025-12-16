@@ -1,145 +1,171 @@
 import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject, of } from 'rxjs';
-import { delay, tap } from 'rxjs/operators';
+import { Observable, of, BehaviorSubject } from 'rxjs';
 
-export interface Notification {
-  id: string;
+export interface AppNotification {
+  id: number;
+  recipientEmail: string;
   title: string;
   message: string;
-  type: 'success' | 'error' | 'warning' | 'info';
+  type: 'success' | 'info' | 'warning' | 'error';
   timestamp: Date;
   read: boolean;
+  link?: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class NotificationService {
-  private notifications: Notification[] = [];
-  private notificationsSubject = new BehaviorSubject<Notification[]>([]);
-  private unreadCountSubject = new BehaviorSubject<number>(0);
 
-  constructor() {
-    // Initialize with some sample notifications (optional)
-    this.addSampleNotifications();
+  private storageKey = 'mock_notifications';
+  private ADMIN_TARGET = 'Admin'; // Target string for all admins
+
+  // Real-time stream
+  public unreadCount$ = new BehaviorSubject<number>(0);
+
+  constructor() {}
+
+  // ==============================================================
+  // 1. Refresh Unread Count
+  // ==============================================================
+  refreshUnreadCount(currentUserEmail: string, currentUserRole: string) {
+    const notifications = this.loadFromStorage();
+    const count = notifications.filter(n => {
+      // If Admin, they see messages for 'Admin' target OR their email
+      const isMine = (currentUserRole === 'Admin')
+        ? (n.recipientEmail === this.ADMIN_TARGET || n.recipientEmail === currentUserEmail)
+        : (n.recipientEmail === currentUserEmail);
+      return isMine && !n.read;
+    }).length;
+
+    this.unreadCount$.next(count);
   }
 
-  // Request permission for browser notifications
-  requestPermission(): void {
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission().then(permission => {
-        console.log('Notification permission:', permission);
-      });
-    }
-  }
+  // ==============================================================
+  // 2. Get Notifications
+  // ==============================================================
+  getNotifications(currentUserEmail: string, currentUserRole: string): Observable<AppNotification[]> {
+    let allNotifications = this.loadFromStorage();
 
-  // Get all notifications as Observable
-  getNotifications(): Observable<Notification[]> {
-    return this.notificationsSubject.asObservable();
-  }
+    // Refresh count whenever we check the list
+    this.refreshUnreadCount(currentUserEmail, currentUserRole);
 
-  // Get unread count as Observable
-  getUnreadCount(): Observable<number> {
-    return this.unreadCountSubject.asObservable();
-  }
-
-  // Add a new notification
-  addNotification(notification: Omit<Notification, 'id' | 'timestamp' | 'read'>): void {
-    const newNotification: Notification = {
-      ...notification,
-      id: this.generateId(),
-      timestamp: new Date(),
-      read: false
-    };
-
-    this.notifications.unshift(newNotification); // Add to beginning
-    this.updateSubjects();
-
-    // Show browser notification if permission granted
-    this.showBrowserNotification(newNotification);
-  }
-
-  // Mark a notification as read
-  markAsRead(id: string): void {
-    const notification = this.notifications.find(n => n.id === id);
-    if (notification) {
-      notification.read = true;
-      this.updateSubjects();
-    }
-  }
-
-  // Mark all notifications as read
-  markAllAsRead(): void {
-    this.notifications.forEach(n => n.read = true);
-    this.updateSubjects();
-  }
-
-  // Clear all notifications
-  clearAll(): void {
-    this.notifications = [];
-    this.updateSubjects();
-  }
-
-  // Private helper methods
-  private generateId(): string {
-    return Math.random().toString(36).substring(2, 9);
-  }
-
-  private updateSubjects(): void {
-    this.notificationsSubject.next([...this.notifications]);
-    const unreadCount = this.notifications.filter(n => !n.read).length;
-    this.unreadCountSubject.next(unreadCount);
-  }
-
-  private showBrowserNotification(notification: Notification): void {
-    if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification(notification.title, {
-        body: notification.message,
-        icon: this.getNotificationIcon(notification.type),
-        tag: notification.id
-      });
-    }
-  }
-
-  private getNotificationIcon(type: string): string {
-    switch (type) {
-      case 'success': return 'assets/icons/success.png';
-      case 'warning': return 'assets/icons/warning.png';
-      case 'error': return 'assets/icons/error.png';
-      default: return 'assets/icons/info.png';
-    }
-  }
-
-  // Optional: Add some sample notifications for testing
-  private addSampleNotifications(): void {
-    const samples: Omit<Notification, 'id' | 'timestamp' | 'read'>[] = [
-      {
-        title: 'Welcome!',
-        message: 'Welcome to the conference management system',
-        type: 'info'
-      },
-      {
-        title: 'New Conference Available',
-        message: 'Tech Summit 2024 is now open for registration',
-        type: 'success'
-      },
-      {
-        title: 'Reminder',
-        message: 'Your conference registration expires in 3 days',
-        type: 'warning'
+    const myNotifications = allNotifications.filter(n => {
+      if (currentUserRole === 'Admin') {
+        return n.recipientEmail === this.ADMIN_TARGET || n.recipientEmail === currentUserEmail;
       }
-    ];
-
-    samples.forEach(sample => {
-      const notification: Notification = {
-        ...sample,
-        id: this.generateId(),
-        timestamp: new Date(Date.now() - Math.random() * 86400000), // Random time in last 24h
-        read: Math.random() > 0.5 // Random read status
-      };
-      this.notifications.push(notification);
+      return n.recipientEmail === currentUserEmail;
     });
 
-    this.updateSubjects();
+    return of(myNotifications.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()));
+  }
+
+  // ==============================================================
+  // 3. Generic Add (For Conference compatibility)
+  // ==============================================================
+  addNotification(config: { title: string, message: string, type: 'success' | 'info' | 'warning' | 'error', recipientEmail?: string }) {
+    this.send(
+      config.recipientEmail || this.ADMIN_TARGET,
+      config.title,
+      config.message,
+      config.type
+    );
+  }
+
+  // ==============================================================
+  // 4. Core Send Logic
+  // ==============================================================
+  private send(recipient: string, title: string, message: string, type: 'success' | 'info' | 'warning' | 'error', link: string = '') {
+    const notifications = this.loadFromStorage();
+
+    const newNote: AppNotification = {
+      id: Date.now(),
+      recipientEmail: recipient,
+      title: title,
+      message: message,
+      type: type,
+      timestamp: new Date(),
+      read: false,
+      link: link
+    };
+
+    notifications.push(newNote);
+    this.saveToStorage(notifications);
+
+    console.log(`✅ Notification stored for: ${recipient}`);
+  }
+
+  // ==============================================================
+  // 5. Triggers
+  // ==============================================================
+
+  // 🔥 This is the one Admin needs to see
+  notifyAdminNewSubmission(authorName: string, paperTitle: string) {
+    this.send(
+      this.ADMIN_TARGET, // Sends to 'Admin'
+      'New Paper Submitted',
+      `${authorName} has submitted a new paper: "${paperTitle}".`,
+      'info',
+      '/dashboard/all-papers'
+    );
+  }
+
+  notifyReviewerAssignment(reviewerEmail: string, paperTitle: string) {
+    this.send(reviewerEmail, 'New Assignment', `You have been assigned to review: "${paperTitle}".`, 'warning', '/dashboard/reviews');
+  }
+
+  notifyAdminReviewCompleted(reviewerName: string, paperTitle: string) {
+    this.send(this.ADMIN_TARGET, 'Review Completed', `${reviewerName} reviewed "${paperTitle}".`, 'success', '/dashboard/all-papers');
+  }
+
+  notifyAuthorApproval(authorEmail: string, paperTitle: string) {
+    this.send(authorEmail, '🎉 Paper Accepted!', `Your paper "${paperTitle}" has been ACCEPTED.`, 'success', '/dashboard/my-submissions');
+  }
+
+  notifyAuthorRejection(authorEmail: string, paperTitle: string) {
+    this.send(authorEmail, 'Paper Status Update', `Your paper "${paperTitle}" was rejected.`, 'error', '/dashboard/my-submissions');
+  }
+
+  notifyRegistrationSuccess(userEmail: string, conferenceTitle: string) {
+    this.send(userEmail, 'Registration Confirmed', `You registered for "${conferenceTitle}".`, 'success', '/dashboard/conference-list');
+  }
+
+  // ==============================================================
+  // 6. Helpers
+  // ==============================================================
+  markAsRead(id: number, currentUserEmail: string, currentUserRole: string) {
+    const notifications = this.loadFromStorage();
+    const target = notifications.find(n => n.id === id);
+    if (target) {
+      target.read = true;
+      this.saveToStorage(notifications);
+      this.refreshUnreadCount(currentUserEmail, currentUserRole);
+    }
+  }
+
+  markAllAsRead(currentUserEmail: string, currentUserRole: string) {
+    const notifications = this.loadFromStorage();
+    notifications.forEach(n => {
+      const isMine = (currentUserRole === 'Admin')
+        ? (n.recipientEmail === this.ADMIN_TARGET || n.recipientEmail === currentUserEmail)
+        : (n.recipientEmail === currentUserEmail);
+      if (isMine) n.read = true;
+    });
+    this.saveToStorage(notifications);
+    this.refreshUnreadCount(currentUserEmail, currentUserRole);
+  }
+
+  getUnreadCount(currentUserEmail: string, role: string): Observable<number> {
+    this.refreshUnreadCount(currentUserEmail, role);
+    return this.unreadCount$;
+  }
+
+  private loadFromStorage(): AppNotification[] {
+    const data = localStorage.getItem(this.storageKey);
+    return data ? JSON.parse(data) : [];
+  }
+
+  private saveToStorage(data: AppNotification[]) {
+    localStorage.setItem(this.storageKey, JSON.stringify(data));
   }
 }

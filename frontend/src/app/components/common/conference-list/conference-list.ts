@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth';
-import { ConferenceService } from '../../../services/conference';
+import { ConferenceService } from '../../../services/conference'; // ✅ Correct place for this
 
 @Component({
   selector: 'app-conference-list',
@@ -14,7 +14,7 @@ import { ConferenceService } from '../../../services/conference';
 export class ConferenceList implements OnInit {
 
   conferences: any[] = [];
-  currentUserRole: string = '';
+  currentUser: any = null;
 
   constructor(
     private conferenceService: ConferenceService,
@@ -23,73 +23,63 @@ export class ConferenceList implements OnInit {
   ) {}
 
   ngOnInit() {
-    const user = this.authService.getLoggedUser();
-    if (user) {
-      this.currentUserRole = user.role;
-    }
-
+    this.currentUser = this.authService.getLoggedUser();
     this.loadConferences();
   }
 
   loadConferences() {
+    // Fetch all conferences
     this.conferenceService.getAllConferences().subscribe(data => {
+      // Optional: If you want to filter like your teammate did (Active only)
+      // For now, we show all, but you can uncomment the filter below:
+
+      // this.conferences = data.filter(c => c.status === 'Ongoing' || c.status === 'Upcoming');
       this.conferences = data;
     });
   }
 
+  // --- Role Helpers ---
   isAuthor() {
-    return this.currentUserRole === 'Author';
-  }
-
-  isAdmin() {
-    return this.currentUserRole === 'Admin';
+    return this.currentUser?.role === 'Author';
   }
 
   isReviewer() {
-    return this.currentUserRole === 'Reviewer';
+    return this.currentUser?.role === 'Reviewer';
   }
 
-  viewConferenceDetails(conferenceId: number) {
-    this.router.navigate(['/conference-details', conferenceId]);
+  isAdmin() {
+    return this.currentUser?.role === 'Admin';
   }
 
-  joinConference(conferenceId: number) {
-    // Dapatkan user yang sedang log masuk
-    const user = this.authService.getLoggedUser();
+  // --- Actions ---
 
-    if (user) {
-      // Simpan data pendaftaran conference
+  // 1. Register (For Author)
+  joinConference(conference: any) {
+    if (!this.currentUser) return;
+
+    if (confirm(`Do you want to register for "${conference.title}"?`)) {
+
       const registrationData = {
-        conferenceId: conferenceId,
-        userId: user.id,
-        userEmail: user.email,
-        userName: user.name,
+        conferenceId: conference.id,
+        conferenceTitle: conference.title,
+        userId: this.currentUser.email,
+        userEmail: this.currentUser.email,
+        userName: this.currentUser.firstName + ' ' + this.currentUser.lastName,
         registrationDate: new Date(),
-        status: 'Registered'
+        status: 'Registered',
+        fee: 150
       };
 
-      // Panggil service untuk daftar
       this.conferenceService.createRegistration(registrationData).subscribe(response => {
         if (response.success) {
-          alert('Anda telah berjaya mendaftar untuk conference!');
-          // Optional: Refresh conference list untuk tunjuk status baru
-          this.loadConferences();
-        } else {
-          alert('Ralat berlaku semasa mendaftar. Sila cuba lagi.');
+          alert('✅ You have successfully registered!');
         }
       });
     }
   }
 
-  editConference(conferenceId: number) {
-    this.router.navigate(['/dashboard/edit-conference', conferenceId]);
-  }
-
-  deleteConference(conferenceId: number) {
-    if (confirm('Are you sure you want to delete this conference?')) {
-      this.conferenceService.deleteConference(conferenceId).subscribe(() => {
-        this.loadConferences();
-      });
-    }
+  // 2. Edit (For Admin)
+  editConference(id: number) {
+    this.router.navigate(['/dashboard/create-conference']);
   }
 }

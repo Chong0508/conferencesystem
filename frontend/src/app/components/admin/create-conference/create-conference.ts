@@ -13,11 +13,14 @@ import { ConferenceService } from '../../../services/conference';
 })
 export class CreateConference {
 
+  // Data model binding to the form
   newConference: any = {
     title: '',
+    description: '',
     date: '',
     venue: '',
-    description: ''
+    category: 'Computer Science', // Default value
+    status: 'Upcoming' // Default status
   };
 
   constructor(
@@ -26,13 +29,19 @@ export class CreateConference {
   ) {}
 
   createConference() {
-    if(this.newConference.title) {
-      // 👇 Use Service to create
-      // Note: Ensure createConference() exists in ConferenceService
-      this.conferenceService.createConference(this.newConference).subscribe(() => {
-        alert('Conference created successfully!');
-        this.router.navigate(['/dashboard/manage-conferences']);
-      });
+    // 1. Basic Validation
+    if (!this.newConference.title || !this.newConference.date || !this.newConference.venue) {
+      alert('Please fill in all required fields (Title, Date, Venue).');
+      return;
     }
+
+    // 2. Call Service to save data (This saves to LocalStorage)
+    // Once saved, Author/Reviewer will see it because they read from the same Service.
+    this.conferenceService.createConference(this.newConference).subscribe(() => {
+      alert('✅ Conference created successfully!');
+
+      // 3. Redirect to Admin Conference List
+      this.router.navigate(['/dashboard/conferences']);
+    });
   }
 }

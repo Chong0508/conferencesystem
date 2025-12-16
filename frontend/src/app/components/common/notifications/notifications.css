@@ -1,93 +1,53 @@
-.notifications-container {
-  width: 350px;
-  max-height: 400px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 5px 25px rgba(0,0,0,0.1);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+.container {
+  max-width: 900px;
 }
 
-.notifications-header {
+.icon-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 15px 20px;
-  border-bottom: 1px solid #e9ecef;
+  justify-content: center;
 }
 
-.notification-actions {
-  display: flex;
-  gap: 8px;
+/* Icon Box for each item */
+.icon-box {
+  width: 45px;
+  height: 45px;
 }
 
-.notifications-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 10px;
-}
+.bg-success-subtle { background-color: #d1e7dd !important; }
+.bg-warning-subtle { background-color: #fff3cd !important; }
+.bg-danger-subtle  { background-color: #f8d7da !important; }
+.bg-primary-subtle { background-color: #cfe2ff !important; }
 
+/* Item Styling */
 .notification-item {
-  display: flex;
-  padding: 12px;
-  border-bottom: 1px solid #f1f3f4;
+  border: none;
+  border-bottom: 1px solid #f0f0f0 !important;
+  transition: background-color 0.2s ease;
   cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .notification-item:hover {
-  background-color: #f8f9fa;
+  background-color: #fcfcfc;
 }
 
-.notification-item.unread {
-  background-color: rgba(17, 153, 142, 0.05);
-  border-left: 3px solid #11998e;
+/* Unread Styling */
+.unread-item {
+  background-color: #ffffff;
+  border-left: 4px solid #11998e !important; /* Green highlight */
 }
 
-.notification-icon {
-  margin-right: 15px;
-  font-size: 1.2rem;
+.bg-light {
+  background-color: #f8f9fa !important; /* Read items are greyed out slightly */
+  opacity: 0.8;
 }
 
-.notification-content {
-  flex: 1;
-}
-
-.notification-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 5px;
-}
-
-.notification-title {
-  margin: 0;
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
-.notification-time {
-  font-size: 0.75rem;
-  color: #6c757d;
-}
-
-.notification-message {
-  margin: 0;
-  font-size: 0.85rem;
-  color: #495057;
-  line-height: 1.4;
-}
-
-.no-notifications {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 30px;
-  color: #6c757d;
-}
-
-.display-4 {
-  font-size: 2.5rem;
+.unread-dot {
+  width: 10px;
+  height: 10px;
+  background-color: #11998e !important; /* Theme Color */
+  margin-top: 8px;
 }

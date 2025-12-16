@@ -1,39 +1,71 @@
-<!-- File: frontend/src/app/components/common/conference-list/conference-list.html -->
-<div class="conference-list-container">
-  <h2>Conference List</h2>
+<div class="conference-container animate__animated animate__fadeIn">
 
-  <!-- Papar ini jika Admin log masuk -->
-  <div *ngIf="isAdmin()" class="admin-actions">
-    <button class="btn btn-primary">Create New Conference</button>
+  <div class="header-section mb-4 d-flex justify-content-between align-items-end">
+    <div>
+      <h2 class="fw-bold text-dark">Active Conferences</h2>
+      <p class="text-muted mb-0">Browse and register for upcoming events.</p>
+    </div>
+
+    <button *ngIf="isAdmin()" class="btn btn-dark" (click)="editConference(0)">
+      <i class="bi bi-plus-lg me-1"></i> New Conference
+    </button>
   </div>
 
-  <!-- Senarai conference -->
-  <div class="conference-grid">
-    <div *ngFor="let conference of conferences" class="conference-card">
+  <div *ngIf="conferences.length === 0" class="text-center p-5 text-muted bg-white rounded shadow-sm border">
+    <h4>No conferences available yet.</h4>
+    <p>Please check back later.</p>
+  </div>
 
-      <!-- Butang untuk Author -->
-      <div *ngIf="isAuthor()" class="actions author-actions">
-        <button id="join-{{conference.id}}" name="join-{{conference.id}}" class="btn btn-success" (click)="joinConference(conference.id)">Join Conference</button>
+  <div class="d-flex flex-column gap-3">
+
+    <div *ngFor="let conf of conferences" class="card border-0 shadow-sm conference-card">
+      <div class="card-body p-4 d-flex flex-column flex-md-row justify-content-between align-items-center">
+
+        <div class="mb-3 mb-md-0 info-section">
+
+          <div class="mb-2">
+            <span class="badge bg-success-subtle text-success fw-bold px-3 py-2 rounded-pill">
+              <i class="bi bi-broadcast me-1"></i> Open for Registration
+            </span>
+          </div>
+
+          <h4 class="fw-bold text-dark mb-2">{{ conf.title }}</h4>
+          <p class="text-muted mb-3 description">{{ conf.description }}</p>
+
+          <div class="d-flex gap-4 text-secondary small fw-bold">
+            <span class="d-flex align-items-center">
+              <i class="bi bi-calendar-event me-2 text-primary"></i> {{ conf.date }}
+            </span>
+            <span class="d-flex align-items-center">
+              <i class="bi bi-geo-alt me-2 text-danger"></i> {{ conf.venue }}
+            </span>
+          </div>
+        </div>
+
+        <div class="action-area ms-md-4">
+
+          <button *ngIf="isAuthor()"
+                  class="btn custom-btn px-4 py-2 text-white w-100"
+                  (click)="joinConference(conf)">
+            <i class="bi bi-ticket-perforated-fill me-2"></i> Register
+          </button>
+
+          <button *ngIf="isReviewer()"
+                  class="btn btn-outline-secondary px-4 py-2 w-100"
+                  disabled>
+            <i class="bi bi-eye me-2"></i> View Only
+          </button>
+
+          <button *ngIf="isAdmin()"
+                  class="btn btn-warning px-4 py-2 w-100"
+                  (click)="editConference(conf.id)">
+            <i class="bi bi-pencil me-2"></i> Edit
+          </button>
+
+        </div>
+
       </div>
-
-      <!-- Butang untuk Admin -->
-      <div *ngIf="isAdmin()" class="actions admin-actions">
-        <button id="edit-{{conference.id}}" name="edit-{{conference.id}}" class="btn btn-warning" (click)="editConference(conference.id)">Edit</button>
-        <button id="delete-{{conference.id}}" name="delete-{{conference.id}}" class="btn btn-danger" (click)="deleteConference(conference.id)">Delete</button>
-      </div>
-
-      <!-- Paparan untuk Reviewer (tiada butang, hanya info) -->
-      <div *ngIf="isReviewer()" class="reviewer-info">
-        <span class="badge">Available for Review</span>
-      </div>
-
-      <div class="conference-details" (click)="viewConferenceDetails(conference.id)" style="cursor: pointer;">
-        <h3>{{ conference.name }}</h3>
-        <p><strong>Date:</strong> {{ conference.date }}</p>
-        <p><strong>Location:</strong> {{ conference.location }}</p>
-        <p>{{ conference.description }}</p>
-      </div>
-
     </div>
+
   </div>
 </div>

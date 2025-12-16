@@ -1,14 +1,20 @@
 <div class="container mt-4 mb-5 animate__animated animate__fadeIn">
 
   <button class="btn btn-link text-decoration-none text-muted mb-3 ps-0" (click)="cancel()">
-    <i class="bi bi-arrow-left me-1"></i> Back to List
+    <i class="bi bi-arrow-left me-1"></i> {{ isReadOnly ? 'Back to History' : 'Back to List' }}
   </button>
 
   <div class="row" *ngIf="paper">
+
     <div class="col-lg-5 mb-4">
       <div class="card border-0 shadow-sm rounded-4 h-100">
         <div class="card-body p-4">
-          <span class="badge bg-light text-dark border mb-3">Paper ID: {{ paper.id }}</span>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="badge bg-light text-dark border">Paper ID: {{ paper.id }}</span>
+            <span *ngIf="isReadOnly" class="badge bg-success">Reviewed</span>
+            <span *ngIf="!isReadOnly" class="badge bg-warning text-dark">Pending</span>
+          </div>
+
           <h4 class="fw-bold mb-3">{{ paper.title }}</h4>
 
           <h6 class="text-uppercase text-muted small fw-bold">Abstract</h6>
@@ -26,9 +32,12 @@
 
     <div class="col-lg-7">
       <div class="card border-0 shadow rounded-4">
-        <div class="card-header bg-white border-0 pt-4 px-4">
+
+        <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
           <h5 class="fw-bold text-primary mb-0">Evaluation Form</h5>
+          <span *ngIf="isReadOnly" class="badge bg-secondary">View Only Mode</span>
         </div>
+
         <div class="card-body p-4">
 
           <form (ngSubmit)="submitReview()">
@@ -38,25 +47,33 @@
             <div class="row g-3 mb-2 align-items-center">
               <label class="col-6 col-form-label">Originality</label>
               <div class="col-6">
-                <input type="number" class="form-control" [(ngModel)]="scoreCriteria.originality" name="orig" min="0" max="25">
+                <input type="number" class="form-control"
+                       [(ngModel)]="scoreCriteria.originality" name="orig"
+                       min="0" max="25" [disabled]="isReadOnly">
               </div>
             </div>
             <div class="row g-3 mb-2 align-items-center">
               <label class="col-6 col-form-label">Relevance</label>
               <div class="col-6">
-                <input type="number" class="form-control" [(ngModel)]="scoreCriteria.relevance" name="rel" min="0" max="25">
+                <input type="number" class="form-control"
+                       [(ngModel)]="scoreCriteria.relevance" name="rel"
+                       min="0" max="25" [disabled]="isReadOnly">
               </div>
             </div>
             <div class="row g-3 mb-2 align-items-center">
               <label class="col-6 col-form-label">Quality</label>
               <div class="col-6">
-                <input type="number" class="form-control" [(ngModel)]="scoreCriteria.quality" name="qual" min="0" max="25">
+                <input type="number" class="form-control"
+                       [(ngModel)]="scoreCriteria.quality" name="qual"
+                       min="0" max="25" [disabled]="isReadOnly">
               </div>
             </div>
             <div class="row g-3 mb-4 align-items-center">
               <label class="col-6 col-form-label">Presentation</label>
               <div class="col-6">
-                <input type="number" class="form-control" [(ngModel)]="scoreCriteria.presentation" name="pres" min="0" max="25">
+                <input type="number" class="form-control"
+                       [(ngModel)]="scoreCriteria.presentation" name="pres"
+                       min="0" max="25" [disabled]="isReadOnly">
               </div>
             </div>
 
@@ -67,7 +84,7 @@
 
             <div class="mb-4">
               <label class="form-label fw-bold">Recommendation</label>
-              <select class="form-select" [(ngModel)]="recommendation" name="recommendation">
+              <select class="form-select" [(ngModel)]="recommendation" name="recommendation" [disabled]="isReadOnly">
                 <option value="Accept">Accept</option>
                 <option value="Reject">Reject</option>
                 <option value="Revision">Major Revision</option>
@@ -76,12 +93,18 @@
 
             <div class="mb-4">
               <label class="form-label fw-bold">Comments to Author</label>
-              <textarea class="form-control" rows="4" [(ngModel)]="comments" name="comments" placeholder="Write your feedback here..."></textarea>
+              <textarea class="form-control" rows="4"
+                        [(ngModel)]="comments" name="comments"
+                        placeholder="Write your feedback here..." [disabled]="isReadOnly"></textarea>
             </div>
 
-            <div class="d-grid">
-              <button type="submit" class="btn btn-primary py-3 fw-bold shadow-sm">
+            <div class="d-grid gap-2">
+              <button *ngIf="!isReadOnly" type="submit" class="btn btn-primary py-3 fw-bold shadow-sm">
                 Submit Review
+              </button>
+
+              <button type="button" class="btn btn-light py-2 text-muted" (click)="cancel()">
+                {{ isReadOnly ? 'Close' : 'Cancel' }}
               </button>
             </div>
 

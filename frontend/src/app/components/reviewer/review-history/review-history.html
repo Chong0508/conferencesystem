@@ -2,65 +2,70 @@
 
   <div class="mb-4">
     <h4 class="fw-bold text-dark mb-1">Review History</h4>
-    <p class="text-muted small mb-0">List of papers you have evaluated.</p>
+    <p class="text-muted small mb-0">A log of all papers you have evaluated.</p>
   </div>
 
   <div *ngIf="isLoading" class="text-center py-5">
-    <div class="spinner-border text-warning" role="status"></div>
+    <div class="spinner-border text-primary" role="status"></div>
   </div>
 
-  <div *ngIf="!isLoading && historyList.length === 0" class="text-center py-5 bg-white rounded-4 shadow-sm">
-    <i class="bi bi-clipboard-x display-1 text-muted opacity-25"></i>
-    <h5 class="mt-3 text-secondary">No History Yet</h5>
-    <p class="text-muted small">You haven't graded any papers yet.</p>
-    <button class="btn btn-warning text-white" routerLink="/dashboard/reviews">
-      Go to Pending Reviews
+  <div *ngIf="!isLoading && historyList.length === 0" class="text-center py-5 bg-white rounded-4 shadow-sm border">
+    <div class="mb-3">
+      <i class="bi bi-journal-x" style="font-size: 3rem; color: #ccc;"></i>
+    </div>
+    <h5 class="text-secondary fw-bold">No History Found</h5>
+    <p class="text-muted small">You haven't completed any reviews yet.</p>
+    <button class="btn btn-primary px-4 mt-2" routerLink="/dashboard/reviews">
+      View Pending Reviews
     </button>
   </div>
 
-  <div *ngIf="!isLoading && historyList.length > 0" class="card border-0 shadow-sm rounded-4 overflow-hidden">
+  <div *ngIf="!isLoading && historyList.length > 0" class="card border-0 shadow-sm rounded-4">
     <div class="table-responsive">
-      <table class="table table-hover align-middle mb-0">
-        <thead class="bg-light">
+      <table class="table align-middle mb-0">
+        <thead>
         <tr>
           <th class="py-3 ps-4">Paper Title</th>
           <th class="py-3">Date Reviewed</th>
-          <th class="py-3">Score</th>
-          <th class="py-3">Recommendation</th>
-          <th class="py-3 text-end pe-4">Action</th>
+          <th class="py-3 text-center">Score</th>
+          <th class="py-3 text-center">Verdict</th>
+          <th class="py-3 text-end pe-4">Details</th>
         </tr>
         </thead>
         <tbody>
         <tr *ngFor="let item of historyList">
+
           <td class="ps-4">
-            <div class="fw-bold text-dark">{{ item.paperTitle }}</div>
-            <small class="text-muted">Paper ID: {{ item.paperId }}</small>
+            <div class="fw-bold text-dark mb-1">{{ item.paperTitle }}</div>
+            <span class="badge bg-light text-secondary border">ID: {{ item.paperId }}</span>
           </td>
 
           <td class="text-muted small">
+            <i class="bi bi-calendar3 me-2"></i>
             {{ item.date | date:'mediumDate' }}
           </td>
 
-          <td>
-                            <span class="fs-5" [ngClass]="getScoreColor(item.score)">
-                                {{ item.score }}
-                            </span>
+          <td class="text-center">
+            <span class="fs-6 fw-bold" [ngClass]="getScoreColor(item.score)">
+               {{ item.score }}
+            </span>
             <span class="text-muted small">/100</span>
           </td>
 
-          <td>
-                            <span class="badge rounded-pill border px-3 py-2"
-                                  [ngClass]="{'bg-success-subtle text-success border-success': item.recommendation === 'Accept',
-                                              'bg-danger-subtle text-danger border-danger': item.recommendation === 'Reject'}">
-                                {{ item.recommendation }}
-                            </span>
+          <td class="text-center">
+            <span class="badge rounded-pill border px-3 py-2"
+                  [ngClass]="{'bg-success-subtle text-success border-success': item.recommendation === 'Accept',
+                              'bg-danger-subtle text-danger border-danger': item.recommendation === 'Reject'}">
+              {{ item.recommendation }}
+            </span>
           </td>
 
           <td class="text-end pe-4">
-            <button class="btn btn-sm btn-light border text-primary" (click)="viewReview(item.paperId)">
-              <i class="bi bi-eye me-1"></i> View
+            <button class="btn btn-sm btn-light rounded-pill px-3" (click)="viewReview(item.paperId)">
+              View <i class="bi bi-arrow-right ms-1"></i>
             </button>
           </td>
+
         </tr>
         </tbody>
       </table>

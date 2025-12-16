@@ -1,129 +1,71 @@
-.conference-list-container {
-  padding: 20px;
-  max-width: 1200px;
+/* Layout Container */
+.conference-container {
+  max-width: 1000px;
   margin: 0 auto;
-}
-
-.conference-list-container h2 {
-  margin-bottom: 30px;
-  color: #333;
-  font-weight: bold;
-}
-
-.admin-actions {
-  margin-bottom: 20px;
-}
-
-.conference-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
-}
-
-.conference-card {
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   padding: 20px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border: 1px solid #e0e0e0;
+}
+
+/* Card Styling */
+.conference-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 12px !important;
+  background-color: #fff;
+  border: 1px solid #f0f0f0;
 }
 
 .conference-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08) !important;
+  border-color: #e0e0e0;
 }
 
-.actions {
-  margin-bottom: 15px;
-  display: flex;
-  gap: 10px;
+/* Info Section Width */
+.info-section {
+  max-width: 70%;
 }
 
-.author-actions .btn-success {
-  background-color: #28a745;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: 500;
+@media (max-width: 768px) {
+  .info-section {
+    max-width: 100%;
+  }
 }
 
-.author-actions .btn-success:hover {
-  background-color: #218838;
+/* Description Text Truncation */
+.description {
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Limit to 2 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 0.95rem;
+  color: #6c757d;
 }
 
-.admin-actions .btn-warning {
-  background-color: #ffc107;
-  color: #212529;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: 500;
-}
-
-.admin-actions .btn-warning:hover {
-  background-color: #e0a800;
-}
-
-.admin-actions .btn-danger {
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: 500;
-}
-
-.admin-actions .btn-danger:hover {
-  background-color: #c82333;
-}
-
-.reviewer-info {
-  margin-bottom: 15px;
-}
-
-.reviewer-info .badge {
-  background-color: #6c757d;
-  color: white;
-  padding: 5px 10px;
-  border-radius: 15px;
-  font-size: 0.85rem;
-}
-
-.conference-details {
-  cursor: pointer;
-}
-
-.conference-details h3 {
-  margin: 0 0 10px 0;
-  color: #333;
-  font-size: 1.2rem;
-}
-
-.conference-details p {
-  margin: 5px 0;
-  color: #666;
-  line-height: 1.5;
-}
-
-.conference-details strong {
-  color: #333;
-}
-
-.btn-primary {
+/* Custom Green Button (The one you liked) */
+.custom-btn {
   background-color: #11998e;
-  color: white;
   border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: 500;
+  font-weight: 600;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  white-space: nowrap; /* Prevent text wrapping */
 }
 
-.btn-primary:hover {
-  background-color: #0e8278;
+.custom-btn:hover {
+  background-color: #0d8a80;
+  box-shadow: 0 4px 12px rgba(17, 153, 142, 0.4);
+  transform: translateY(-1px);
+}
+
+/* Badge Styling */
+.badge.bg-success-subtle {
+  background-color: #d1e7dd !important;
+  color: #0f5132 !important;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+h4 {
+  font-size: 1.25rem;
+  letter-spacing: -0.5px;
 }

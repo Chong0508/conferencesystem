@@ -1,0 +1,81 @@
+/* Container */
+.container {
+  max-width: 1100px;
+}
+
+/* Card Styling */
+.card {
+  background: white;
+  border-radius: 16px !important;
+  overflow: hidden; /* To ensure child table radius works */
+}
+
+/* Table Styling */
+.table {
+  margin-bottom: 0;
+}
+
+.table thead th {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #eee;
+}
+
+.table tbody td {
+  padding-top: 1.2rem;
+  padding-bottom: 1.2rem;
+  vertical-align: middle;
+  border-bottom: 1px solid #f9f9f9;
+  transition: background-color 0.2s;
+}
+
+.table tbody tr:hover td {
+  background-color: #fcfcfc;
+}
+
+/* Score Styling */
+.text-success { color: #11998e !important; }
+.text-warning { color: #ffc107 !important; }
+.text-danger  { color: #dc3545 !important; }
+
+/* Badge Styling (Accept/Reject) */
+.badge.bg-success-subtle {
+  background-color: #d1e7dd !important;
+  color: #0f5132 !important;
+}
+
+.badge.bg-danger-subtle {
+  background-color: #f8d7da !important;
+  color: #842029 !important;
+}
+
+/* Button Styling */
+.btn-light {
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  color: #555;
+  transition: all 0.2s;
+}
+
+.btn-light:hover {
+  background-color: #11998e;
+  border-color: #11998e;
+  color: white !important; /* Force white text on hover */
+}
+
+.btn-light:hover i {
+  color: white; /* Ensure icon turns white */
+}
+
+.btn-light.text-primary {
+  color: #11998e !important; /* Use theme color instead of bootstrap blue */
+}
+
+/* Empty State */
+.display-1 {
+  font-size: 4rem;
+}

@@ -3,12 +3,13 @@
   display: flex;
   min-height: 100vh;
   background-color: #f8f9fa;
+  overflow: hidden; /* Prevent double scrollbars on body */
 }
 
-/* 2. Sidebar */
+/* 2. Sidebar - Fixed to the left */
 .sidebar {
   width: 260px;
-  height: 100vh;
+  height: 100vh; /* Full height */
   background: white;
   padding: 20px;
   position: fixed;
@@ -17,7 +18,7 @@
   z-index: 1000;
   box-shadow: 2px 0 10px rgba(0,0,0,0.05);
   display: flex;
-  flex-direction: column;
+  flex-direction: column; /* 🔴 Mandatory: Stack Header, Nav, and Footer vertically */
 }
 
 /* 3. Sidebar Header */
@@ -27,6 +28,7 @@
   gap: 12px;
   padding-bottom: 20px;
   border-bottom: 1px solid #f0f0f0;
+  flex-shrink: 0; /* Prevent header from shrinking when scrolling */
 }
 
 .brand-icon {
@@ -41,16 +43,42 @@
   margin: 0;
 }
 
-/* 4. Navigation */
+/* 4. Navigation List (The scrollable part) */
 .sidebar .nav {
-  flex-grow: 1;
-  overflow-y: auto;
+  flex-grow: 1; /* Takes up remaining space */
+
+  /* 🔴 FIX: Scroll Logic */
+  overflow-y: auto;   /* Allow scroll UP/DOWN */
+  overflow-x: hidden; /* Block scroll LEFT/RIGHT */
+
+  /* 🔴 FIX: Layout Logic */
+  display: flex;
+  flex-direction: column; /* Force vertical stacking */
+  flex-wrap: nowrap;      /* Prevent side-by-side wrapping */
+
   margin-top: 1rem;
-  padding-right: 5px;
+  padding-right: 5px; /* Space for scrollbar */
+}
+
+/* Custom Scrollbar Styling (Optional but looks nice) */
+.sidebar .nav::-webkit-scrollbar {
+  width: 5px;
+}
+.sidebar .nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar .nav::-webkit-scrollbar-thumb {
+  background: #eee;
+  border-radius: 10px;
+}
+.sidebar .nav::-webkit-scrollbar-thumb:hover {
+  background: #ccc;
 }
 
 .nav-item {
   margin-bottom: 4px;
+  width: 100%; /* Ensure full width */
+  display: block; /* Force block behavior */
 }
 
 .nav-link {
@@ -61,6 +89,7 @@
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
+  white-space: nowrap; /* Prevent text from breaking lines */
 }
 
 .nav-link:hover {
@@ -75,12 +104,14 @@
   box-shadow: 0 4px 10px rgba(17, 153, 142, 0.3);
 }
 
-/* 5. Main Content */
+/* 5. Main Content (Right Side) */
 .main-content {
-  margin-left: 260px;
+  margin-left: 260px; /* Pushes content to the right of fixed sidebar */
   width: calc(100% - 260px);
   padding: 30px;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 /* 6. Navbar */
@@ -89,6 +120,9 @@
   border-radius: 12px;
   padding: 15px 20px;
   margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .navbar-brand {
@@ -102,11 +136,16 @@
   background: white;
   border-radius: 12px;
   padding: 20px;
-  min-height: calc(100vh - 180px);
+  flex-grow: 1;
   box-shadow: 0 4px 20px rgba(0,0,0,0.05);
 }
 
-/* 8. Logout Button */
+/* 8. Logout Button area */
+.mt-auto {
+  margin-top: auto !important; /* Pushes button to bottom */
+  flex-shrink: 0; /* Prevent shrinking */
+}
+
 .btn-logout {
   background-color: #fff5f5;
   color: #dc3545;
@@ -115,6 +154,7 @@
   padding: 12px;
   border-radius: 8px;
   transition: all 0.2s ease;
+  width: 100%;
 }
 
 .btn-logout:hover {
@@ -126,72 +166,32 @@
 .avatar {
   width: 40px;
   height: 40px;
+  border-radius: 50%;
   border: 2px solid white;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 /* 10. Animation */
 .animate__animated {
-  animation-duration: 1s;
+  animation-duration: 0.8s;
   animation-fill-mode: both;
 }
 
-.animate__fadeInLeft {
-  animation-name: fadeInLeft;
-}
-
-.animate__fadeInDown {
-  animation-name: fadeInDown;
-}
-
-.animate__fadeIn {
-  animation-name: fadeIn;
-}
+.animate__fadeInLeft { animation-name: fadeInLeft; }
+.animate__fadeInDown { animation-name: fadeInDown; }
+.animate__fadeIn { animation-name: fadeIn; }
 
 @keyframes fadeInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes fadeInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* 11. Responsive */
-@media (max-width: 768px) {
-  .sidebar {
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-  }
-
-  .sidebar.open {
-    transform: translateX(0);
-  }
-
-  .main-content {
-    margin-left: 0;
-    width: 100%;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

@@ -1,17 +1,20 @@
-// File: frontend/src/app/services/conference.ts
+// File: src/app/services/conference.ts
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { delay, map } from 'rxjs/operators';
+// 👇 Ensure this path is correct
 import { NotificationService } from './notification';
 
 // Define interfaces for type safety
 export interface Conference {
   id: number | string;
-  name: string;
+  name: string;      // Note: Some components might use 'title', mapping might be needed
+  title?: string;    // Added 'title' to be safe since Admin page uses it
   date?: string;
-  location?: string;
+  location?: string; // Note: Admin page uses 'venue'
+  venue?: string;    // Added 'venue'
   description?: string;
-  status?: string; // Added status property
+  status?: string;
 }
 
 export interface Track {
@@ -27,7 +30,6 @@ export interface Session {
   conference: string;
   date: string;
   time: string;
-  // Additional properties that might be used in components
   title?: string;
   trackId?: string;
   speakerId?: string;
@@ -35,7 +37,7 @@ export interface Session {
 }
 
 export interface Registration {
-  id?: number | string; // Made id optional since it's generated in the service
+  id?: number | string;
   conferenceId: number | string;
   userId?: number | string;
   userEmail?: string;
@@ -81,9 +83,9 @@ export class ConferenceService {
     tracks.push(newTrack);
     this.saveDataToStorage(this.trackStorageKey, tracks);
 
-    // Add notification
+    // Add generic system notification
     this.notificationService.addNotification({
-      title: 'Success',
+      title: 'Track Added',
       message: `Track "${trackName}" added successfully`,
       type: 'success'
     });
@@ -98,16 +100,14 @@ export class ConferenceService {
       tracks[index] = updatedTrack;
       this.saveDataToStorage(this.trackStorageKey, tracks);
 
-      // Add notification
       this.notificationService.addNotification({
-        title: 'Success',
+        title: 'Track Updated',
         message: `Track "${updatedTrack.name}" updated successfully`,
         type: 'success'
       });
 
       return of(updatedTrack).pipe(delay(300));
     }
-    // Return a default track instead of null to match the expected return type
     return of({ id: -1, name: 'Not Found' }).pipe(delay(300));
   }
 
@@ -117,9 +117,8 @@ export class ConferenceService {
     tracks = tracks.filter((t: Track) => t.id !== id);
     this.saveDataToStorage(this.trackStorageKey, tracks);
 
-    // Add notification
     this.notificationService.addNotification({
-      title: 'Success',
+      title: 'Track Deleted',
       message: `Track "${trackName}" deleted successfully`,
       type: 'success'
     });
@@ -132,10 +131,31 @@ export class ConferenceService {
   // ==========================================
   getAllConferences(): Observable<Conference[]> {
     const data = localStorage.getItem(this.confStorageKey);
+
+    // Default Data
     let conferences = data ? JSON.parse(data) : [
-      { id: 1, name: 'G5Conf 2024', date: '2024-12-20', location: 'Kuala Lumpur', description: 'Annual conference for the G5 project.', status: 'Upcoming' },
-      { id: 2, name: 'Tech Talk Asia', date: '2025-03-15', location: 'Singapore', description: 'A conference on the latest technology.', status: 'Ongoing' }
+      {
+        id: 1,
+        name: 'G5Conf 2024',
+        title: 'G5Conf 2024', // Ensure compatibility with Admin form
+        date: '2024-12-20',
+        location: 'Kuala Lumpur',
+        venue: 'Kuala Lumpur', // Ensure compatibility
+        description: 'Annual conference for the G5 project.',
+        status: 'Upcoming'
+      },
+      {
+        id: 2,
+        name: 'Tech Talk Asia',
+        title: 'Tech Talk Asia',
+        date: '2025-03-15',
+        location: 'Singapore',
+        venue: 'Singapore',
+        description: 'A conference on the latest technology.',
+        status: 'Ongoing'
+      }
     ];
+
     if (!data) {
       localStorage.setItem(this.confStorageKey, JSON.stringify(conferences));
     }
@@ -144,24 +164,27 @@ export class ConferenceService {
 
   getConference(id: string | number): Observable<Conference | undefined> {
     return this.getAllConferences().pipe(
-      map(conferences => conferences.find(c => c.id === id))
+      map(conferences => conferences.find(c => String(c.id) === String(id)))
     );
   }
 
-  // Alias for getConference to fix the error
   getConferenceById(id: string | number): Observable<Conference | undefined> {
     return this.getConference(id);
   }
 
-  createConference(confData: Conference): Observable<{ success: boolean }> {
+  createConference(confData: any): Observable<{ success: boolean }> {
     const conferences = this.getDataFromStorage(this.confStorageKey);
     confData.id = Date.now();
+
+    // Map fields to ensure compatibility (Admin form uses 'title'/'venue')
+    if (!confData.name && confData.title) confData.name = confData.title;
+    if (!confData.location && confData.venue) confData.location = confData.venue;
+
     conferences.push(confData);
     this.saveDataToStorage(this.confStorageKey, conferences);
 
-    // Add notification
     this.notificationService.addNotification({
-      title: 'Success',
+      title: 'Conference Created',
       message: `Conference "${confData.name}" created successfully`,
       type: 'success'
     });
@@ -176,9 +199,8 @@ export class ConferenceService {
       conferences[index] = updatedConf;
       this.saveDataToStorage(this.confStorageKey, conferences);
 
-      // Add notification
       this.notificationService.addNotification({
-        title: 'Success',
+        title: 'Conference Updated',
         message: `Conference "${updatedConf.name}" updated successfully`,
         type: 'success'
       });
@@ -194,9 +216,8 @@ export class ConferenceService {
     conferences = conferences.filter((c: Conference) => c.id !== id);
     this.saveDataToStorage(this.confStorageKey, conferences);
 
-    // Add notification
     this.notificationService.addNotification({
-      title: 'Success',
+      title: 'Conference Deleted',
       message: `Conference "${confName}" deleted successfully`,
       type: 'success'
     });
@@ -210,8 +231,7 @@ export class ConferenceService {
   getAllSessions(): Observable<Session[]> {
     const data = localStorage.getItem(this.sessionStorageKey);
     let sessions = data ? JSON.parse(data) : [
-      { id: 1, name: 'Opening Keynote', title: 'Opening Keynote', conference: 'G5Conf 2024', date: '2024-12-20', time: '09:00 AM' },
-      { id: 2, name: 'AI Workshop', title: 'AI Workshop', conference: 'G5Conf 2024', date: '2024-12-20', time: '11:00 AM' }
+      { id: 1, name: 'Opening Keynote', title: 'Opening Keynote', conference: 'G5Conf 2024', date: '2024-12-20', time: '09:00 AM' }
     ];
     if (!data) {
       localStorage.setItem(this.sessionStorageKey, JSON.stringify(sessions));
@@ -220,7 +240,6 @@ export class ConferenceService {
   }
 
   addSession(sessionData: any): Observable<{ success: boolean }> {
-    // Accept any type of session data and adapt it to our interface
     const sessions = this.getDataFromStorage(this.sessionStorageKey);
     const newSession: Session = {
       id: sessions.length + 1,
@@ -237,9 +256,8 @@ export class ConferenceService {
     sessions.push(newSession);
     this.saveDataToStorage(this.sessionStorageKey, sessions);
 
-    // Add notification
     this.notificationService.addNotification({
-      title: 'Success',
+      title: 'Session Added',
       message: `Session "${newSession.name}" added successfully`,
       type: 'success'
     });
@@ -253,9 +271,8 @@ export class ConferenceService {
     sessions = sessions.filter((s: Session) => s.id !== id);
     this.saveDataToStorage(this.sessionStorageKey, sessions);
 
-    // Add notification
     this.notificationService.addNotification({
-      title: 'Success',
+      title: 'Session Deleted',
       message: `Session "${sessionName}" deleted successfully`,
       type: 'success'
     });
@@ -267,8 +284,8 @@ export class ConferenceService {
   // 4. Registration Management
   // ==========================================
   createRegistration(regData: any): Observable<{ success: boolean }> {
-    // Accept any type of registration data and adapt it to our interface
     const registrations = this.getDataFromStorage(this.regStorageKey);
+
     const newRegistration: Registration = {
       id: Date.now(),
       conferenceId: regData.conferenceId,
@@ -286,10 +303,18 @@ export class ConferenceService {
     registrations.push(newRegistration);
     this.saveDataToStorage(this.regStorageKey, registrations);
 
-    // Add notification
+    // 🔥 Trigger Specific User Notification
+    if (regData.userEmail) {
+      this.notificationService.notifyRegistrationSuccess(
+        regData.userEmail,
+        regData.conferenceTitle || 'Conference'
+      );
+    }
+
+    // Also Log Generic Success (optional, for Admin logs)
     this.notificationService.addNotification({
-      title: 'Success',
-      message: 'Registration created successfully',
+      title: 'Registration Created',
+      message: `New registration for ${newRegistration.userName}`,
       type: 'success'
     });
 

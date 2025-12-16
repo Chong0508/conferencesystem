@@ -20,6 +20,9 @@ export class Grading implements OnInit {
   paper: any = null;
   currentUser: any = {};
 
+  // ✨ New Flag: Determines if the form is in Read-Only mode (View History)
+  isReadOnly: boolean = false;
+
   // Form Data
   scoreCriteria: any = {
     originality: 0,
@@ -59,6 +62,7 @@ export class Grading implements OnInit {
     }
 
     this.loadPaper();
+    this.checkForExistingReview(); // 👈 Check if this paper was already graded
   }
 
   loadPaper() {
@@ -70,7 +74,31 @@ export class Grading implements OnInit {
     }
   }
 
+  // ✨ Logic to populate form if viewing history
+  checkForExistingReview() {
+    this.reviewService.getAllReviews().subscribe((allReviews: any[]) => {
+      // Find a review that matches this Paper ID AND this Reviewer's Email
+      const existingReview = allReviews.find((r: any) =>
+        String(r.paperId) === String(this.paperId) &&
+        r.reviewerEmail === this.currentUser.email
+      );
+
+      if (existingReview) {
+        // ✅ Found previous review: Enable Read-Only Mode
+        this.isReadOnly = true;
+
+        // ✅ Populate Form Data
+        this.scoreCriteria = existingReview.breakdown;
+        this.comments = existingReview.comments;
+        this.recommendation = existingReview.recommendation;
+      }
+    });
+  }
+
   submitReview() {
+    // Prevent submission if in Read-Only mode
+    if (this.isReadOnly) return;
+
     // 1. Validation
     if (this.totalScore === 0) {
       alert("Please score the paper before submitting.");
@@ -109,6 +137,11 @@ export class Grading implements OnInit {
   }
 
   cancel() {
-    this.router.navigate(['/dashboard/reviews']);
+    // Redirect logic based on mode
+    if (this.isReadOnly) {
+      this.router.navigate(['/dashboard/review-history']); // Go back to History
+    } else {
+      this.router.navigate(['/dashboard/reviews']); // Go back to Pending list
+    }
   }
 }
