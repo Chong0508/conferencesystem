@@ -1,0 +1,94 @@
+/* --- Variables --- */
+:host {
+  --teal-primary: #11998e;
+  --teal-hover: #0d8a80;
+  --teal-light: #e0f2f1;
+}
+
+/* --- Common Text Colors --- */
+.text-teal { color: var(--teal-primary) !important; }
+.bg-teal-subtle { background-color: var(--teal-light) !important; }
+
+/* --- Buttons --- */
+.btn-teal {
+  background-color: var(--teal-primary);
+  color: white;
+  border: none;
+  transition: all 0.3s;
+}
+.btn-teal:hover {
+  background-color: var(--teal-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(17, 153, 142, 0.3);
+  color: white;
+}
+
+/* --- Form Inputs --- */
+.custom-input {
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  padding: 10px 12px;
+}
+.custom-input:focus {
+  border-color: var(--teal-primary);
+  box-shadow: 0 0 0 3px rgba(17, 153, 142, 0.1);
+}
+
+/* --- Day Tabs --- */
+.tab-btn {
+  color: #64748b;
+  border: none;
+  transition: all 0.2s;
+}
+.tab-btn:hover {
+  background-color: #f1f5f9;
+}
+.tab-btn.active-tab {
+  background-color: var(--teal-primary);
+  color: white;
+  box-shadow: 0 2px 8px rgba(17, 153, 142, 0.4);
+}
+
+/* --- Session Card --- */
+.session-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden; /* For left border radius */
+}
+.session-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08) !important;
+}
+
+.time-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: #f8fafc;
+  border-right: 1px solid #f1f5f9;
+}
+
+/* Badges (Subtle) */
+.bg-primary-subtle { background-color: #dbeafe !important; color: #1e40af !important; }
+.bg-success-subtle { background-color: #dcfce7 !important; color: #166534 !important; }
+.bg-warning-subtle { background-color: #fef9c3 !important; color: #854d0e !important; }
+.bg-secondary-subtle { background-color: #f3f4f6 !important; color: #4b5563 !important; }
+
+/* Icon Button */
+.btn-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+.btn-icon:hover {
+  background-color: #fee2e2;
+}
+
+/* Dashed Border for Empty State */
+.border-dashed {
+  border-style: dashed !important;
+  border-color: #cbd5e1 !important;
+}

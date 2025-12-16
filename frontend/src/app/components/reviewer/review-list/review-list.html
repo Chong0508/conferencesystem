@@ -1,48 +1,61 @@
 <div class="container mt-4 animate__animated animate__fadeIn">
 
-  <div class="d-flex justify-content-between align-items-center mb-4">
+  <div class="d-flex justify-content-between align-items-end mb-5">
     <div>
-      <h2 class="fw-bold text-dark">My Reviews</h2>
-      <p class="text-muted">Papers assigned to you for evaluation.</p>
+      <h2 class="fw-bold text-dark mb-1">My Reviews</h2>
+      <p class="text-muted mb-0">Manage your assigned papers and complete evaluations.</p>
     </div>
-    <span class="badge bg-primary fs-6 rounded-pill px-3">{{ papers.length }} Pending</span>
+    <div class="bg-white px-4 py-2 rounded-pill shadow-sm border d-flex align-items-center">
+      <span class="text-muted small fw-bold me-2">PENDING TASKS</span>
+      <span class="badge bg-teal rounded-pill">{{ papers.length }}</span>
+    </div>
   </div>
 
   <div *ngIf="isLoading" class="text-center py-5">
-    <div class="spinner-border text-primary" role="status"></div>
-    <p class="text-muted mt-2">Loading tasks...</p>
+    <div class="spinner-border text-teal" role="status"></div>
+    <p class="text-muted mt-3 small fw-bold">Loading assignments...</p>
   </div>
 
-  <div *ngIf="!isLoading && papers.length === 0" class="text-center py-5 bg-white rounded shadow-sm empty-state">
-    <div class="mb-3">
-      <i class="bi bi-check-circle-fill text-success icon-large"></i>
+  <div *ngIf="!isLoading && papers.length === 0" class="text-center py-5 bg-white rounded-4 shadow-sm border border-dashed">
+    <div class="mb-4">
+      <div class="icon-circle bg-light text-muted mx-auto">
+        <i class="bi bi-check2-all display-4 text-teal"></i>
+      </div>
     </div>
-    <h4>All caught up!</h4>
-    <p class="text-muted">You have no pending papers to review at the moment.</p>
+    <h4 class="fw-bold text-dark">All Caught Up!</h4>
+    <p class="text-muted mb-0">You have no pending papers to review at the moment.</p>
   </div>
 
   <div class="row g-4" *ngIf="!isLoading && papers.length > 0">
     <div *ngFor="let paper of papers" class="col-12">
 
-      <div class="card border-0 shadow-sm rounded-3 paper-card">
-        <div class="card-body p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+      <div class="card border-0 shadow-sm rounded-4 paper-card overflow-hidden">
+        <div class="card-body p-4">
+          <div class="row align-items-center">
 
-          <div>
-            <div class="d-flex align-items-center gap-2 mb-2">
-              <span class="badge bg-warning text-dark">Pending Review</span>
-              <span class="text-muted small"><i class="bi bi-hash"></i> {{ paper.id }}</span>
+            <div class="col-md-9">
+              <div class="d-flex align-items-center mb-2">
+                <span class="badge bg-warning-subtle text-warning-dark border border-warning-subtle px-3 py-1 rounded-pill fw-bold small">
+                  <i class="bi bi-hourglass-split me-1"></i> Pending Review
+                </span>
+                <span class="text-muted x-small ms-3 fw-bold tracking-wide">ID: #{{ paper.id }}</span>
+              </div>
+
+              <h5 class="fw-bold text-dark mb-2">{{ paper.title }}</h5>
+
+              <div class="d-flex align-items-center text-secondary small">
+                <i class="bi bi-layers-fill me-2 text-teal"></i>
+                <span class="fw-medium">{{ paper.trackId || 'General Track' }}</span>
+              </div>
             </div>
 
-            <h5 class="fw-bold mb-1 text-dark">{{ paper.title }}</h5>
-            <p class="text-muted mb-0 small"><i class="bi bi-layers"></i> {{ paper.trackId || 'General Track' }}</p>
-          </div>
+            <div class="col-md-3 text-md-end mt-4 mt-md-0">
+              <button class="btn btn-teal px-4 py-2 fw-bold shadow-sm w-100 w-md-auto" (click)="onGrade(paper.id)">
+                <i class="bi bi-pencil-square me-2"></i> Grade Paper
+              </button>
+            </div>
 
-          <div class="text-end">
-            <button class="btn btn-primary px-4 py-2 fw-bold action-btn" (click)="onGrade(paper.id)">
-              <i class="bi bi-pencil-square me-2"></i> Grade Paper
-            </button>
           </div>
-
         </div>
       </div>
 

@@ -1,42 +1,64 @@
-/* Container spacing */
+/* --- Variables --- */
+:host {
+  --teal-primary: #11998e;
+  --teal-hover: #0d8a80;
+}
+
 .container {
   max-width: 900px;
 }
 
-/* Empty State */
-.empty-state {
-  border: 1px dashed #dee2e6;
-}
+/* --- Utilities --- */
+.bg-teal { background-color: var(--teal-primary) !important; }
+.text-teal { color: var(--teal-primary) !important; }
+.x-small { font-size: 0.8rem; }
+.tracking-wide { letter-spacing: 0.5px; }
 
-.icon-large {
-  font-size: 3rem;
-  color: #11998e; /* Consistent Green Brand Color */
-}
+/* --- Custom Badge Colors --- */
+.bg-warning-subtle { background-color: #fffbeb !important; }
+.text-warning-dark { color: #b45309 !important; }
+.border-warning-subtle { border-color: #fcd34d !important; }
 
-/* Paper Card Styles */
+/* --- Paper Card --- */
 .paper-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  border-left: 4px solid #ffc107 !important; /* Yellow border indicating 'Pending' */
+  transition: all 0.2s ease;
+  border-left: 5px solid #f59e0b !important; /* Orange strip for pending */
 }
 
 .paper-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.08) !important;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08) !important;
 }
 
-/* Button Styles */
-.btn-primary {
-  background-color: #11998e;
+/* --- Buttons --- */
+.btn-teal {
+  background-color: var(--teal-primary);
+  color: white;
   border: none;
-  border-radius: 6px;
-  transition: all 0.3s ease;
+  border-radius: 8px;
+  transition: all 0.3s;
 }
 
-.btn-primary:hover {
-  background-color: #0d8a80;
-  box-shadow: 0 4px 10px rgba(17, 153, 142, 0.3);
+.btn-teal:hover {
+  background-color: var(--teal-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(17, 153, 142, 0.3);
+  color: white;
 }
 
+/* --- Empty State --- */
+.border-dashed {
+  border-style: dashed !important;
+  border-color: #e2e8f0 !important;
+}
+.icon-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .text-muted {
   font-size: 0.9rem;
 }

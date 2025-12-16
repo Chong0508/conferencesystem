@@ -1,69 +1,78 @@
 <div class="conference-container animate__animated animate__fadeIn">
 
-  <div class="header-section mb-4 d-flex justify-content-between align-items-end">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-end mb-5">
     <div>
-      <h2 class="fw-bold text-dark">Active Conferences</h2>
-      <p class="text-muted mb-0">Browse and register for upcoming events.</p>
+      <h2 class="fw-bold text-dark mb-1">Active Conferences</h2>
+      <p class="text-muted mb-0">Discover upcoming events and book your seat.</p>
     </div>
 
-    <button *ngIf="isAdmin()" class="btn btn-dark" (click)="editConference(0)">
-      <i class="bi bi-plus-lg me-1"></i> New Conference
+    <button *ngIf="isAdmin()" class="btn btn-dark shadow-sm px-4 fw-bold mt-3 mt-md-0" (click)="editConference(0)">
+      <i class="bi bi-plus-lg me-2"></i> Create Event
     </button>
   </div>
 
-  <div *ngIf="conferences.length === 0" class="text-center p-5 text-muted bg-white rounded shadow-sm border">
-    <h4>No conferences available yet.</h4>
-    <p>Please check back later.</p>
+  <div *ngIf="conferences.length === 0" class="text-center py-5 bg-white rounded-4 shadow-sm border border-dashed">
+    <div class="mb-3">
+      <div class="icon-circle bg-light mx-auto text-muted">
+        <i class="bi bi-calendar2-event display-4 opacity-50"></i>
+      </div>
+    </div>
+    <h4 class="fw-bold text-secondary">No Events Scheduled</h4>
+    <p class="text-muted small">Stay tuned for future updates.</p>
   </div>
 
-  <div class="d-flex flex-column gap-3">
+  <div class="row g-4" *ngIf="conferences.length > 0">
 
-    <div *ngFor="let conf of conferences" class="card border-0 shadow-sm conference-card">
-      <div class="card-body p-4 d-flex flex-column flex-md-row justify-content-between align-items-center">
+    <div *ngFor="let conf of conferences" class="col-md-6 col-lg-4 d-flex">
+      <div class="card border-0 shadow-sm conference-card rounded-4 w-100 overflow-hidden d-flex flex-column">
 
-        <div class="mb-3 mb-md-0 info-section">
+        <div class="card-header-strip bg-teal-gradient"></div>
 
-          <div class="mb-2">
-            <span class="badge bg-success-subtle text-success fw-bold px-3 py-2 rounded-pill">
-              <i class="bi bi-broadcast me-1"></i> Open for Registration
+        <div class="card-body p-4 d-flex flex-column flex-grow-1">
+
+          <div class="mb-3">
+            <span class="badge bg-teal-subtle text-teal fw-bold px-3 py-1 rounded-pill border border-teal-subtle small-badge">
+              <i class="bi bi-broadcast me-1"></i> Registration Open
             </span>
           </div>
 
-          <h4 class="fw-bold text-dark mb-2">{{ conf.title }}</h4>
-          <p class="text-muted mb-3 description">{{ conf.description }}</p>
+          <h4 class="fw-bold text-dark mb-2 title-clamp" title="{{ conf.title }}">{{ conf.title }}</h4>
 
-          <div class="d-flex gap-4 text-secondary small fw-bold">
+          <div class="d-flex flex-wrap gap-3 text-secondary x-small fw-bold mb-3">
             <span class="d-flex align-items-center">
-              <i class="bi bi-calendar-event me-2 text-primary"></i> {{ conf.date }}
+              <i class="bi bi-calendar-event me-2 text-teal"></i> {{ conf.date }}
             </span>
             <span class="d-flex align-items-center">
               <i class="bi bi-geo-alt me-2 text-danger"></i> {{ conf.venue }}
             </span>
           </div>
+
+          <p class="text-muted mb-4 description flex-grow-1">{{ conf.description }}</p>
+
+          <hr class="border-light mb-4 mt-auto">
+
+          <div class="mt-auto">
+
+            <button *ngIf="isAuthor()"
+                    class="btn btn-teal w-100 py-2 fw-bold shadow-sm"
+                    (click)="joinConference(conf)">
+              Register Now <i class="bi bi-arrow-right ms-1"></i>
+            </button>
+
+            <button *ngIf="isReviewer()"
+                    class="btn btn-light w-100 py-2 text-muted fw-bold border"
+                    disabled>
+              <i class="bi bi-eye-fill me-2"></i> View Only Access
+            </button>
+
+            <button *ngIf="isAdmin()"
+                    class="btn btn-outline-dark w-100 py-2 fw-bold"
+                    (click)="editConference(conf.id)">
+              <i class="bi bi-pencil-square me-2"></i> Edit Event
+            </button>
+
+          </div>
         </div>
-
-        <div class="action-area ms-md-4">
-
-          <button *ngIf="isAuthor()"
-                  class="btn custom-btn px-4 py-2 text-white w-100"
-                  (click)="joinConference(conf)">
-            <i class="bi bi-ticket-perforated-fill me-2"></i> Register
-          </button>
-
-          <button *ngIf="isReviewer()"
-                  class="btn btn-outline-secondary px-4 py-2 w-100"
-                  disabled>
-            <i class="bi bi-eye me-2"></i> View Only
-          </button>
-
-          <button *ngIf="isAdmin()"
-                  class="btn btn-warning px-4 py-2 w-100"
-                  (click)="editConference(conf.id)">
-            <i class="bi bi-pencil me-2"></i> Edit
-          </button>
-
-        </div>
-
       </div>
     </div>
 

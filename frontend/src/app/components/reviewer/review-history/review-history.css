@@ -1,81 +1,73 @@
-/* Container */
+/* --- Variables --- */
+:host {
+  --teal-primary: #11998e;
+  --teal-hover: #0d8a80;
+}
+
 .container {
-  max-width: 1100px;
+  max-width: 1000px;
 }
 
-/* Card Styling */
-.card {
-  background: white;
-  border-radius: 16px !important;
-  overflow: hidden; /* To ensure child table radius works */
+/* --- Buttons --- */
+.btn-teal {
+  background-color: var(--teal-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+.btn-teal:hover {
+  background-color: var(--teal-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(17, 153, 142, 0.3);
 }
 
-/* Table Styling */
-.table {
-  margin-bottom: 0;
+/* --- Card Styles --- */
+.hover-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid #f8f9fa;
+}
+.hover-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.06) !important;
+  border-color: #fff;
 }
 
-.table thead th {
-  background-color: #f8f9fa;
-  color: #6c757d;
-  font-weight: 600;
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: 1px solid #eee;
+/* --- Utilities --- */
+.text-teal { color: var(--teal-primary) !important; }
+.x-small { font-size: 0.75rem; letter-spacing: 0.5px; }
+
+.icon-square {
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.table tbody td {
-  padding-top: 1.2rem;
-  padding-bottom: 1.2rem;
-  vertical-align: middle;
-  border-bottom: 1px solid #f9f9f9;
-  transition: background-color 0.2s;
+.icon-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.table tbody tr:hover td {
-  background-color: #fcfcfc;
-}
+/* --- Verdict Badges --- */
+.bg-success-subtle { background-color: #d1e7dd !important; }
+.border-success { border: 1px solid #a3cfbb !important; }
 
-/* Score Styling */
-.text-success { color: #11998e !important; }
-.text-warning { color: #ffc107 !important; }
-.text-danger  { color: #dc3545 !important; }
+.bg-danger-subtle { background-color: #f8d7da !important; }
+.border-danger { border: 1px solid #f1aeb5 !important; }
 
-/* Badge Styling (Accept/Reject) */
-.badge.bg-success-subtle {
-  background-color: #d1e7dd !important;
-  color: #0f5132 !important;
-}
+/* --- Score Colors --- */
+.text-success { color: var(--teal-primary) !important; }
+.text-warning { color: #f59e0b !important; }
+.text-danger { color: #ef4444 !important; }
 
-.badge.bg-danger-subtle {
-  background-color: #f8d7da !important;
-  color: #842029 !important;
-}
-
-/* Button Styling */
-.btn-light {
-  background-color: #fff;
-  border: 1px solid #e0e0e0;
-  color: #555;
-  transition: all 0.2s;
-}
-
-.btn-light:hover {
-  background-color: #11998e;
-  border-color: #11998e;
-  color: white !important; /* Force white text on hover */
-}
-
-.btn-light:hover i {
-  color: white; /* Ensure icon turns white */
-}
-
-.btn-light.text-primary {
-  color: #11998e !important; /* Use theme color instead of bootstrap blue */
-}
-
-/* Empty State */
-.display-1 {
-  font-size: 4rem;
+/* --- Empty State --- */
+.border-dashed {
+  border-style: dashed !important;
+  border-color: #e2e8f0 !important;
 }
