@@ -1,18 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-// 👇 Import AuthService
-import { AuthService } from '../../../services/auth';
-
-interface ActivityLog {
-  id: number;
-  user: string;
-  role: string;
-  action: string;
-  details: string;
-  timestamp: string;
-  type: 'info' | 'warning' | 'success' | 'danger';
-}
+import { LogActivityService } from '../../../services/logActivity';
 
 @Component({
   selector: 'app-activity-logs',
@@ -22,44 +11,50 @@ interface ActivityLog {
   styleUrls: ['./activity-logs.css']
 })
 export class ActivityLogsComponent implements OnInit {
-
-  logs: ActivityLog[] = [];
-  filteredLogs: ActivityLog[] = [];
+  logs: any[] = [];
+  filteredLogs: any[] = [];
   searchTerm: string = '';
+  isLoading: boolean = false;
 
-  // 👇 Inject AuthService
-  constructor(private authService: AuthService) { }
+  constructor(private logService: LogActivityService) {}
 
   ngOnInit(): void {
     this.loadLogs();
   }
 
   loadLogs() {
-    // 👇 Use Service to get logs
-    // Note: You need to ensure getActivityLogs() exists in AuthService
-    this.authService.getActivityLogs().subscribe(data => {
-      this.logs = data;
-      this.filteredLogs = [...this.logs];
+    this.isLoading = true;
+    this.logService.getAll().subscribe({
+      next: (res) => {
+        this.logs = res;
+        this.filteredLogs = [...this.logs];
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Failed to load logs', err);
+        this.isLoading = false;
+      }
     });
   }
 
-  // Search Logic
   searchLogs() {
-    const term = this.searchTerm.toLowerCase();
     this.filteredLogs = this.logs.filter(log =>
-      log.user.toLowerCase().includes(term) ||
-      log.action.toLowerCase().includes(term) ||
-      log.details.toLowerCase().includes(term)
+      log.user_id?.toLowerCase().includes(this.searchTerm.toLowerCase())
     );
   }
 
-  // Clear Logs
   clearLogs() {
-    if(confirm('Are you sure you want to clear ALL activity logs? This cannot be undone.')) {
-      // 👇 Use Service to clear logs
-      this.authService.clearActivityLogs().subscribe(() => {
-        this.logs = [];
-        this.filteredLogs = [];
+    if (confirm('Are you sure you want to clear all activity logs?')) {
+      this.logService.clearAll().subscribe({
+        next: () => {
+          alert('All logs cleared.');
+          this.logs = [];
+          this.filteredLogs = [];
+        },
+        error: (err) => {
+          console.error('Failed to clear logs', err);
+          alert('Failed to clear logs.');
+        }
       });
     }
   }

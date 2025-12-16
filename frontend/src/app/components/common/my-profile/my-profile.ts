@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../services/auth';
-import { UserService } from '../../../services/user';
+import { UserService } from '../../../services/user.service';
 
 @Component({
   selector: 'app-my-profile',

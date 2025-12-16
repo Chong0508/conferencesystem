@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 // 👇 Fixed Imports: No .service suffix
 import { PaperService } from '../../../services/paper';
-import { UserService } from '../../../services/user';
+import { UserService } from '../../../services/user.service';
 
 @Component({
   selector: 'app-paper-master',

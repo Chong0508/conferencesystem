@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 // 👇 Import UserService
-import { UserService } from '../../../services/user';
+import { UserService } from '../../../services/user.service';
 
 // Define Interface matching Register data structure
 interface User {
