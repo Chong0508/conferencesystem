@@ -1,7 +1,7 @@
+// File: frontend/src/app/components/common/my-profile/my-profile.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-// 👇 Import Services
 import { AuthService } from '../../../services/auth';
 import { UserService } from '../../../services/user';
 
@@ -10,7 +10,7 @@ import { UserService } from '../../../services/user';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './my-profile.html',
-  styleUrl: './my-profile.css',
+  styleUrl: './my-profile.css'
 })
 export class MyProfile implements OnInit {
 
@@ -24,8 +24,12 @@ export class MyProfile implements OnInit {
 
   ngOnInit() {
     const currentUser = this.authService.getLoggedUser();
+
+
+    console.log('Data dari AuthService:', currentUser);
+
     if (currentUser) {
-      this.user = { ...currentUser }; // Clone object
+      this.user = { ...currentUser };
     }
   }
 
@@ -34,7 +38,6 @@ export class MyProfile implements OnInit {
     this.userService.updateUser(this.user).subscribe(() => {
       this.isLoading = false;
       alert("✅ Profile updated successfully!");
-      // Session update is handled implicitly or you can force refresh
     });
   }
 }

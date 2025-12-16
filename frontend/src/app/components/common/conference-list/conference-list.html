@@ -1,1 +1,39 @@
-<p>conference-list works!</p>
+<!-- File: frontend/src/app/components/common/conference-list/conference-list.html -->
+<div class="conference-list-container">
+  <h2>Conference List</h2>
+
+  <!-- Papar ini jika Admin log masuk -->
+  <div *ngIf="isAdmin()" class="admin-actions">
+    <button class="btn btn-primary">Create New Conference</button>
+  </div>
+
+  <!-- Senarai conference -->
+  <div class="conference-grid">
+    <div *ngFor="let conference of conferences" class="conference-card">
+
+      <!-- Butang untuk Author -->
+      <div *ngIf="isAuthor()" class="actions author-actions">
+        <button id="join-{{conference.id}}" name="join-{{conference.id}}" class="btn btn-success" (click)="joinConference(conference.id)">Join Conference</button>
+      </div>
+
+      <!-- Butang untuk Admin -->
+      <div *ngIf="isAdmin()" class="actions admin-actions">
+        <button id="edit-{{conference.id}}" name="edit-{{conference.id}}" class="btn btn-warning" (click)="editConference(conference.id)">Edit</button>
+        <button id="delete-{{conference.id}}" name="delete-{{conference.id}}" class="btn btn-danger" (click)="deleteConference(conference.id)">Delete</button>
+      </div>
+
+      <!-- Paparan untuk Reviewer (tiada butang, hanya info) -->
+      <div *ngIf="isReviewer()" class="reviewer-info">
+        <span class="badge">Available for Review</span>
+      </div>
+
+      <div class="conference-details" (click)="viewConferenceDetails(conference.id)" style="cursor: pointer;">
+        <h3>{{ conference.name }}</h3>
+        <p><strong>Date:</strong> {{ conference.date }}</p>
+        <p><strong>Location:</strong> {{ conference.location }}</p>
+        <p>{{ conference.description }}</p>
+      </div>
+
+    </div>
+  </div>
+</div>

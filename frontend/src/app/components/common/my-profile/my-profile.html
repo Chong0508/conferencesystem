@@ -1,1 +1,53 @@
-<p>my-profile works!</p>
+<!-- File: frontend/src/app/components/common/my-profile/my-profile.html -->
+<div class="container mt-4">
+
+  <div class="card border-0 shadow-sm rounded-4">
+    <div class="card-body p-5">
+
+      <h3 class="fw-bold mb-4">My Profile</h3>
+
+      <div *ngIf="isLoading" class="text-center my-4">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="text-muted mt-2">Saving changes...</p>
+      </div>
+
+      <form *ngIf="!isLoading" (ngSubmit)="onSave()">
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="firstName" class="form-label fw-bold">First Name</label>
+            <input type="text" id="firstName" class="form-control py-2"
+                   [(ngModel)]="user.firstName" name="firstName" required>
+          </div>
+
+          <div class="col-md-6">
+            <label for="lastName" class="form-label fw-bold">Last Name</label>
+            <input type="text" id="lastName" class="form-control py-2"
+                   [(ngModel)]="user.lastName" name="lastName" required>
+          </div>
+
+          <div class="col-12">
+            <label for="email" class="form-label fw-bold">Email Address</label>
+            <input type="email" id="email" class="form-control py-2 bg-light"
+                   [(ngModel)]="user.email" name="email" readonly>
+            <div class="form-text">Email cannot be changed.</div>
+          </div>
+
+          <div class="col-12">
+            <label for="role" class="form-label fw-bold">Role</label>
+            <input type="text" id="role" class="form-control py-2 bg-light"
+                   [value]="user.role" readonly>
+          </div>
+        </div>
+
+        <div class="mt-4 d-flex justify-content-end">
+          <button type="submit" class="btn btn-primary px-4 fw-bold">
+            Save Changes
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>

@@ -1,0 +1,157 @@
+/* File: frontend/src/app/components/common/my-profile/my-profile.css */
+
+/* --- Latar Belakang Utama Halaman --- */
+.profile-page-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  padding: 2rem;
+  background: linear-gradient(135deg, #eef2f3 0%, #d4e4d1 100%);
+  border: 3px solid #11998e; /* <-- PEMBAHARUAN: Border hijau sekeliling */
+  border-radius: 12px;         /* <-- PEMBAHARUAN: Border melengkung untuk sepadan */
+}
+
+/* --- Kad Utama Profil --- */
+.profile-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 600px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* --- Tajuk Kad --- */
+.profile-header {
+  background: linear-gradient(120deg, #11998e 0%, #38ef7d 100%);
+  color: white;
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+}
+
+.profile-header h2 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.profile-subtitle {
+  margin: 0;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+/* --- Borang dan Elemen Dalamnya --- */
+.profile-form {
+  padding: 2.5rem 2rem;
+}
+
+fieldset {
+  border: 1px solid #e0e6e6;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  background-color: #fafbfc;
+}
+
+legend {
+  padding: 0 1rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #2c3e50;
+  border-bottom: none;
+  width: auto;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* --- Grid untuk Input --- */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+/* --- Kumpulan Input --- */
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #34495e;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.form-control {
+  padding: 0.8rem 1rem;
+  border: 1px solid #d1e7dd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background-color: #fff;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #38ef7d;
+  box-shadow: 0 0 0 4px rgba(56, 239, 125, 0.2);
+}
+
+.form-control[readonly] {
+  background-color: #f8f9fa;
+  cursor: not-allowed;
+  color: #6c757d;
+  border-color: #e9ecef;
+}
+
+.form-group small {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+/* --- Butang Simpan --- */
+.form-actions {
+  text-align: right;
+  margin-top: 1.5rem;
+}
+
+.btn {
+  padding: 0.8rem 2.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-primary {
+  background: linear-gradient(120deg, #11998e 0%, #38ef7d 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(17, 153, 142, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(17, 153, 142, 0.4);
+}
+
+/* --- Keadaan Memuat (Loading) --- */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: #11998e;
+}

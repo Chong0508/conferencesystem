@@ -1,69 +1,53 @@
 <div class="container mt-4 mb-5 animate__animated animate__fadeIn">
 
+  <!-- Active Conferences Section -->
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-      <h4 class="fw-bold text-dark mb-1">My Reviews</h4>
-      <p class="text-muted small mb-0">Papers assigned to you for evaluation.</p>
+      <h4 class="fw-bold text-dark mb-1">Active Conferences</h4>
+      <p class="text-muted small mb-0">Conferences currently running that need reviewers.</p>
     </div>
     <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
-            Pending: {{ papers.length }}
-        </span>
+      Active: {{ activeConferences.length }}
+    </span>
   </div>
 
   <div *ngIf="isLoading" class="text-center py-5">
-    <div class="spinner-border text-warning" role="status"></div>
-    <p class="text-muted mt-2 small">Loading papers...</p>
+    <div class="spinner-border text-success" role="status"></div>
+    <p class="text-muted mt-2 small">Loading conferences...</p>
   </div>
 
-  <div *ngIf="!isLoading && papers.length === 0" class="text-center py-5 bg-white rounded-4 shadow-sm">
-    <i class="bi bi-clipboard-check display-1 text-muted opacity-25"></i>
-    <h5 class="mt-3 text-secondary">All Caught Up!</h5>
-    <p class="text-muted small">You have no pending papers to review at the moment.</p>
+  <div *ngIf="!isLoading && activeConferences.length === 0" class="text-center py-5 bg-white rounded-4 shadow-sm">
+    <i class="bi bi-calendar-x display-1 text-muted opacity-25"></i>
+    <h5 class="mt-3 text-secondary">No Active Conferences</h5>
+    <p class="text-muted small">There are no conferences currently running.</p>
   </div>
 
-  <div *ngIf="!isLoading && papers.length > 0" class="row">
-    <div class="col-12 mb-3" *ngFor="let paper of papers">
-
-      <div class="card review-card h-100">
+  <div *ngIf="!isLoading && activeConferences.length > 0" class="row">
+    <div class="col-12 mb-3" *ngFor="let conference of activeConferences">
+      <div class="card conference-card h-100">
         <div class="card-body p-4">
           <div class="d-flex justify-content-between align-items-start">
-
             <div class="w-75">
-                            <span class="badge bg-soft-primary text-primary mb-2 rounded-pill">
-                                <i class="bi bi-tag-fill me-1"></i> Track ID: {{ paper.trackId }}
-                            </span>
-
-              <h5 class="fw-bold text-dark mb-2">{{ paper.title }}</h5>
-
-              <p class="text-muted small mb-3 text-truncate-2">
-                {{ paper.abstract }}
-              </p>
-
+              <span class="badge bg-soft-success text-success mb-2 rounded-pill">
+                <i class="bi bi-calendar-check me-1"></i> {{ conference.status || 'Active' }}
+              </span>
+              <h5 class="fw-bold text-dark mb-2">{{ conference.name }}</h5>
+              <p class="text-muted small mb-3">{{ conference.description }}</p>
               <div class="d-flex align-items-center text-muted small">
-                <i class="bi bi-person-circle me-2"></i>
-                <span class="me-3">{{ paper.authorName || 'Unknown Author' }}</span>
-
                 <i class="bi bi-calendar3 me-2"></i>
-                <span>{{ paper.submittedAt | date:'mediumDate' }}</span>
+                <span class="me-3">{{ conference.date }}</span>
+                <i class="bi bi-geo-alt me-2"></i>
+                <span>{{ conference.location }}</span>
               </div>
             </div>
-
             <div class="text-end">
-              <button class="btn btn-grade shadow-sm" (click)="onGrade(paper.id)">
-                <i class="bi bi-star-fill me-2"></i>Rate Now
+              <button class="btn btn-success shadow-sm" (click)="viewConferenceDetails(conference.id)">
+                <i class="bi bi-eye me-2"></i>View Details
               </button>
-              <div class="mt-2">
-                <small class="text-warning fw-bold">
-                  <i class="bi bi-hourglass-split me-1"></i>Pending
-                </small>
-              </div>
             </div>
-
           </div>
         </div>
       </div>
-
     </div>
   </div>
-
 </div>

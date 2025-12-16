@@ -13,14 +13,37 @@
   box-shadow: 0 8px 25px rgba(0,0,0,0.1);
 }
 
+/* Conference Card Style */
+.conference-card {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  overflow: hidden;
+  transition: all 0.3s;
+  height: 100%;
+}
+
+.conference-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(17, 153, 142, 0.15);
+}
+
 /* Badge Style */
 .bg-soft-primary {
   background-color: rgba(13, 110, 253, 0.1);
   font-weight: 500;
 }
 
+.bg-soft-success {
+  background-color: rgba(56, 239, 125, 0.1);
+}
+
 .text-primary {
   color: #0d6efd !important;
+}
+
+.text-success {
+  color: #38ef7d !important;
 }
 
 /* Text Truncate (Show only 2 lines of abstract) */
@@ -47,4 +70,36 @@
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
   color: #000;
+}
+
+/* Success Button (matching your theme) */
+.btn-success {
+  background: linear-gradient(120deg, #11998e 0%, #38ef7d 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8rem 2.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(17, 153, 142, 0.3);
+}
+
+.btn-success:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(17, 153, 142, 0.4);
+}
+
+/* Spinner Color */
+.spinner-border {
+  border-color: #11998e;
+  border-right-color: transparent;
+}
+
+.spinner-border.text-success {
+  border-color: #11998e;
+  border-right-color: transparent;
 }

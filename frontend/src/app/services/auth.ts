@@ -1,5 +1,6 @@
+// File: frontend/src/app/services/auth.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { Observable, of, throwError } from 'rxjs';
 import { delay } from 'rxjs/operators';
 
@@ -7,18 +8,42 @@ import { delay } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class AuthService {
-
-  private baseUrl = 'http://localhost:8080/api/auth';
   private userStorageKey = 'mock_db_users';
   private logStorageKey = 'mock_activity_logs';
+  private loggedUserKey = 'loggedUser'; // Define as a constant
 
-  constructor(private http: HttpClient) { }
+  constructor(private router: Router) { }
 
   // --- Helper: Get Current Logged-In User ---
-  // This replaces localStorage.getItem('loggedUser') in components
   getLoggedUser(): any {
-    const user = localStorage.getItem('loggedUser');
+    const user = localStorage.getItem(this.loggedUserKey);
     return user ? JSON.parse(user) : null;
+  }
+
+  // --- Methods needed for route guards ---
+  isLoggedIn(): boolean {
+    return this.getLoggedUser() !== null;
+  }
+
+  getUserRole(): string {
+    const user = this.getLoggedUser();
+    return user ? user.role : 'guest';
+  }
+
+  // --- Logout method ---
+  logout(): void {
+    const user = this.getLoggedUser();
+    if (user) {
+      this.logActivity(
+        user.firstName + ' ' + user.lastName,
+        user.role,
+        'Logout',
+        'User logged out',
+        'info'
+      );
+    }
+    localStorage.removeItem(this.loggedUserKey);
+    this.router.navigate(['/login']);
   }
 
   // ==========================================================
@@ -34,6 +59,8 @@ export class AuthService {
 
     userData.id = users.length + 1;
     userData.joinDate = new Date().toISOString().split('T')[0];
+    // PASTIKAN ROLE DITETAPKAN SEMASA DAFTAR
+    userData.role = userData.role || 'Author';
 
     users.push(userData);
     localStorage.setItem(this.userStorageKey, JSON.stringify(users));
@@ -56,11 +83,16 @@ export class AuthService {
     // Backdoor for Admin
     if (loginData.email === 'admin@test.com' && loginData.password === '123') {
       const adminUser = {
-        firstName: 'System', lastName: 'Admin', email: 'admin@test.com', role: 'Admin', avatarColor: 'dc3545'
+        firstName: 'System',
+        lastName: 'Admin',
+        email: 'admin@test.com',
+        role: 'Admin',
+        avatarColor: 'dc3545',
+        id: 0
       };
       this.logActivity('System Admin', 'Admin', 'Login', 'Admin login successful', 'warning');
       // Save session
-      localStorage.setItem('loggedUser', JSON.stringify(adminUser));
+      localStorage.setItem(this.loggedUserKey, JSON.stringify(adminUser));
       return of({ token: 'admin-token', user: adminUser }).pipe(delay(500));
     }
 
@@ -71,22 +103,27 @@ export class AuthService {
     );
 
     if (foundUser) {
+      // --- PEMBAHARUAN PENTING: JAMINAN ROLE SENTIASA ADA ---
+      // Jika pengguna lama tiada 'role', beri 'Author' sebagai default
+      const userRole = foundUser.role || 'Author';
+
       const response = {
         token: 'fake-jwt-token-123456',
         user: {
+          id: foundUser.id,
           firstName: foundUser.firstName,
           lastName: foundUser.lastName,
           email: foundUser.email,
-          role: foundUser.role || 'Author',
-          avatarColor: foundUser.role === 'Reviewer' ? 'ffc107' : '11998e'
+          role: userRole, // <-- GUNAKAN ROLE YANG TELAH DIJAMIN
+          avatarColor: userRole === 'Reviewer' ? 'ffc107' : '11998e'
         }
       };
       // Save session
-      localStorage.setItem('loggedUser', JSON.stringify(response.user));
+      localStorage.setItem(this.loggedUserKey, JSON.stringify(response.user));
 
       this.logActivity(
         foundUser.firstName + ' ' + foundUser.lastName,
-        foundUser.role || 'Author',
+        userRole,
         'Login',
         'Login successful',
         'success'

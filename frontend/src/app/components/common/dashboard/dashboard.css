@@ -1,30 +1,27 @@
-/* 1. Dashboard 整体容器 */
+/* 1. Dashboard Container */
 .dashboard-container {
   display: flex;
   min-height: 100vh;
-  background-color: #f8f9fa; /* 浅灰背景 */
+  background-color: #f8f9fa;
 }
 
-/* 2. Sidebar (侧边栏) 核心布局 */
+/* 2. Sidebar */
 .sidebar {
   width: 260px;
-  height: 100vh; /* 占满全屏高度 */
+  height: 100vh;
   background: white;
   padding: 20px;
-  position: fixed; /* 固定在左侧 */
+  position: fixed;
   top: 0;
   left: 0;
   z-index: 1000;
   box-shadow: 2px 0 10px rgba(0,0,0,0.05);
-
-  /* ✨ 关键 Flexbox 布局 ✨ */
   display: flex;
-  flex-direction: column; /* 垂直排列 */
+  flex-direction: column;
 }
 
-/* 3. Sidebar Header (Logo) */
+/* 3. Sidebar Header */
 .sidebar-header {
-  flex-shrink: 0; /* 头部不可压缩 */
   display: flex;
   align-items: center;
   gap: 12px;
@@ -44,25 +41,14 @@
   margin: 0;
 }
 
-/* 4. Navigation Menu (中间菜单) - 也就是你要滚动的区域 */
+/* 4. Navigation */
 .sidebar .nav {
-  flex-grow: 1;    /* ✨ 占据所有剩余空间 */
-  overflow-y: auto; /* ✨ 内容溢出时，只有这里会出现滚动条 */
+  flex-grow: 1;
+  overflow-y: auto;
   margin-top: 1rem;
-  padding-right: 5px; /* 给滚动条留点位置 */
-  flex-wrap: nowrap; /* 防止换行 */
+  padding-right: 5px;
 }
 
-/* (可选) 美化滚动条 */
-.sidebar .nav::-webkit-scrollbar {
-  width: 5px;
-}
-.sidebar .nav::-webkit-scrollbar-thumb {
-  background-color: #e0e0e0;
-  border-radius: 10px;
-}
-
-/* 5. 菜单项样式 */
 .nav-item {
   margin-bottom: 4px;
 }
@@ -89,15 +75,38 @@
   box-shadow: 0 4px 10px rgba(17, 153, 142, 0.3);
 }
 
-/* 6. Logout Button (底部区域) */
-.mt-auto {
-  margin-top: auto; /* Bootstrap 类，但在 Flex 容器里这个其实是辅助 */
-  flex-shrink: 0;   /* 底部不可压缩 */
-  padding-top: 15px;
-  border-top: 1px solid #f0f0f0;
-  background: white; /* 防止滚动内容透视 */
+/* 5. Main Content */
+.main-content {
+  margin-left: 260px;
+  width: calc(100% - 260px);
+  padding: 30px;
+  min-height: 100vh;
 }
 
+/* 6. Navbar */
+.custom-navbar {
+  background: white;
+  border-radius: 12px;
+  padding: 15px 20px;
+  margin-bottom: 20px;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  color: #2c3e50;
+  font-size: 1.5rem;
+}
+
+/* 7. Content Wrapper */
+.content-wrapper {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  min-height: calc(100vh - 180px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+/* 8. Logout Button */
 .btn-logout {
   background-color: #fff5f5;
   color: #dc3545;
@@ -105,7 +114,7 @@
   font-weight: 600;
   padding: 12px;
   border-radius: 8px;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
 .btn-logout:hover {
@@ -113,18 +122,76 @@
   color: white;
 }
 
-/* 7. 右侧主内容区域 */
-.main-content {
-  margin-left: 260px; /* 留出侧边栏宽度 */
-  width: calc(100% - 260px);
-  padding: 30px;
-  min-height: 100vh;
-}
-
-/* Avatar */
+/* 9. Avatar */
 .avatar {
   width: 40px;
   height: 40px;
   border: 2px solid white;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* 10. Animation */
+.animate__animated {
+  animation-duration: 1s;
+  animation-fill-mode: both;
+}
+
+.animate__fadeInLeft {
+  animation-name: fadeInLeft;
+}
+
+.animate__fadeInDown {
+  animation-name: fadeInDown;
+}
+
+.animate__fadeIn {
+  animation-name: fadeIn;
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 11. Responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+  }
 }

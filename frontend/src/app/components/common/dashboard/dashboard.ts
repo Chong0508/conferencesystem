@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
-// 👇 Import AuthService
 import { AuthService } from '../../../services/auth';
 
 @Component({
@@ -22,7 +21,7 @@ export class Dashboard implements OnInit {
 
   constructor(
     private router: Router,
-    private authService: AuthService // 👈 Inject
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -30,20 +29,19 @@ export class Dashboard implements OnInit {
   }
 
   loadUser() {
-    // 👇 Use Service instead of localStorage
     const user = this.authService.getLoggedUser();
 
     if (user) {
       this.loggedUser = user;
-      console.log('Current Dashboard User:', this.loggedUser.role);
+      console.log('Current Dashboard User:', this.loggedUser.role); // Debugging line
     } else {
-      // If not logged in, redirect to log in
+      // If not logged in, redirect to login
       this.router.navigate(['/login']);
     }
   }
 
   onLogout() {
-    // 👇 Optional: You can add a logout method in AuthService too
+    // Optional: You can add a logout method in AuthService too
     localStorage.removeItem('loggedUser');
     localStorage.removeItem('token');
     this.router.navigate(['/login']);

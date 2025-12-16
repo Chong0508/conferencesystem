@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { PaperService } from '../../../services/paper';
 import { ReviewService } from '../../../services/review';
 import { AuthService } from '../../../services/auth';
+import { ConferenceService } from '../../../services/conference'; // TAMBAH: Import ConferenceService
 
 @Component({
   selector: 'app-review-list',
@@ -16,6 +17,7 @@ import { AuthService } from '../../../services/auth';
 export class ReviewList implements OnInit {
 
   papers: any[] = [];
+  activeConferences: any[] = []; // TAMBAH: Property untuk simpan active conferences
   isLoading: boolean = true;
   loggedUser: any = null;
 
@@ -23,7 +25,8 @@ export class ReviewList implements OnInit {
     private router: Router,
     private paperService: PaperService,   // 👈 Inject PaperService
     private reviewService: ReviewService, // 👈 Inject ReviewService
-    private authService: AuthService      // 👈 Inject AuthService
+    private authService: AuthService,      // 👈 Inject AuthService
+    private conferenceService: ConferenceService // TAMBAH: Inject ConferenceService
   ) {}
 
   ngOnInit() {
@@ -32,6 +35,7 @@ export class ReviewList implements OnInit {
 
     if (this.loggedUser) {
       this.loadPapers();
+      this.loadActiveConferences(); // TAMBAH: Muatkan active conferences
     } else {
       this.isLoading = false;
     }
@@ -68,8 +72,23 @@ export class ReviewList implements OnInit {
     });
   }
 
+  // TAMBAH: Kaedah untuk muatkan active conferences
+  loadActiveConferences() {
+    this.conferenceService.getAllConferences().subscribe(data => {
+      // Filter untuk active conferences (Ongoing atau Upcoming)
+      this.activeConferences = data.filter(c =>
+        c.status === 'Ongoing' || c.status === 'Upcoming' || !c.status
+      );
+    });
+  }
+
   // Action: Go to Grading Page
   onGrade(paperId: number) {
     this.router.navigate(['/dashboard/review', paperId]);
+  }
+
+  // TAMBAH: Kaedah untuk lihat butiran conference
+  viewConferenceDetails(conferenceId: number) {
+    this.router.navigate(['/conference-details', conferenceId]);
   }
 }

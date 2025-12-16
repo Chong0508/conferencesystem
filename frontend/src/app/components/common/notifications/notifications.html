@@ -1,1 +1,38 @@
-<p>notifications works!</p>
+<div class="notifications-container">
+  <div class="notifications-header">
+    <h4 class="fw-bold">Notifications</h4>
+    <div class="notification-actions">
+      <button class="btn btn-sm btn-outline-secondary" (click)="markAllAsRead()" *ngIf="unreadCount > 0">
+        Mark All as Read
+      </button>
+      <button class="btn btn-sm btn-outline-danger" (click)="clearAll()">
+        Clear All
+      </button>
+    </div>
+  </div>
+
+  <div class="notifications-list">
+    <div *ngIf="notifications.length === 0" class="no-notifications">
+      <i class="bi bi-bell-slash display-4 text-muted"></i>
+      <p class="text-muted">No notifications</p>
+    </div>
+
+    <div
+      *ngFor="let notification of notifications"
+      class="notification-item"
+      [class.unread]="!notification.read"
+      (click)="markAsRead(notification.id)"
+    >
+      <div class="notification-icon">
+        <i class="bi" [ngClass]="getNotificationIcon(notification.type)"></i>
+      </div>
+      <div class="notification-content">
+        <div class="notification-header">
+          <h6 class="notification-title">{{ notification.title }}</h6>
+          <span class="notification-time">{{ formatTime(notification.timestamp) }}</span>
+        </div>
+        <p class="notification-message">{{ notification.message }}</p>
+      </div>
+    </div>
+  </div>
+</div>
