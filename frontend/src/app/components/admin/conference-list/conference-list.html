@@ -1,7 +1,7 @@
 <div class="container mt-4">
+
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="fw-bold text-secondary">Academic Conferences</h2>
-
     <a routerLink="/dashboard/create-conference" class="btn btn-primary-custom">
       <i class="bi bi-plus-circle me-2"></i>Create New Conference
     </a>
@@ -19,62 +19,69 @@
         <option selected>All Categories</option>
         <option value="1">Computer Science</option>
         <option value="2">Engineering</option>
-        <option value="3">Business</option>
       </select>
     </div>
     <div class="col-md-3">
       <select class="form-select">
-        <option selected>Upcoming</option>
-        <option value="1">Past</option>
-        <option value="2">Ongoing</option>
+        <option selected>All Statuses</option>
+        <option value="1">Upcoming</option>
+        <option value="2">Past</option>
       </select>
     </div>
   </div>
 
-  <div class="row g-4">
-    <div class="col-md-4">
-      <div class="conference-card">
-        <div class="card-header-custom">
-          <h5 class="card-title">International Conference on AI</h5>
-          <span class="badge bg-success">Upcoming</span>
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ errorMessage }}
+  </div>
+
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="text-muted mt-2">Loading conferences...</p>
+  </div>
+
+  <div class="row g-4" *ngIf="!isLoading && !errorMessage">
+
+    <div class="col-md-4" *ngFor="let conf of conferenceList">
+      <div class="conference-card h-100 shadow-sm"> <div class="card-header-custom d-flex justify-content-between align-items-center p-3 border-bottom">
+        <div>
+          <h5 class="card-title mb-0 fw-bold">{{ conf.title }}</h5>
+          <small class="text-muted">{{ conf.acronym }}</small>
         </div>
-        <div class="card-body">
-          <p class="card-text text-muted"><i class="bi bi-calendar-event me-2"></i>July 15-17, 2025</p>
-          <p class="card-text text-muted"><i class="bi bi-geo-alt me-2"></i>Kuala Lumpur, Malaysia</p>
-          <p class="card-text">A premier conference showcasing the latest advancements in Artificial Intelligence.</p>
-          <a href="#" class="btn btn-outline-primary-custom">View Details</a>
+        <span class="badge" [ngClass]="getStatusClass(conf.status)">
+            {{ conf.status || 'Active' }}
+          </span>
+      </div>
+
+        <div class="card-body p-3">
+          <p class="card-text text-muted mb-2">
+            <i class="bi bi-calendar-event me-2 text-primary"></i>
+            {{ conf.startDate || conf.start_date }}
+            <span *ngIf="conf.endDate || conf.end_date"> - {{ conf.endDate || conf.end_date }}</span>
+          </p>
+
+          <p class="card-text text-muted mb-3">
+            <i class="bi bi-geo-alt me-2 text-danger"></i>
+            {{ conf.location }}
+          </p>
+
+          <p class="card-text text-secondary small">
+            {{ conf.description || 'No description provided.' }}
+          </p>
+
+          <div class="mt-3">
+            <a routerLink="#" class="btn btn-outline-primary-custom w-100">View Details</a>
+          </div>
         </div>
+
       </div>
     </div>
 
-    <div class="col-md-4">
-      <div class="conference-card">
-        <div class="card-header-custom">
-          <h5 class="card-title">Global Engineering Summit</h5>
-          <span class="badge bg-warning text-dark">Ongoing</span>
-        </div>
-        <div class="card-body">
-          <p class="card-text text-muted"><i class="bi bi-calendar-event me-2"></i>June 1-30, 2025</p>
-          <p class="card-text text-muted"><i class="bi bi-geo-alt me-2"></i>Singapore</p>
-          <p class="card-text">A month-long summit with workshops and talks on various engineering fields.</p>
-          <a href="#" class="btn btn-outline-primary-custom">View Details</a>
-        </div>
-      </div>
+    <div class="col-12 text-center py-5" *ngIf="conferenceList.length === 0">
+      <i class="bi bi-inbox fs-1 text-muted"></i>
+      <p class="text-muted mt-2">No conferences found.</p>
     </div>
 
-    <div class="col-md-4">
-      <div class="conference-card">
-        <div class="card-header-custom">
-          <h5 class="card-title">Web Development Symposium</h5>
-          <span class="badge bg-secondary">Past</span>
-        </div>
-        <div class="card-body">
-          <p class="card-text text-muted"><i class="bi bi-calendar-event me-2"></i>May 10, 2025</p>
-          <p class="card-text text-muted"><i class="bi bi-geo-alt me-2"></i>Virtual Event</p>
-          <p class="card-text">Exploring the latest trends in modern web development and design.</p>
-          <a href="#" class="btn btn-outline-primary-custom">View Details</a>
-        </div>
-      </div>
-    </div>
   </div>
 </div>

@@ -1,9 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../../services/auth';
-// 👇 Import Notification Service
-import { NotificationService } from '../../../services/notification';
 
 @Component({
   selector: 'app-dashboard',
@@ -14,49 +11,38 @@ import { NotificationService } from '../../../services/notification';
 })
 export class Dashboard implements OnInit {
 
+  // 🔴 FIX: 默认不要写死成 Admin，防止权限泄露
   loggedUser: any = {
     firstName: 'Guest',
     lastName: '',
-    role: 'Guest',
+    role: 'Guest', // 默认是访客，没有任何权限
     avatarColor: 'cccccc'
   };
 
-  // Property to store the number of unread notifications
-  unreadCount: number = 0;
-
-  constructor(
-    private router: Router,
-    private authService: AuthService,
-    private notificationService: NotificationService // 👈 Inject Service
-  ) {}
+  constructor(private router: Router) {}
 
   ngOnInit() {
     this.loadUser();
-
-    // 🔥 Setup Real-time Subscription
-    if (this.loggedUser && this.loggedUser.email) {
-      // 1. Force a refresh to get current state
-      this.notificationService.refreshUnreadCount(this.loggedUser.email, this.loggedUser.role);
-
-      // 2. Subscribe to changes (Whenever service updates, this updates)
-      this.notificationService.unreadCount$.subscribe(count => {
-        this.unreadCount = count;
-      });
-    }
   }
 
   loadUser() {
-    const user = this.authService.getLoggedUser();
-    if (user) {
-      this.loggedUser = user;
+    // 1. 从 LocalStorage 获取当前登录用户
+    const userJson = localStorage.getItem('loggedUser');
+
+    if (userJson) {
+      this.loggedUser = JSON.parse(userJson);
+      // 调试用：在 Console 打印当前身份，方便你检查
+      console.log('Current Dashboard User:', this.loggedUser.role);
     } else {
+      // 2. 如果没登录，踢回登录页
       this.router.navigate(['/login']);
     }
   }
 
   onLogout() {
+    // 清除登录信息
     localStorage.removeItem('loggedUser');
-    localStorage.removeItem('token');
+    // 跳转回 Landing Page 或 Login
     this.router.navigate(['/login']);
   }
 }

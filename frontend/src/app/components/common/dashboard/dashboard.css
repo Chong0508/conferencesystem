@@ -1,34 +1,35 @@
-/* 1. Dashboard Container */
+/* 1. Dashboard 整体容器 */
 .dashboard-container {
   display: flex;
   min-height: 100vh;
-  background-color: #f8f9fa;
-  overflow: hidden; /* Prevent double scrollbars on body */
+  background-color: #f8f9fa; /* 浅灰背景 */
 }
 
-/* 2. Sidebar - Fixed to the left */
+/* 2. Sidebar (侧边栏) 核心布局 */
 .sidebar {
   width: 260px;
-  height: 100vh; /* Full height */
+  height: 100vh; /* 占满全屏高度 */
   background: white;
   padding: 20px;
-  position: fixed;
+  position: fixed; /* 固定在左侧 */
   top: 0;
   left: 0;
   z-index: 1000;
   box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+
+  /* ✨ 关键 Flexbox 布局 ✨ */
   display: flex;
-  flex-direction: column; /* 🔴 Mandatory: Stack Header, Nav, and Footer vertically */
+  flex-direction: column; /* 垂直排列 */
 }
 
-/* 3. Sidebar Header */
+/* 3. Sidebar Header (Logo) */
 .sidebar-header {
+  flex-shrink: 0; /* 头部不可压缩 */
   display: flex;
   align-items: center;
   gap: 12px;
   padding-bottom: 20px;
   border-bottom: 1px solid #f0f0f0;
-  flex-shrink: 0; /* Prevent header from shrinking when scrolling */
 }
 
 .brand-icon {
@@ -43,42 +44,27 @@
   margin: 0;
 }
 
-/* 4. Navigation List (The scrollable part) */
+/* 4. Navigation Menu (中间菜单) - 也就是你要滚动的区域 */
 .sidebar .nav {
-  flex-grow: 1; /* Takes up remaining space */
-
-  /* 🔴 FIX: Scroll Logic */
-  overflow-y: auto;   /* Allow scroll UP/DOWN */
-  overflow-x: hidden; /* Block scroll LEFT/RIGHT */
-
-  /* 🔴 FIX: Layout Logic */
-  display: flex;
-  flex-direction: column; /* Force vertical stacking */
-  flex-wrap: nowrap;      /* Prevent side-by-side wrapping */
-
+  flex-grow: 1;    /* ✨ 占据所有剩余空间 */
+  overflow-y: auto; /* ✨ 内容溢出时，只有这里会出现滚动条 */
   margin-top: 1rem;
-  padding-right: 5px; /* Space for scrollbar */
+  padding-right: 5px; /* 给滚动条留点位置 */
+  flex-wrap: nowrap; /* 防止换行 */
 }
 
-/* Custom Scrollbar Styling (Optional but looks nice) */
+/* (可选) 美化滚动条 */
 .sidebar .nav::-webkit-scrollbar {
   width: 5px;
 }
-.sidebar .nav::-webkit-scrollbar-track {
-  background: transparent;
-}
 .sidebar .nav::-webkit-scrollbar-thumb {
-  background: #eee;
+  background-color: #e0e0e0;
   border-radius: 10px;
 }
-.sidebar .nav::-webkit-scrollbar-thumb:hover {
-  background: #ccc;
-}
 
+/* 5. 菜单项样式 */
 .nav-item {
   margin-bottom: 4px;
-  width: 100%; /* Ensure full width */
-  display: block; /* Force block behavior */
 }
 
 .nav-link {
@@ -89,7 +75,6 @@
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
-  white-space: nowrap; /* Prevent text from breaking lines */
 }
 
 .nav-link:hover {
@@ -104,46 +89,13 @@
   box-shadow: 0 4px 10px rgba(17, 153, 142, 0.3);
 }
 
-/* 5. Main Content (Right Side) */
-.main-content {
-  margin-left: 260px; /* Pushes content to the right of fixed sidebar */
-  width: calc(100% - 260px);
-  padding: 30px;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-/* 6. Navbar */
-.custom-navbar {
-  background: white;
-  border-radius: 12px;
-  padding: 15px 20px;
-  margin-bottom: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.navbar-brand {
-  font-weight: 700;
-  color: #2c3e50;
-  font-size: 1.5rem;
-}
-
-/* 7. Content Wrapper */
-.content-wrapper {
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  flex-grow: 1;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-}
-
-/* 8. Logout Button area */
+/* 6. Logout Button (底部区域) */
 .mt-auto {
-  margin-top: auto !important; /* Pushes button to bottom */
-  flex-shrink: 0; /* Prevent shrinking */
+  margin-top: auto; /* Bootstrap 类，但在 Flex 容器里这个其实是辅助 */
+  flex-shrink: 0;   /* 底部不可压缩 */
+  padding-top: 15px;
+  border-top: 1px solid #f0f0f0;
+  background: white; /* 防止滚动内容透视 */
 }
 
 .btn-logout {
@@ -153,8 +105,7 @@
   font-weight: 600;
   padding: 12px;
   border-radius: 8px;
-  transition: all 0.2s ease;
-  width: 100%;
+  transition: all 0.2s;
 }
 
 .btn-logout:hover {
@@ -162,36 +113,18 @@
   color: white;
 }
 
-/* 9. Avatar */
+/* 7. 右侧主内容区域 */
+.main-content {
+  margin-left: 260px; /* 留出侧边栏宽度 */
+  width: calc(100% - 260px);
+  padding: 30px;
+  min-height: 100vh;
+}
+
+/* Avatar */
 .avatar {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
   border: 2px solid white;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-/* 10. Animation */
-.animate__animated {
-  animation-duration: 0.8s;
-  animation-fill-mode: both;
-}
-
-.animate__fadeInLeft { animation-name: fadeInLeft; }
-.animate__fadeInDown { animation-name: fadeInDown; }
-.animate__fadeIn { animation-name: fadeIn; }
-
-@keyframes fadeInLeft {
-  from { opacity: 0; transform: translateX(-20px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes fadeInDown {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }

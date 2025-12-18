@@ -1,97 +1,39 @@
-/* --- Variables --- */
-:host {
-  --teal-primary: #11998e;
-  --teal-hover: #0d8a80;
-  --teal-light: #e0f2f1;
-}
 
-/* --- Container --- */
-.container {
-  max-width: 1100px;
-}
-
-/* --- Buttons --- */
-.btn-teal {
-  background-color: var(--teal-primary);
-  color: white;
-  border: none;
-  transition: all 0.3s;
-}
-.btn-teal:hover {
-  background-color: var(--teal-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(17, 153, 142, 0.3);
-  color: white;
-}
-
-.btn-outline-teal {
-  color: var(--teal-primary);
-  border-color: var(--teal-primary);
-}
-.btn-outline-teal:hover {
-  background-color: var(--teal-primary);
-  color: white;
-}
-
-/* --- Icon Button (View) --- */
-.btn-icon {
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #f0f0f0;
-  transition: all 0.2s;
-}
-.btn-icon:hover {
-  background-color: #f8f9fa;
-  color: var(--teal-primary) !important;
-  border-color: var(--teal-primary);
-}
-
-/* --- Text Utilities --- */
-.text-teal { color: var(--teal-primary) !important; }
-.x-small { font-size: 0.75rem; letter-spacing: 0.5px; }
-
-/* --- Table Styles --- */
 .table thead th {
-  background-color: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #e9ecef;
 }
 
-.paper-row {
-  transition: background-color 0.2s;
-}
-.paper-row:hover {
-  background-color: #fcfcfc;
+.table-hover tbody tr:hover {
+  background-color: rgba(17, 153, 142, 0.02);
+  cursor: pointer;
 }
 
-.icon-square {
-  width: 45px;
-  height: 45px;
-  display: flex;
+
+.badge {
+  font-size: 0.8rem;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 6px;
 }
 
-/* --- Empty State --- */
-.border-dashed {
-  border-style: dashed !important;
-  border-color: #e2e8f0 !important;
-}
-.icon-circle {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+
+.bg-success-subtle { background-color: #d1e7dd; }
+.bg-danger-subtle { background-color: #f8d7da; }
+.bg-warning-subtle { background-color: #fff3cd; }
+
+
+.btn-primary {
+  background: #11998e;
+  border-color: #11998e;
 }
 
-/* --- Status Badges --- */
-.status-badge {
-  font-size: 0.75rem;
-  letter-spacing: 0.3px;
-  text-transform: uppercase;
+.btn-primary:hover {
+  background: #0e857b;
+}
+
+.text-light {
+  color: #e9ecef !important;
 }

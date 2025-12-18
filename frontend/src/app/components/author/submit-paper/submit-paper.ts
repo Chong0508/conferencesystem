@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router'; // Removed RouterLink based on your previous check
-// 👇 Import Services
-import { ConferenceService } from '../../../services/conference';
-import { PaperService } from '../../../services/paper';
+import { Router } from '@angular/router';
+import { PaperService } from '../../../services/paper.service';
 import { AuthService } from '../../../services/auth';
+// 1. ADD THIS IMPORT:
+import { TrackService } from '../../../services/track.service';
 
 @Component({
   selector: 'app-submit-paper',
@@ -17,7 +17,6 @@ import { AuthService } from '../../../services/auth';
 export class SubmitPaper implements OnInit {
 
   tracks: any[] = [];
-
   paperObj: any = {
     title: '',
     abstract: '',
@@ -29,28 +28,28 @@ export class SubmitPaper implements OnInit {
   isLoading: boolean = false;
 
   constructor(
-    private router: Router,
-    private conferenceService: ConferenceService, // 👈 Inject ConferenceService
-    private paperService: PaperService,           // 👈 Inject PaperService
-    private authService: AuthService              // 👈 Inject AuthService
-  ) {}
+      private router: Router,
+      private authService: AuthService,
+      private paperService: PaperService,
+      private trackService: TrackService
+    ) {}
 
   ngOnInit() {
     this.loadTracks();
   }
 
   loadTracks() {
-    // 👇 Use Service to get tracks
-    this.conferenceService.getAllTracks().subscribe((data: any[]) => {
-      this.tracks = data;
+    this.trackService.getAllTracks().subscribe({
+      next: (data: any[]) => {
+        this.tracks = data;
+      },
+      error: (err: any) => console.error("Failed to load tracks", err)
     });
   }
 
-  // Handle file selection
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
-      // Simple validation: Max 10MB
       if (file.size > 10 * 1024 * 1024) {
         alert("File is too large! Max size is 10MB.");
         return;
@@ -59,9 +58,7 @@ export class SubmitPaper implements OnInit {
     }
   }
 
-  // Handle Form Submission
   onSubmit() {
-    // 1. Validation
     if (!this.paperObj.title || !this.paperObj.abstract || !this.paperObj.trackId || !this.paperObj.fileName) {
       alert("Please fill in all required fields (*) and upload a file.");
       return;
@@ -69,34 +66,33 @@ export class SubmitPaper implements OnInit {
 
     this.isLoading = true;
 
-    // 2. Get Current User info from AuthService
-    const currentUser = this.authService.getLoggedUser();
+    this.authService.getLoggedUser().subscribe({
+      next: (user: any) => {
+        const payload = {
+          ...this.paperObj,
+          authorId: user.user_id,
+          status: 'Pending Review'
+        };
 
-    if (!currentUser) {
-      alert("Session expired. Please login again.");
-      this.router.navigate(['/login']);
-      return;
-    }
-
-    // 3. Create the Paper Object
-    const newPaper = {
-      ...this.paperObj,
-      authorEmail: currentUser.email,
-      authorName: currentUser.firstName + ' ' + currentUser.lastName,
-      // 'id' and 'status' will be handled by the Service
-    };
-
-    // 4. Use Service to Submit Paper
-    this.paperService.createPaper(newPaper).subscribe(() => {
-      this.isLoading = false;
-      alert("🎉 Paper Submitted Successfully! \nStatus: Pending Review");
-      this.resetForm();
-      // Optional: Navigate to 'My Submissions'
-      // this.router.navigate(['/dashboard/my-submissions']);
+        this.paperService.submitPaper(payload).subscribe({
+          next: (res: any) => {
+            this.isLoading = false;
+            alert("🎉 Paper Submitted Successfully!");
+            this.router.navigate(['/dashboard/my-submissions']);
+          },
+          error: (err: any) => {
+            this.isLoading = false;
+            alert("Submission failed. Check backend connection.");
+          }
+        });
+      },
+      error: () => {
+        alert("Session expired. Please login again.");
+        this.router.navigate(['/login']);
+      }
     });
   }
 
-  // Reset the form
   resetForm() {
     this.paperObj = { title: '', abstract: '', trackId: '', keywords: '', fileName: '' };
   }

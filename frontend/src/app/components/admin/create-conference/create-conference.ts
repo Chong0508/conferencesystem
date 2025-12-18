@@ -1,47 +1,64 @@
-import { Component } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-// 👇 Import ConferenceService
-import { ConferenceService } from '../../../services/conference';
+import { Router, RouterLink } from '@angular/router';
+import { ConferenceService } from '../../../services/conference.service';
 
 @Component({
   selector: 'app-create-conference',
   standalone: true,
-  imports: [RouterLink, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './create-conference.html',
   styleUrl: './create-conference.css',
 })
-export class CreateConference {
+export class CreateConference implements OnInit {
 
-  // Data model binding to the form
-  newConference: any = {
+  conferenceObj: any = {
     title: '',
+    acronym: '',
     description: '',
-    date: '',
-    venue: '',
-    category: 'Computer Science', // Default value
-    status: 'Upcoming' // Default status
+    start_date: '',
+    end_date: '',
+    location: '',
+    website_url: '',
+    createdBy: null
   };
 
+  isLoading: boolean = false;
+
   constructor(
-    private conferenceService: ConferenceService,
+    private confService: ConferenceService,
     private router: Router
   ) {}
 
-  createConference() {
-    // 1. Basic Validation
-    if (!this.newConference.title || !this.newConference.date || !this.newConference.venue) {
-      alert('Please fill in all required fields (Title, Date, Venue).');
+  ngOnInit() {
+    // Get logged-in user ID for 'created_by'
+    const userStr = localStorage.getItem('loggedUser');
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      this.conferenceObj.createdBy = user.id || user.user_id;
+    }
+  }
+
+  onSubmit() {
+    if (!this.conferenceObj.title || !this.conferenceObj.start_date || !this.conferenceObj.location) {
+      alert('Please fill in required fields.');
       return;
     }
 
-    // 2. Call Service to save data (This saves to LocalStorage)
-    // Once saved, Author/Reviewer will see it because they read from the same Service.
-    this.conferenceService.createConference(this.newConference).subscribe(() => {
-      alert('✅ Conference created successfully!');
+    this.isLoading = true;
 
-      // 3. Redirect to Admin Conference List
-      this.router.navigate(['/dashboard/conferences']);
+    this.confService.createConference(this.conferenceObj).subscribe({
+      next: (res) => {
+        this.isLoading = false;
+        alert('Conference Created Successfully!');
+        this.router.navigate(['/dashboard/conferences']);
+      },
+      error: (err) => {
+        this.isLoading = false;
+        console.error('Error:', err);
+        alert('Failed to save. Check your Backend connection.');
+      }
     });
   }
 }

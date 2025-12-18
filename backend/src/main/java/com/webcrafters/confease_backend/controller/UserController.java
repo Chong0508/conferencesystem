@@ -6,11 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-@RestController
 @RequestMapping("/users")
-@CrossOrigin(origins = "*")
+@RestController
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 public class UserController {
 
     @Autowired
@@ -44,7 +46,9 @@ public class UserController {
         return userRepository.findById(id)
                 .map(existingUser -> {
                     existingUser.setEmail(updatedUser.getEmail());
-                    existingUser.setPassword_hash(updatedUser.getPassword_hash());
+                    if(updatedUser.getPassword_hash() != null) {
+                        existingUser.setPassword_hash(updatedUser.getPassword_hash());
+                    }
                     existingUser.setFirst_name(updatedUser.getFirst_name());
                     existingUser.setLast_name(updatedUser.getLast_name());
                     existingUser.setAffiliation(updatedUser.getAffiliation());
@@ -71,5 +75,38 @@ public class UserController {
                     return ResponseEntity.ok("User deleted successfully.");
                 })
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    // ==================================================
+    // 2. NEW MAPPING (ADD THIS FOR LOGIN)
+    // ==================================================
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        // 1. Find user by Email
+        User user = userRepository.findByEmail(loginRequest.getEmail());
+
+        // 2. Check if user exists AND password matches
+        if (user != null && user.getPassword_hash().equals(loginRequest.getPassword())) {
+
+            // 3. Return the user object (Frontend will save this to localStorage)
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Login successful");
+            response.put("user", user);
+            return ResponseEntity.ok(response);
+        }
+
+        return ResponseEntity.status(401).body("Invalid email or password");
+    }
+
+    // Helper class to read the JSON { "email": "...", "password": "..." }
+    public static class LoginRequest {
+        private String email;
+        private String password;
+
+        public String getEmail() { return email; }
+        public void setEmail(String email) { this.email = email; }
+        public String getPassword() { return password; }
+        public void setPassword(String password) { this.password = password; }
     }
 }

@@ -1,29 +1,27 @@
 <div class="container mt-4 animate__animated animate__fadeIn">
 
-  <div class="d-flex justify-content-between align-items-end mb-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-      <h2 class="fw-bold text-dark mb-1">My Submissions</h2>
-      <p class="text-muted mb-0">Track the status of your research papers and manage registrations.</p>
+      <h4 class="fw-bold text-dark mb-1">My Submissions</h4>
+      <p class="text-muted small mb-0">Track and manage your research papers.</p>
     </div>
-    <button class="btn btn-teal rounded-pill px-4 py-2 shadow-sm fw-bold" routerLink="/dashboard/submit-paper">
+    <button class="btn btn-primary rounded-pill px-4 shadow-sm" routerLink="/dashboard/submit-paper">
       <i class="bi bi-plus-lg me-2"></i>New Submission
     </button>
   </div>
 
   <div *ngIf="isLoading" class="text-center py-5">
-    <div class="spinner-border text-teal" role="status"></div>
-    <p class="text-muted mt-3 small fw-bold">Loading your papers...</p>
+    <div class="spinner-border text-primary" role="status"></div>
+    <p class="text-muted mt-2 small">Loading records...</p>
   </div>
 
-  <div *ngIf="!isLoading && myPapers.length === 0" class="text-center py-5 bg-white rounded-4 shadow-sm border border-dashed">
-    <div class="mb-4">
-      <div class="icon-circle bg-light text-muted mx-auto">
-        <i class="bi bi-folder2-open display-4"></i>
-      </div>
+  <div *ngIf="!isLoading && myPapers.length === 0" class="text-center py-5 bg-white rounded-4 shadow-sm border-0">
+    <div class="mb-3">
+      <i class="bi bi-folder-x display-1 text-light"></i>
     </div>
-    <h4 class="fw-bold text-dark">No Submissions Yet</h4>
-    <p class="text-muted mb-4">You haven't submitted any research papers to G5ConfEase.</p>
-    <button class="btn btn-outline-teal px-4 py-2 fw-bold" routerLink="/dashboard/submit-paper">
+    <h5 class="fw-bold text-secondary">No Submissions Found</h5>
+    <p class="text-muted small mb-4">You haven't submitted any papers to G5ConfEase yet.</p>
+    <button class="btn btn-outline-primary" routerLink="/dashboard/submit-paper">
       Start Your First Submission
     </button>
   </div>
@@ -33,70 +31,66 @@
       <table class="table table-hover align-middle mb-0">
         <thead class="bg-light">
         <tr>
-          <th class="py-3 ps-4 text-uppercase text-muted x-small fw-bold">Paper Information</th>
-          <th class="py-3 text-uppercase text-muted x-small fw-bold">Track</th>
-          <th class="py-3 text-uppercase text-muted x-small fw-bold">Date</th>
-          <th class="py-3 text-uppercase text-muted x-small fw-bold">Status</th>
-          <th class="py-3 text-end pe-4 text-uppercase text-muted x-small fw-bold">Actions</th>
+          <th class="py-3 ps-4 text-uppercase small text-muted">Paper Details</th>
+          <th class="py-3 text-uppercase small text-muted">Track ID</th>
+          <th class="py-3 text-uppercase small text-muted">Submitted Date</th>
+          <th class="py-3 text-uppercase small text-muted">Status</th>
+          <th class="py-3 text-end pe-4 text-uppercase small text-muted">Action</th>
         </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let paper of myPapers" class="paper-row">
-
-          <td class="ps-4 py-4">
-            <div class="d-flex align-items-center">
-              <div class="icon-square bg-light text-teal rounded-3 me-3 d-none d-md-flex">
-                <i class="bi bi-file-earmark-text-fill fs-5"></i>
-              </div>
-              <div>
-                <h6 class="fw-bold text-dark mb-1">{{ paper.title }}</h6>
-                <div class="d-flex align-items-center text-muted small">
-                  <i class="bi bi-paperclip me-1"></i> {{ paper.fileName }}
-                </div>
-              </div>
+        <tr *ngFor="let paper of myPapers">
+          <td class="ps-4 py-3">
+            <div class="fw-bold text-dark mb-1">{{ paper.title }}</div>
+            <div class="d-flex align-items-center text-muted small">
+              <i class="bi bi-file-earmark-pdf me-1"></i>
+              {{ paper.fileName }}
             </div>
           </td>
 
           <td>
-              <span class="badge bg-light text-dark border fw-normal px-2 py-1">
-                #{{ paper.trackId }}
-              </span>
+                            <span class="badge bg-light text-dark border fw-normal">
+                                #{{ paper.trackId }}
+                            </span>
           </td>
 
-          <td class="text-muted small fw-medium">
+          <td class="text-muted small">
             {{ paper.submittedAt | date:'mediumDate' }}
           </td>
 
           <td>
-              <span class="badge rounded-pill border px-3 py-2 fw-bold status-badge"
-                    [ngClass]="getStatusClass(paper.status)">
-                <i class="bi me-1"
-                   [ngClass]="{
-                     'bi-check-circle-fill': paper.status === 'Accepted',
-                     'bi-x-circle-fill': paper.status === 'Rejected',
-                     'bi-check2-all': paper.status === 'Registered',
-                     'bi-hourglass-split': paper.status === 'Pending Review' || paper.status === 'Reviewed'
-                   }"></i>
-                {{ paper.status }}
-              </span>
+                            <span class="badge rounded-pill border px-3 py-2 fw-bold"
+                                  [ngClass]="getStatusClass(paper.status)">
+                                <i class="bi"
+                                   [ngClass]="{'bi-check-circle-fill': paper.status === 'Accepted',
+                                               'bi-x-circle-fill': paper.status === 'Rejected',
+                                               'bi-info-circle-fill': paper.status === 'Reviewed',
+                                               'bi-check2-all': paper.status === 'Registered',
+                                               'bi-hourglass-split': paper.status === 'Pending Review'}">
+                                </i>
+                              {{ paper.status }}
+                            </span>
           </td>
 
           <td class="text-end pe-4">
             <div class="d-flex justify-content-end gap-2">
 
-              <button class="btn btn-icon btn-light text-muted" (click)="viewDetails(paper)" title="View Details">
-                <i class="bi bi-eye"></i>
+              <button class="btn btn-sm btn-light text-primary border"
+                      (click)="viewDetails(paper)"
+                      title="View Details">
+                Details
               </button>
 
               <button *ngIf="paper.status === 'Accepted'"
-                      class="btn btn-sm btn-teal shadow-sm animate__animated animate__fadeIn px-3"
+                      class="btn btn-sm btn-success shadow-sm animate__animated animate__fadeIn"
                       [routerLink]="['/dashboard/registration', paper.id]">
-                Register Now
+                Register
               </button>
 
               <button *ngIf="paper.status === 'Registered'"
-                      class="btn btn-sm btn-outline-success border fw-bold animate__animated animate__fadeIn px-3"
-                      (click)="viewReceipt(paper)">
+                      class="btn btn-sm btn-outline-success border-2 fw-bold animate__animated animate__fadeIn"
+                      (click)="viewReceipt(paper)"
+                      title="View Official Receipt">
                 <i class="bi bi-receipt me-1"></i> Receipt
               </button>
 

@@ -1,107 +1,15 @@
 <div class="container mt-4 mb-5 animate__animated animate__fadeIn">
 
   <button class="btn btn-link text-decoration-none text-muted mb-3 ps-0" (click)="goBack()">
-    <i class="bi bi-arrow-left me-1"></i> Back
+    <i class="bi bi-arrow-left me-1"></i> Back to My Submissions
   </button>
 
   <div *ngIf="isLoading" class="text-center py-5">
     <div class="spinner-border text-primary" role="status"></div>
   </div>
 
-  <!-- Conference Details View -->
-  <div *ngIf="!isLoading && isConference && conference" class="row">
-    <div class="col-lg-8">
-      <div class="card border-0 shadow-sm">
-        <div class="card-body p-4">
-          <div class="d-flex justify-content-between align-items-start mb-3">
-            <div>
-              <h2 class="fw-bold mb-2">{{ conference.name }}</h2>
-              <span class="badge" [ngClass]="{'bg-success': conference.status === 'Upcoming', 'bg-warning text-dark': conference.status === 'Ongoing', 'bg-secondary': conference.status === 'Past'}">
-                {{ conference.status || 'Upcoming' }}
-              </span>
-            </div>
-            <div>
-              <!-- Author Actions -->
-              <button *ngIf="isAuthor()" class="btn btn-success me-2" (click)="joinConference()">
-                <i class="bi bi-plus-circle me-2"></i>Join Conference
-              </button>
+  <div *ngIf="!isLoading && paper" class="row">
 
-              <!-- Admin Actions -->
-              <div *ngIf="isAdmin()">
-                <button class="btn btn-warning me-2" (click)="editConference()">
-                  <i class="bi bi-pencil me-2"></i>Edit
-                </button>
-                <button class="btn btn-danger" (click)="deleteConference()">
-                  <i class="bi bi-trash me-2"></i>Delete
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div class="mb-4">
-            <h5 class="fw-semibold mb-3">Description</h5>
-            <p class="text-muted">{{ conference.description }}</p>
-          </div>
-
-          <div class="row mb-4">
-            <div class="col-md-6">
-              <h6 class="fw-semibold mb-2">
-                <i class="bi bi-calendar-event me-2"></i>Date
-              </h6>
-              <p class="text-muted">{{ conference.date }}</p>
-            </div>
-            <div class="col-md-6">
-              <h6 class="fw-semibold mb-2">
-                <i class="bi bi-geo-alt me-2"></i>Location
-              </h6>
-              <p class="text-muted">{{ conference.location }}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-lg-4">
-      <div class="card border-0 shadow-sm mb-3">
-        <div class="card-body">
-          <h5 class="fw-semibold mb-3">Quick Actions</h5>
-
-          <!-- Author Quick Actions -->
-          <div *ngIf="isAuthor()" class="d-grid gap-2">
-            <button class="btn btn-outline-primary">
-              <i class="bi bi-file-earmark-text me-2"></i>Submit Paper
-            </button>
-            <button class="btn btn-outline-secondary">
-              <i class="bi bi-info-circle me-2"></i>View Guidelines
-            </button>
-          </div>
-
-          <!-- Reviewer Quick Actions -->
-          <div *ngIf="isReviewer()" class="d-grid gap-2">
-            <button class="btn btn-outline-primary">
-              <i class="bi bi-journal-text me-2"></i>View Papers
-            </button>
-            <button class="btn btn-outline-secondary">
-              <i class="bi bi-clipboard-check me-2"></i>Review History
-            </button>
-          </div>
-
-          <!-- Admin Quick Actions -->
-          <div *ngIf="isAdmin()" class="d-grid gap-2">
-            <button class="btn btn-outline-primary">
-              <i class="bi bi-people me-2"></i>Manage Participants
-            </button>
-            <button class="btn btn-outline-secondary">
-              <i class="bi bi-tags me-2"></i>Manage Tracks
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Paper Details View -->
-  <div *ngIf="!isLoading && !isConference && paper" class="row">
     <div class="col-lg-8 mb-4">
       <div class="card border-0 shadow-sm h-100 rounded-4">
         <div class="card-body p-4">
@@ -122,9 +30,9 @@
 
           <h6 class="text-uppercase text-muted small fw-bold ls-1 mb-2">Keywords</h6>
           <div class="d-flex flex-wrap gap-2 mb-4">
-            <span class="badge bg-secondary-subtle text-secondary fw-normal px-3 py-2">
-              {{ paper.keywords || 'None' }}
-            </span>
+                        <span class="badge bg-secondary-subtle text-secondary fw-normal px-3 py-2">
+                            {{ paper.keywords || 'None' }}
+                        </span>
           </div>
 
           <hr class="text-muted opacity-25 my-4">
@@ -152,8 +60,8 @@
         <div class="card-body p-4 text-center">
           <h6 class="text-muted text-uppercase small fw-bold mb-3">Current Status</h6>
           <span class="badge px-4 py-2 fs-6 rounded-pill" [ngClass]="getStatusClass(paper.status)">
-            {{ paper.status }}
-          </span>
+                        {{ paper.status }}
+                    </span>
           <p class="text-muted small mt-3 mb-0">
             Track ID: <b>#{{ paper.trackId }}</b>
           </p>
@@ -175,8 +83,8 @@
             <span class="fw-bold text-primary-emphasis d-block mb-1">Recommendation</span>
             <span class="fw-bold"
                   [ngClass]="{'text-success': review.recommendation === 'Accept', 'text-danger': review.recommendation === 'Reject'}">
-              {{ review.recommendation }}
-            </span>
+                            {{ review.recommendation }}
+                        </span>
           </div>
 
           <hr class="border-primary opacity-25">

@@ -7,7 +7,7 @@ USE cmsdb;
 -- ----------------------------
 -- 1. Insert Users
 -- ----------------------------
-INSERT INTO user (email, password_hash, first_name, last_name, affiliation, country, category, orcid, is_email_verified)
+INSERT INTO `user` (email, password_hash, first_name, last_name, affiliation, country, category, orcid, is_email_verified)
 VALUES
     ('admin@cms.com', 'hash_admin', 'Alice', 'Tan', 'UTM', 'Malaysia', 'staff', '0000-0001-1234-5678', TRUE),
     ('reviewer1@cms.com', 'hash_rev1', 'Bob', 'Lee', 'UM', 'Malaysia', 'academic', '0000-0002-1234-5678', TRUE),

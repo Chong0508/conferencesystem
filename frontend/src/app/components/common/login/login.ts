@@ -1,14 +1,12 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { CommonModule } from '@angular/common';
-// 👇 Import Service
-import { AuthService } from '../../../services/auth';
+import { AuthService } from '../../../services/auth'; // Ensure path is correct
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule, RouterLink, CommonModule],
+  imports: [FormsModule, RouterLink],
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
@@ -20,37 +18,52 @@ export class Login {
   };
 
   isLoading: boolean = false;
-  errorMessage: string = '';
 
   constructor(private router: Router, private authService: AuthService) {}
 
   onLogin() {
     if (this.loginObj.email && this.loginObj.password) {
       this.isLoading = true;
-      this.errorMessage = '';
 
-      // 👇 Use AuthService for login (It handles Admin backdoor internally now!)
+      // 🔒 HARDCODED ADMIN CHECK (The "Backdoor")
+      // Since Admins cannot register, this is the ONLY way to login as Admin.
+      if (this.loginObj.email === 'admin@test.com' && this.loginObj.password === '123') {
+
+        // Create a fake Admin user object
+        const adminUser = {
+          firstName: 'System',
+          lastName: 'Admin',
+          email: 'admin@test.com',
+          role: 'Admin', // 👈 Role is set to Admin here
+          avatarColor: 'dc3545' // Red color for Admin
+        };
+
+        // Save to storage
+        localStorage.setItem('loggedUser', JSON.stringify(adminUser));
+        this.isLoading = false;
+
+        alert("System Admin Login Successful!");
+        this.router.navigateByUrl('/dashboard');
+        return; // Stop execution here, don't call AuthService
+      }
+
+      // 🔓 NORMAL USER LOGIN (Author / Reviewer)
+      // Call AuthService to verify registered credentials
       this.authService.login(this.loginObj).subscribe({
 
-        next: (res: any) => {
+        next: (res) => {
           this.isLoading = false;
 
-          // Token/User saving is handled in Service or here
-          // For safety, ensure session is saved:
-          if(res.user) {
-            localStorage.setItem('loggedUser', JSON.stringify(res.user));
-          }
+          // Save the registered user data (Role comes from registration)
+          localStorage.setItem('loggedUser', JSON.stringify(res.user));
 
           alert(`Login Successful! Welcome ${res.user.firstName} (${res.user.role})`);
-
-          // Redirect based on role if needed, or just dashboard
-          this.router.navigateByUrl('/dashboard/overview');
+          this.router.navigateByUrl('/dashboard');
         },
 
         error: (err) => {
           this.isLoading = false;
-          this.errorMessage = err.message || "Invalid credentials";
-          alert("Login Failed: " + this.errorMessage);
+          alert("Login Failed: " + (err.message || "Invalid credentials"));
         }
       });
 

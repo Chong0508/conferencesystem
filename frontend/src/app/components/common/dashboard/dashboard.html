@@ -10,46 +10,91 @@
     <ul class="nav flex-column mt-4">
 
       <li class="nav-item">
-        <a class="nav-link" routerLink="/dashboard/overview" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        <a class="nav-link" routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
           <i class="bi bi-speedometer2 me-2"></i> Overview
         </a>
       </li>
 
-      <li class="nav-item">
-        <a class="nav-link" routerLink="/dashboard/notifications" routerLinkActive="active">
-          <i class="bi bi-bell me-2"></i> Message Center
-          <span *ngIf="unreadCount > 0" class="badge bg-danger ms-auto rounded-pill">{{ unreadCount }}</span>
-        </a>
-      </li>
-
       <ng-container *ngIf="loggedUser.role === 'Admin'">
+
         <li class="nav-item">
           <p class="text-muted small ms-3 mt-3 mb-2 fw-bold">ADMINISTRATION</p>
         </li>
-        <li class="nav-item"><a class="nav-link" routerLink="/dashboard/conferences" routerLinkActive="active"><i class="bi bi-calendar-event me-2"></i> Manage Conferences</a></li>
-        <li class="nav-item"><a class="nav-link" routerLink="/dashboard/tracks" routerLinkActive="active"><i class="bi bi-list-check me-2"></i> Manage Tracks</a></li>
-        <li class="nav-item"><a class="nav-link" routerLink="/dashboard/all-papers" routerLinkActive="active"><i class="bi bi-files me-2"></i> All Papers</a></li>
-        <li class="nav-item"><a class="nav-link" routerLink="/dashboard/user-management" routerLinkActive="active"><i class="bi bi-people-fill me-2"></i> User Management</a></li>
-        <li class="nav-item"><a class="nav-link" routerLink="/dashboard/schedule" routerLinkActive="active"><i class="bi bi-clock-history me-2"></i> Schedule & Sessions</a></li>
-        <li class="nav-item"><a class="nav-link" routerLink="/dashboard/activity-logs" routerLinkActive="active"><i class="bi bi-activity me-2"></i> Activity Logs</a></li>
+
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/dashboard/conferences" routerLinkActive="active">
+            <i class="bi bi-calendar-event me-2"></i> Manage Conferences
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/dashboard/tracks" routerLinkActive="active">
+            <i class="bi bi-list-check me-2"></i> Manage Tracks
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/dashboard/all-papers" routerLinkActive="active">
+            <i class="bi bi-files me-2"></i> All Papers
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/dashboard/user-management" routerLinkActive="active">
+            <i class="bi bi-people-fill me-2"></i> User Management
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/dashboard/schedule" routerLinkActive="active">
+            <i class="bi bi-clock-history me-2"></i> Schedule & Sessions
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/dashboard/activity-logs" routerLinkActive="active">
+            <i class="bi bi-activity me-2"></i> Activity Logs
+          </a>
+        </li>
+
       </ng-container>
 
       <ng-container *ngIf="loggedUser.role === 'Author' || loggedUser.role === 'Admin'">
+
         <li class="nav-item">
           <p class="text-muted small ms-3 mt-3 mb-2 fw-bold">AUTHOR ZONE</p>
         </li>
-        <li class="nav-item"><a class="nav-link" routerLink="/dashboard/submit-paper" routerLinkActive="active"><i class="bi bi-file-earmark-arrow-up me-2"></i> Submit Paper</a></li>
-        <li class="nav-item"><a class="nav-link" routerLink="/dashboard/my-submissions" routerLinkActive="active"><i class="bi bi-folder2-open me-2"></i> My Submissions</a></li>
-        <li class="nav-item"><a class="nav-link" routerLink="/dashboard/conference-list" routerLinkActive="active"><i class="bi bi-calendar3 me-2"></i> Upcoming Conferences</a></li>
+
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/dashboard/submit-paper" routerLinkActive="active">
+            <i class="bi bi-file-earmark-arrow-up me-2"></i> Submit Paper
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/dashboard/my-submissions" routerLinkActive="active">
+            <i class="bi bi-folder2-open me-2"></i> My Submissions
+          </a>
+        </li>
       </ng-container>
 
       <ng-container *ngIf="loggedUser.role === 'Reviewer' || loggedUser.role === 'Admin'">
+
         <li class="nav-item">
           <p class="text-muted small ms-3 mt-3 mb-2 fw-bold">REVIEWER ZONE</p>
         </li>
-        <li class="nav-item"><a class="nav-link" routerLink="/dashboard/reviews" routerLinkActive="active"><i class="bi bi-star me-2"></i> My Reviews</a></li>
-        <li class="nav-item"><a class="nav-link" routerLink="/dashboard/review-history" routerLinkActive="active"><i class="bi bi-clock-history me-2"></i> Review History</a></li>
-        <li class="nav-item"><a class="nav-link" routerLink="/dashboard/conference-list" routerLinkActive="active"><i class="bi bi-calendar3 me-2"></i> Upcoming Conferences</a></li>
+
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/dashboard/reviews" routerLinkActive="active">
+            <i class="bi bi-star me-2"></i> My Reviews
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/dashboard/review-history" routerLinkActive="active">
+            <i class="bi bi-clock-history me-2"></i> Review History
+          </a>
+        </li>
       </ng-container>
 
       <li class="nav-item mt-4">
@@ -74,23 +119,15 @@
         <span class="navbar-brand mb-0 h1 text-secondary">Dashboard</span>
 
         <div class="d-flex align-items-center">
-
-          <a routerLink="/dashboard/notifications" class="text-secondary me-4 position-relative" style="font-size: 1.2rem; cursor: pointer; text-decoration: none;">
-            <i class="bi bi-bell-fill"></i>
-
-            <span *ngIf="unreadCount > 0"
-                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                  style="font-size: 0.6rem; border: 2px solid white;">
-              {{ unreadCount }}
-            </span>
-          </a>
-
           <div class="text-end me-3">
-            <p class="mb-0 fw-bold text-dark">{{ loggedUser.firstName }} {{ loggedUser.lastName }}</p>
+            <p class="mb-0 fw-bold text-dark">
+              {{ loggedUser.firstName }} {{ loggedUser.lastName }}
+            </p>
             <small class="text-muted">{{ loggedUser.role }}</small>
           </div>
           <img [src]="'https://ui-avatars.com/api/?name=' + loggedUser.firstName + '+' + loggedUser.lastName + '&background=' + (loggedUser.avatarColor || '11998e') + '&color=fff'"
-               class="rounded-circle avatar" alt="Avatar">
+               class="rounded-circle avatar"
+               alt="Avatar">
         </div>
       </div>
     </header>

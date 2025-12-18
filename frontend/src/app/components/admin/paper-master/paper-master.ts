@@ -2,9 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-// 👇 Fixed Imports: No .service suffix
-import { PaperService } from '../../../services/paper';
-import { UserService } from '../../../services/user.service';
 
 @Component({
   selector: 'app-paper-master',
@@ -19,40 +16,22 @@ export class PaperMaster implements OnInit {
   filteredPapers: any[] = [];
   isLoading: boolean = true;
 
-  // add and save reviewers
-  reviewers: any[] = [];
-
   // Filter
   statusFilter: string = 'All';
 
-  constructor(
-    private router: Router,
-    private paperService: PaperService, // 👈 Inject PaperService
-    private userService: UserService    // 👈 Inject UserService
-  ) {}
+  constructor(private router: Router) {}
 
   ngOnInit() {
     this.loadPapers();
-    this.loadReviewers();
   }
 
   loadPapers() {
-    this.isLoading = true;
-    // 👇 Fixed: Added type (data: any[]) to avoid implicit any error
-    this.paperService.getAllPapers().subscribe((data: any[]) => {
-      this.allPapers = data;
+    setTimeout(() => {
+      // 1. Get all papers from Mock DB
+      this.allPapers = JSON.parse(localStorage.getItem('mock_papers') || '[]');
       this.applyFilter();
       this.isLoading = false;
-    });
-  }
-
-  // Load Reviewer name list
-  loadReviewers() {
-    // 👇 Fixed: Added type (users: any[])
-    this.userService.getAllUsers().subscribe((users: any[]) => {
-      // choosing role is Reviewer user
-      this.reviewers = users.filter((u: any) => u.role === 'Reviewer');
-    });
+    }, 500);
   }
 
   // Filter Logic
@@ -64,7 +43,7 @@ export class PaperMaster implements OnInit {
     }
   }
 
-  // Helper for Status Color (Used in HTML)
+  // Helper for Status Color
   getStatusClass(status: string): string {
     switch (status) {
       case 'Accepted': return 'bg-success-subtle text-success border-success';
@@ -72,59 +51,48 @@ export class PaperMaster implements OnInit {
       case 'Revision': return 'bg-warning-subtle text-warning border-warning';
       case 'Reviewed': return 'bg-info-subtle text-info border-info';
       case 'Registered': return 'bg-success text-white';
-      case 'Under Review': return 'bg-primary-subtle text-primary border-primary';
       default: return 'bg-light text-secondary border-secondary';
     }
   }
 
   // --- Admin Actions ---
 
-  assignReviewer(paper: any) {
-    if (paper.status === 'Pending Review') {
-      paper.status = 'Under Review';
-    }
-
-    // Use Service to update paper (save assigned reviewer)
-    this.paperService.updatePaper(paper).subscribe(() => {
-      this.applyFilter();
-    });
-  }
-
-  // 1. Accept Paper
+  // 1. Accept Paper (This enables Registration for Author)
   acceptPaper(paper: any) {
     if (confirm(`Are you sure you want to ACCEPT "${paper.title}"?`)) {
-      paper.status = 'Accepted';
-      this.updateStatus(paper);
+      this.updateStatus(paper.id, 'Accepted');
     }
   }
 
   // 2. Reject Paper
   rejectPaper(paper: any) {
     if (confirm(`Are you sure you want to REJECT "${paper.title}"?`)) {
-      paper.status = 'Rejected';
-      this.updateStatus(paper);
+      this.updateStatus(paper.id, 'Rejected');
     }
   }
 
-  // 3. Delete Paper
+  // 3. Delete Paper (Cleanup)
   deletePaper(paperId: number) {
     if (confirm("⚠️ Warning: This will permanently delete the paper. Continue?")) {
-      // Use Service to delete
-      this.paperService.deletePaper(paperId).subscribe(() => {
-        this.loadPapers(); // Refresh list
-      });
+      this.allPapers = this.allPapers.filter(p => p.id !== paperId);
+      this.filteredPapers = this.filteredPapers.filter(p => p.id !== paperId);
+      localStorage.setItem('mock_papers', JSON.stringify(this.allPapers));
     }
   }
 
-  // View Details
+  // View Details (Reuse Author's detail page or Reviewer's)
   viewDetails(paperId: number) {
+    // For Admin, we can reuse the Paper Details page
     this.router.navigate(['/dashboard/paper-details', paperId]);
   }
 
   // Internal Helper to save status
-  updateStatus(paper: any) {
-    this.paperService.updatePaper(paper).subscribe(() => {
-      this.applyFilter();
-    });
+  updateStatus(id: number, newStatus: string) {
+    const index = this.allPapers.findIndex(p => p.id === id);
+    if (index !== -1) {
+      this.allPapers[index].status = newStatus;
+      localStorage.setItem('mock_papers', JSON.stringify(this.allPapers));
+      this.applyFilter(); // Refresh list
+    }
   }
 }

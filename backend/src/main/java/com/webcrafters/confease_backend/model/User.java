@@ -1,5 +1,6 @@
 package com.webcrafters.confease_backend.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
 
@@ -12,10 +13,16 @@ public class User {
     private Long user_id;
     private String email;
     private String password_hash;
+
+    @JsonProperty("firstName")
     private String first_name;
+
+    @JsonProperty("lastName")
     private String last_name;
     private String affiliation;
     private String country;
+
+    @JsonProperty("role")
     private String category;
     private String orcid;
     private String profile_picture;

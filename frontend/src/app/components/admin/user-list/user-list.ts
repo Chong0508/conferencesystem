@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-// 👇 Import UserService
+
 import { UserService } from '../../../services/user.service';
 
-// Define Interface matching Register data structure
 interface User {
   id?: number;
   firstName: string;
@@ -28,7 +27,6 @@ export class UserListComponent implements OnInit {
   searchTerm: string = '';
   selectedRole: string = 'All';
 
-  // 👇 Inject UserService
   constructor(private userService: UserService) { }
 
   ngOnInit(): void {
@@ -37,11 +35,18 @@ export class UserListComponent implements OnInit {
 
   // --- Load Real Data ---
   loadUsers() {
-    // 👇 Use Service to get users
     this.userService.getAllUsers().subscribe(data => {
-      this.users = data;
-      this.filteredUsers = [...this.users];
-    });
+        this.users = data.map((u: any) => ({
+          role: u.category || 'Author',
+
+          id: u.user_id,
+          firstName: u.first_name,
+          lastName: u.last_name,
+          email: u.email,
+          joinDate: u.created_at
+        }));
+        this.filteredUsers = [...this.users];
+      });
   }
 
   // --- Search ---
@@ -71,21 +76,23 @@ export class UserListComponent implements OnInit {
   }
 
   // --- Delete User ---
-  deleteUser(email: string) {
-    if (confirm(`Are you sure you want to delete user: ${email}?`)) {
-      // 👇 Use Service to delete user
-      this.userService.deleteUser(email).subscribe(() => {
-        this.loadUsers(); // Refresh list
+  deleteUser(user: any) {
+    // Use the specific ID from your MySQL model (likely user_id)
+    const userId = user.user_id || user.id;
+
+    if (confirm(`Are you sure you want to delete ${user.firstName} ${user.lastName}?`)) {
+      this.userService.deleteUser(userId).subscribe({
+        next: (response) => {
+          console.log('✅ Success:', response);
+          alert('User deleted successfully.');
+          this.loadUsers(); // Refresh the list from the backend
+        },
+        error: (err) => {
+          console.error('❌ Delete failed:', err);
+          alert('Could not delete user. Check console for details.');
+        }
       });
     }
   }
-
-  // (Optional) Debug function to clear all users
-  clearAllUsers() {
-    if(confirm('Warning: This will delete ALL users. Continue?')) {
-      // Assuming you might add this method to UserService later
-      // this.userService.deleteAllUsers().subscribe(...)
-      alert('Function not implemented in service yet.');
-    }
   }
-}
+

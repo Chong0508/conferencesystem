@@ -1,5 +1,6 @@
 package com.webcrafters.confease_backend.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
 
@@ -10,15 +11,26 @@ public class Paper {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long paper_id;
+
+    @JsonProperty("trackId")
+    @Column(name = "track_id")
     private Long track_id;
     private String title;
+
+    @JsonProperty("abstract")
     @Column(columnDefinition = "TEXT")
     private String abstractText;
+
+    @JsonProperty("fileName")
+    @Column(name = "submission_file")
     private String submission_file;
     private String file_type;
     private Integer version;
     private Double plagiarism_score;
     private String status;
+
+    @JsonProperty("authorId")
+    @Column(name = "submitted_by")
     private Long submitted_by;
     private Timestamp submitted_at;
     private Timestamp last_updated;

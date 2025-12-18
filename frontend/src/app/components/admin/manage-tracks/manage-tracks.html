@@ -1,103 +1,84 @@
 <div class="container mt-4 animate__animated animate__fadeIn">
 
-  <div class="mb-4">
-    <h2 class="fw-bold text-dark mb-1">Track Management</h2>
-    <p class="text-muted mb-0">Define and organize research areas for the conference.</p>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="fw-bold text-dark mb-1">Manage Tracks</h4>
+      <p class="text-muted small mb-0">Define the research areas for the conference.</p>
+    </div>
   </div>
 
-  <div class="row g-4">
+  <div class="row">
 
-    <div class="col-lg-4">
-      <div class="modern-card create-card h-100">
-        <div class="d-flex align-items-center mb-4">
-          <div class="bg-success-subtle text-success rounded-circle d-flex align-items-center justify-content-center me-3"
-               style="width: 40px; height: 40px;">
-            <i class="bi bi-plus-lg fw-bold"></i>
+    <div class="col-md-4 mb-4">
+      <div class="card border-0 shadow-sm rounded-4 bg-primary text-white">
+        <div class="card-body p-4">
+          <h5 class="fw-bold mb-3"><i class="bi bi-plus-circle me-2"></i>Add New Track</h5>
+          <p class="small opacity-75 mb-3">Create a new category for paper submissions.</p>
+
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control text-dark border-0" id="trackName"
+                   [(ngModel)]="newTrackName" placeholder="e.g. Cloud Computing">
+            <label for="trackName" class="text-dark">Track Name</label>
           </div>
-          <div>
-            <h5 class="fw-bold mb-0 text-dark">Add New Track</h5>
-            <small class="text-muted">Create a category</small>
-          </div>
-        </div>
 
-        <div class="mb-3">
-          <label class="form-label">Track Name</label>
-          <input type="text" class="form-control modern-input"
-                 placeholder="e.g. Artificial Intelligence"
-                 [(ngModel)]="newTrackName">
-        </div>
-
-        <button class="btn btn-create"
-                (click)="addTrack()"
-                [disabled]="!newTrackName">
-          <i class="bi bi-folder-plus me-2"></i> Create Track
-        </button>
-
-        <div class="mt-5 text-center opacity-25">
-          <i class="bi bi-diagram-3" style="font-size: 4rem; color: #10b981;"></i>
+          <button class="btn btn-light text-primary fw-bold w-100 py-2"
+                  (click)="addTrack()" [disabled]="!newTrackName">
+            Create Track
+          </button>
         </div>
       </div>
     </div>
 
-    <div class="col-lg-8">
-      <div class="modern-card">
-        <div class="table-responsive">
-          <table class="table table-modern">
-            <thead>
-            <tr>
-              <th class="ps-4" style="width: 80px;">ID</th>
-              <th>Track Name</th>
-              <th class="text-end pe-4" style="width: 180px;">Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr *ngIf="tracks.length === 0">
-              <td colspan="3" class="text-center py-5 text-muted">
-                No tracks found. Add one on the left.
-              </td>
-            </tr>
+    <div class="col-md-8">
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="bg-light">
+              <tr>
+                <th class="ps-4 py-3">ID</th>
+                <th class="py-3 w-75">Track Name</th>
+                <th class="text-end pe-4 py-3">Actions</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let track of tracks">
+                <td class="ps-4 fw-bold text-muted">#{{ track.id }}</td>
 
-            <tr *ngFor="let track of tracks">
+                <td *ngIf="!editingTrack || editingTrack.id !== track.id">
+                  {{ track.name }}
+                </td>
 
-              <td class="ps-4">
-                <span class="id-badge">#{{ track.id }}</span>
-              </td>
-
-              <td>
-                <div *ngIf="!editingTrack || editingTrack.id !== track.id">
-                  <span class="track-name">{{ track.name }}</span>
-                </div>
-
-                <div *ngIf="editingTrack && editingTrack.id === track.id">
-                  <input type="text" class="form-control modern-input py-1"
+                <td *ngIf="editingTrack && editingTrack.id === track.id">
+                  <input type="text" class="form-control form-control-sm"
                          [(ngModel)]="editingTrack.name">
-                </div>
-              </td>
+                </td>
 
-              <td class="text-end pe-4">
+                <td class="text-end pe-4">
+                  <div *ngIf="!editingTrack || editingTrack.id !== track.id">
+                    <button class="btn btn-sm btn-link text-primary p-0 me-3"
+                            (click)="startEdit(track)">
+                      <i class="bi bi-pencil-square"></i> Edit
+                    </button>
+                    <button class="btn btn-sm btn-link text-danger p-0"
+                            (click)="deleteTrack(track.id)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
 
-                <div *ngIf="!editingTrack || editingTrack.id !== track.id">
-                  <button class="action-btn btn-edit-icon" (click)="startEdit(track)" title="Edit">
-                    <i class="bi bi-pencil-fill small"></i>
-                  </button>
-                  <button class="action-btn btn-delete-icon" (click)="deleteTrack(track.id)" title="Delete">
-                    <i class="bi bi-trash-fill small"></i>
-                  </button>
-                </div>
-
-                <div *ngIf="editingTrack && editingTrack.id === track.id" class="d-flex gap-2 justify-content-end">
-                  <button class="btn btn-sm btn-success text-white px-3" (click)="saveEdit()">
-                    Save
-                  </button>
-                  <button class="btn btn-sm btn-light border px-3" (click)="cancelEdit()">
-                    Cancel
-                  </button>
-                </div>
-
-              </td>
-            </tr>
-            </tbody>
-          </table>
+                  <div *ngIf="editingTrack && editingTrack.id === track.id">
+                    <button class="btn btn-sm btn-success py-0 me-2" (click)="saveEdit()">
+                      Save
+                    </button>
+                    <button class="btn btn-sm btn-secondary py-0" (click)="cancelEdit()">
+                      Cancel
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

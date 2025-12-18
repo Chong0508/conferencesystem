@@ -48,7 +48,6 @@ public class PaperController {
         Optional<Paper> optionalPaper = paperRepository.findById(id);
         if (optionalPaper.isPresent()) {
             Paper paper = optionalPaper.get();
-            // Update fields
             paper.setTrack_id(paperDetails.getTrack_id());
             paper.setTitle(paperDetails.getTitle());
             paper.setAbstractText(paperDetails.getAbstractText());
@@ -58,8 +57,6 @@ public class PaperController {
             paper.setPlagiarism_score(paperDetails.getPlagiarism_score());
             paper.setStatus(paperDetails.getStatus());
             paper.setSubmitted_by(paperDetails.getSubmitted_by());
-            // Note: submitted_at and last_updated are typically not updated manually, as they are timestamps
-
             Paper updatedPaper = paperRepository.save(paper);
             return ResponseEntity.ok(updatedPaper);
         } else {
@@ -67,7 +64,6 @@ public class PaperController {
         }
     }
 
-    // Delete a paper
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePaper(@PathVariable Long id) {
         if (paperRepository.existsById(id)) {

@@ -1,5 +1,6 @@
 package com.webcrafters.confease_backend.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
 
@@ -9,7 +10,10 @@ public class LogActivity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonProperty("log_id")
     private Long log_id;
+
+    @JsonProperty("user_id")
     private Long user_id;
     private String action;
     @Column(columnDefinition = "TEXT")

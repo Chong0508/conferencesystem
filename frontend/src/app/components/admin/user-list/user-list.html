@@ -71,8 +71,9 @@
           </td>
           <td class="text-muted small">{{ user.joinDate || 'N/A' }}</td>
           <td class="text-end pe-4">
-            <button class="btn btn-sm btn-outline-danger rounded-circle" title="Delete" (click)="deleteUser(user.email)">
-              <i class="bi bi-trash"></i>
+            <button class="btn btn-sm btn-outline-danger rounded-circle"
+                    title="Delete"
+                    (click)="deleteUser(user)"> <i class="bi bi-trash"></i>
             </button>
           </td>
         </tr>
