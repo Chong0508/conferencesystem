@@ -17,6 +17,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -93,10 +94,28 @@ public class UserServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw exception when updating non-existent user")
+    void updateFailTest() {
+        when(repository.existsById(99L)).thenReturn(false);
+    
+        assertThrows(RuntimeException.class, () -> service.update(99L, sampleUser));
+        verify(repository, never()).save(any(User.class));
+    }
+
+    @Test
     @DisplayName("Should delete user successfully")
     void deleteSuccessTest() {
         when(repository.existsById(1L)).thenReturn(true);
         service.delete(1L);
         verify(repository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    @DisplayName("Should throw exception when deleting non-existent user")
+    void deleteFailTest() {
+        when(repository.existsById(99L)).thenReturn(false);
+    
+        assertThrows(RuntimeException.class, () -> service.delete(99L));
+        verify(repository, never()).deleteById(anyLong());
     }
 }
