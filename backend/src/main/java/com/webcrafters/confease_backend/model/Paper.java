@@ -42,10 +42,12 @@ public class Paper {
     @Column(name = "submitted_by")
     private Long submittedBy;
 
+    @JsonProperty("submittedAt") 
     @Column(name = "submitted_at")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime submittedAt;
 
+    @JsonProperty("lastUpdated")
     @Column(name = "last_updated")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime lastUpdated;

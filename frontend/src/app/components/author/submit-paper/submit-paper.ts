@@ -57,40 +57,60 @@ export class SubmitPaper implements OnInit {
     }
   }
 
-  onSubmit() {
-    if (!this.paperObj.title || !this.paperObj.abstract || !this.paperObj.trackId || !this.paperObj.fileName) {
-      alert('Please fill in all required fields (*) and upload a file.');
-      return;
-    }
-
-    const user = this.authService.getCurrentUser?.() ?? null;
-    if (!user) {
-      alert('Session expired. Please login again.');
-      this.router.navigate(['/login']);
-      return;
-    }
-
-    this.isLoading = true;
-
-    const payload = {
-      ...this.paperObj,
-      authorId: user.user_id ?? user.id,
-      status: 'Pending Review'
-    };
-
-    this.paperService.submitPaper(payload).subscribe({
-      next: (res: any) => {
-        this.isLoading = false;
-        alert('🎉 Paper Submitted Successfully!');
-        this.router.navigate(['/dashboard/my-submissions']);
-      },
-      error: (err: any) => {
-        console.error('Submission error', err);
-        this.isLoading = false;
-        alert('Submission failed. Check backend connection.');
-      }
-    });
+onSubmit() {
+  // Validation
+  if (!this.paperObj.title || !this.paperObj.abstract || !this.paperObj.trackId || !this.paperObj.fileName) {
+    alert('Please fill in all required fields (*) and upload a file.');
+    return;
   }
+
+  const user = this.authService.getCurrentUser();
+  const finalUserId = user?.userId || user?.user_id || user?.id;
+
+  if (!finalUserId) {
+    console.warn('User object found but no ID exists:', user);
+    alert('Session expired. Please login again.');
+    this.router.navigate(['/login']);
+    return;
+  }
+
+  this.isLoading = true;
+
+  // DON'T send submittedAt and lastUpdated - let backend handle them
+  const payload = {
+    title: this.paperObj.title,
+    abstract: this.paperObj.abstract,
+    trackId: Number(this.paperObj.trackId),
+    fileName: this.paperObj.fileName,
+    fileType: this.getFileExtension(this.paperObj.fileName),
+    authorId: Number(finalUserId),
+    status: 'Pending Review',
+    version: 1
+    // NO submittedAt or lastUpdated here!
+  };
+
+  console.log('📤 Submitting payload:', JSON.stringify(payload, null, 2));
+
+  this.paperService.submitPaper(payload).subscribe({
+    next: (res) => {
+      this.isLoading = false;
+      console.log('✅ Success response:', res);
+      alert('🎉 Paper Submitted Successfully!');
+      this.router.navigate(['/dashboard/my-submissions']);
+    },
+    error: (err) => {
+      this.isLoading = false;
+      console.error('❌ Full error:', err);
+      alert('Submission failed: ' + (err.error?.message || err.message));
+    }
+  });
+}
+
+getFileExtension(filename: string): string {
+  if (!filename) return 'pdf';
+  const ext = filename.split('.').pop()?.toLowerCase();
+  return ext || 'pdf';
+}
 
   resetForm() {
     this.paperObj = { title: '', abstract: '', trackId: '', keywords: '', fileName: '' };

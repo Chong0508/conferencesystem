@@ -7,11 +7,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/papers")
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 public class PaperController {
 
     @Autowired
@@ -37,10 +41,37 @@ public class PaperController {
 
     // Create a new paper
     @PostMapping
-    public ResponseEntity<Paper> createPaper(@RequestBody Paper paper) {
+    public ResponseEntity<?> createPaper(@RequestBody Paper paper) {
+    try {
+        
+        // ALWAYS set timestamps in backend
+        paper.setSubmittedAt(LocalDateTime.now());
+        paper.setLastUpdated(LocalDateTime.now());
+        
+        // Set defaults
+        if (paper.getStatus() == null || paper.getStatus().isEmpty()) {
+            paper.setStatus("Pending Review");
+        }
+        if (paper.getVersion() == null) {
+            paper.setVersion(1);
+        }
+        
         Paper savedPaper = paperRepository.save(paper);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedPaper);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Paper submitted successfully");
+        response.put("paper", savedPaper);
+        response.put("paperId", savedPaper.getPaperId());
+        
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        
+    } catch (Exception e) {
+        e.printStackTrace();
+        
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(Map.of("message", "Failed to save paper: " + e.getMessage()));
     }
+}
 
     // Update an existing paper
     @PutMapping("/{id}")

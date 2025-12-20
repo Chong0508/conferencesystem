@@ -2,11 +2,15 @@ package com.webcrafters.confease_backend.controller;
 
 import com.webcrafters.confease_backend.model.User;
 import com.webcrafters.confease_backend.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,26 +37,95 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // POST /users — add a new user
-    @PostMapping
-public ResponseEntity<?> createUser(@RequestBody User user) {
+@PostMapping
+@Transactional
+public ResponseEntity<Map<String, Object>> createUser(@RequestBody User user) {
     try {
-        // 1. Check for Duplicate Email
-        if (userRepository.findByEmail(user.getEmail()) != null) {
+        System.out.println("=== START createUser endpoint ===");
+        
+        long userCount = userRepository.count();
+        System.out.println(">>> Current user count: " + userCount);
+        
+        // 3a. If DB empty → create System Admin FIRST with user_id = 1
+        if (userCount == 0) {
+            System.out.println(">>> Database is empty - creating System Admin...");
+            
+            User systemAdmin = new User();
+            // Don't set user_id manually - let the database auto-generate
+            systemAdmin.setFirst_name("System");
+            systemAdmin.setLast_name("Admin");
+            systemAdmin.setEmail("admin@test.com");
+            systemAdmin.setPassword_hash("admin123");
+            systemAdmin.setCategory("Admin");
+            systemAdmin.setIs_email_verified(true);
+            systemAdmin.setCreated_at(new Timestamp(System.currentTimeMillis()));
+            systemAdmin.setUpdated_at(new Timestamp(System.currentTimeMillis()));
+            
+            System.out.println(">>> About to save System Admin...");
+            User savedAdmin = userRepository.saveAndFlush(systemAdmin); // Use saveAndFlush
+            System.out.println(">>> ✓ System Admin saved with ID: " + savedAdmin.getUser_id());
+            System.out.println(">>> ✓ System Admin email: " + savedAdmin.getEmail());
+            
+            // Verify it was saved
+            long afterAdminCount = userRepository.count();
+            System.out.println(">>> User count after admin: " + afterAdminCount);
+            
+            if (afterAdminCount == 0) {
+                System.err.println(">>> ✗✗✗ ADMIN WAS NOT SAVED! ✗✗✗");
+            }
+        } else {
+            System.out.println(">>> Database already has " + userCount + " users - skipping admin creation");
+        }
+        
+        // 3b. Check for duplicate email
+        System.out.println(">>> Checking for duplicate email: " + user.getEmail());
+        User existingUser = userRepository.findByEmail(user.getEmail());
+        if (existingUser != null) {
+            System.out.println(">>> ✗ Duplicate email found!");
             return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Map.of("message", "Email is already registered."));
         }
-
-        // 2. Set default values for missing fields to avoid SQL errors
+        System.out.println(">>> ✓ No duplicate - proceeding with user creation");
+        
+        // 3c. Default role = Author
+        if (user.getCategory() == null || user.getCategory().isEmpty()) {
+            user.setCategory("Author");
+        }
+        
+        // 3d. Set defaults
         if (user.getIs_email_verified() == null) user.setIs_email_verified(false);
-        if (user.getCreated_at() == null) user.setCreated_at(new java.sql.Timestamp(System.currentTimeMillis()));
-
-        User savedUser = userRepository.save(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+        if (user.getCreated_at() == null) user.setCreated_at(new Timestamp(System.currentTimeMillis()));
+        user.setUpdated_at(new Timestamp(System.currentTimeMillis()));
+        
+        System.out.println(">>> About to save user: " + user.getEmail());
+        User savedUser = userRepository.saveAndFlush(user);
+        System.out.println(">>> ✓ User saved with ID: " + savedUser.getUser_id());
+        
+        // Final verification
+        long finalCount = userRepository.count();
+        System.out.println(">>> FINAL user count in DB: " + finalCount);
+        
+        // Prepare response
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("userId", savedUser.getUser_id());
+        userData.put("firstName", savedUser.getFirst_name());
+        userData.put("lastName", savedUser.getLast_name());
+        userData.put("email", savedUser.getEmail());
+        userData.put("role", savedUser.getCategory());
+        userData.put("avatarColor", savedUser.getCategory().equalsIgnoreCase("Admin") ? "dc3545" : "0d6efd");
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", userCount == 0 ? 
+            "System Admin and user created successfully" : 
+            "Registration successful");
+        response.put("user", userData);
+        
+        System.out.println("=== END createUser endpoint ===");
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
         
     } catch (Exception e) {
-        // This will print the exact SQL error in your Java console
-        e.printStackTrace(); 
+        System.err.println("=== ✗✗✗ EXCEPTION in createUser ✗✗✗ ===");
+        e.printStackTrace();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(Map.of("message", "Server Error: " + e.getMessage()));
     }

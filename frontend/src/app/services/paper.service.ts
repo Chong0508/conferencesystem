@@ -10,11 +10,8 @@ export class PaperService {
 
   constructor(private http: HttpClient) { }
 
-  submitPaper(formData: FormData): Observable<any> {
-    return this.http.post<any>(this.apiUrl, formData, {
-      withCredentials: true
-      // Do NOT set Content-Type header — browser sets multipart boundary automatically
-    });
+  submitPaper(paperData: any): Observable<any> {
+    return this.http.post<any>(this.apiUrl, paperData, { withCredentials: true });
   }
 
   getPaperById(id: number): Observable<any> {

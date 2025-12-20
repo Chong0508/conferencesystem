@@ -109,6 +109,7 @@ export class ManageTracks implements OnInit {
       }
 
       const payload: Track = {
+        track_id: this.editingTrack.id,
         name: this.editingTrack.name.trim(),
         description: this.editingTrack.description || '',
         conference_id: this.editingTrack.conference_id || 1,
