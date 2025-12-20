@@ -10,13 +10,22 @@ export class PaperService {
 
   constructor(private http: HttpClient) { }
 
-  // Accept FormData that contains metadata + file
   submitPaper(formData: FormData): Observable<any> {
     return this.http.post<any>(this.apiUrl, formData, {
       withCredentials: true
-      // DO NOT set Content-Type; browser will set multipart/form-data boundary
+      // Do NOT set Content-Type header — browser sets multipart boundary automatically
     });
   }
 
-  // existing methods...
+  getPaperById(id: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${id}`, { withCredentials: true });
+  }
+
+  getAllPapers(): Observable<any[]> {
+    return this.http.get<any[]>(this.apiUrl, { withCredentials: true });
+  }
+
+  getPapersByAuthor(authorId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/author/${authorId}`, { withCredentials: true });
+  }
 }
