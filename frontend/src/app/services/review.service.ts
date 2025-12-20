@@ -2,53 +2,62 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+export interface Review {
+  review_id?: number;
+  paperId?: number;
+  reviewerId?: number;
+  reviewerEmail?: string;
+  score?: number;
+  comments?: string;
+  created_at?: string;
+  [key: string]: any;
+}
+export interface ReviewAssignedPaper {
+  paperId?: number;
+  title?: string;
+  status?: string;
+  trackId?: number;
+  [key: string]: any;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class ReviewService {
   private apiUrl = 'http://localhost:8080/api/reviews';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  getAllReviews(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl, {
-      withCredentials: true
-    });
+  // Get reviews by reviewer id
+  getReviewsByReviewer(reviewerId: number): Observable<Review[]> {
+    return this.http.get<Review[]>(`${this.apiUrl}/reviewer/${reviewerId}`, { withCredentials: true });
   }
 
-  getReviewById(id: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/${id}`, {
-      withCredentials: true
-    });
+  // Get all reviews (admin)
+  getAllReviews(): Observable<Review[]> {
+    return this.http.get<Review[]>(this.apiUrl, { withCredentials: true });
   }
 
-  submitReview(reviewData: any): Observable<any> {
-    return this.http.post<any>(this.apiUrl, reviewData, {
-      withCredentials: true
-    });
+  // Get reviews by paper id
+  getReviewsByPaper(paperId: number): Observable<Review[]> {
+    return this.http.get<Review[]>(`${this.apiUrl}/paper/${paperId}`, { withCredentials: true });
   }
 
-  updateReview(id: number, reviewData: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/${id}`, reviewData, {
-      withCredentials: true
-    });
+  // submit or update review
+  submitReview(payload: any): Observable<any> {
+    return this.http.post<any>(this.apiUrl, payload, { withCredentials: true });
+  }
+
+  updateReview(id: number, payload: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/${id}`, payload, { withCredentials: true });
   }
 
   deleteReview(id: number): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/${id}`, {
-      withCredentials: true
-    });
+    return this.http.delete<any>(`${this.apiUrl}/${id}`, { withCredentials: true });
   }
 
-  getReviewsByPaper(paperId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/paper/${paperId}`, {
-      withCredentials: true
-    });
-  }
-
-  getReviewsByReviewer(reviewerId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/reviewer/${reviewerId}`, {
-      withCredentials: true
-    });
+  // Backend should return papers assigned to reviewer
+  getAssignedPapers(reviewerId: number): Observable<ReviewAssignedPaper[]> {
+    return this.http.get<ReviewAssignedPaper[]>(`${this.apiUrl}/assigned-papers/${reviewerId}`, {withCredentials: true});
   }
 }
