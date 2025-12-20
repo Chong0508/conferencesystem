@@ -10,8 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,13 +31,13 @@ public class PaperServiceTest {
     @BeforeEach
     void setUp() {
         samplePaper = new Paper();
-        samplePaper.setPaper_id(1L);
+        samplePaper.setPaperId(1L); // Changed from setPaper_id
         samplePaper.setTitle("Advancements in AI");
         samplePaper.setAbstractText("This paper explores...");
         samplePaper.setStatus("SUBMITTED");
         samplePaper.setVersion(1);
-        samplePaper.setPlagiarism_score(0.05);
-        samplePaper.setSubmitted_at(Timestamp.from(Instant.now()));
+        samplePaper.setPlagiarismScore(0.05); // Changed from setPlagiarism_score
+        samplePaper.setSubmittedAt(java.time.LocalDateTime.now()); // Changed from Timestamp
     }
 
     @Test
@@ -73,7 +71,7 @@ public class PaperServiceTest {
         when(repository.save(any(Paper.class))).thenReturn(samplePaper);
         Paper saved = service.create(new Paper());
         assertNotNull(saved);
-        assertEquals(0.05, saved.getPlagiarism_score());
+        assertEquals(0.05, saved.getPlagiarismScore()); // Updated getter
         verify(repository, times(1)).save(any(Paper.class));
     }
 

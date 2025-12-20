@@ -10,9 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,17 +31,19 @@ public class SessionServiceTest {
 
     @BeforeEach
     void setUp() {
-        Instant now = Instant.now();
+        // Using LocalDateTime to match your refactored model
+        LocalDateTime now = LocalDateTime.now();
+        
         sampleSession = new Session();
-        sampleSession.setSession_id(1L);
-        sampleSession.setEvent_id(101L);
+        sampleSession.setSessionId(1L); 
+        sampleSession.setEventId(101L); 
         sampleSession.setTitle("Future of Quantum Computing");
-        sampleSession.setChair_id(50L);
-        sampleSession.setSpeaker_name("Dr. Alice Smith");
-        sampleSession.setSession_type("KEYNOTE");
+        sampleSession.setChairId(50L);   
+        sampleSession.setSpeakerName("Dr. Alice Smith"); 
+        sampleSession.setSessionType("KEYNOTE");       
         sampleSession.setVenue("Hall B");
-        sampleSession.setStart_time(Timestamp.from(now));
-        sampleSession.setEnd_time(Timestamp.from(now.plus(90, ChronoUnit.MINUTES)));
+        sampleSession.setStartTime(now);                
+        sampleSession.setEndTime(now.plusMinutes(90));
     }
 
     @Test
@@ -52,7 +52,7 @@ public class SessionServiceTest {
         when(repository.findAll()).thenReturn(List.of(sampleSession));
         List<Session> result = service.getAll();
         assertEquals(1, result.size());
-        assertEquals("Dr. Alice Smith", result.get(0).getSpeaker_name());
+        assertEquals("Dr. Alice Smith", result.get(0).getSpeakerName());
         verify(repository, times(1)).findAll();
     }
 
@@ -62,7 +62,7 @@ public class SessionServiceTest {
         when(repository.findById(1L)).thenReturn(Optional.of(sampleSession));
         Session result = service.getById(1L);
         assertNotNull(result);
-        assertEquals("KEYNOTE", result.getSession_type());
+        assertEquals("KEYNOTE", result.getSessionType());
     }
 
     @Test
@@ -88,11 +88,11 @@ public class SessionServiceTest {
         when(repository.existsById(1L)).thenReturn(true);
         when(repository.save(any(Session.class))).thenReturn(sampleSession);
 
-        sampleSession.setSpeaker_name("Dr. Bob Jones");
+        sampleSession.setSpeakerName("Dr. Bob Jones");
         Session updated = service.update(1L, sampleSession);
 
         assertNotNull(updated);
-        assertEquals("Dr. Bob Jones", updated.getSpeaker_name());
+        assertEquals("Dr. Bob Jones", updated.getSpeakerName());
     }
 
     @Test

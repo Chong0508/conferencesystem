@@ -45,23 +45,21 @@ public class PaperController {
     // Update an existing paper
     @PutMapping("/{id}")
     public ResponseEntity<Paper> updatePaper(@PathVariable Long id, @RequestBody Paper paperDetails) {
-        Optional<Paper> optionalPaper = paperRepository.findById(id);
-        if (optionalPaper.isPresent()) {
-            Paper paper = optionalPaper.get();
-            paper.setTrack_id(paperDetails.getTrack_id());
+        return paperRepository.findById(id).map(paper -> {
+            // Updated to use your new Model method names
+            paper.setTrackId(paperDetails.getTrackId());
             paper.setTitle(paperDetails.getTitle());
             paper.setAbstractText(paperDetails.getAbstractText());
-            paper.setSubmission_file(paperDetails.getSubmission_file());
-            paper.setFile_type(paperDetails.getFile_type());
+            paper.setSubmissionFile(paperDetails.getSubmissionFile());
+            paper.setFileType(paperDetails.getFileType());
             paper.setVersion(paperDetails.getVersion());
-            paper.setPlagiarism_score(paperDetails.getPlagiarism_score());
+            paper.setPlagiarismScore(paperDetails.getPlagiarismScore());
             paper.setStatus(paperDetails.getStatus());
-            paper.setSubmitted_by(paperDetails.getSubmitted_by());
-            Paper updatedPaper = paperRepository.save(paper);
-            return ResponseEntity.ok(updatedPaper);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+            paper.setSubmittedBy(paperDetails.getSubmittedBy());
+            paper.setLastUpdated(java.time.LocalDateTime.now());
+            
+            return ResponseEntity.ok(paperRepository.save(paper));
+        }).orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
