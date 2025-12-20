@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
@@ -21,16 +21,10 @@ export class AuthService {
     );
   }
 
-  login(credentials: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/login`, credentials, {
-      withCredentials: true
-    }).pipe(
-      tap((response: any) => {
-        localStorage.setItem('loggedUser', JSON.stringify(response.user));
-        localStorage.setItem('authToken', response.token || '');
-        console.log('✅ Login successful:', response);
-      })
-    );
+  login(loginData: any): Observable<any> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    // Note: withCredentials: true is vital for session management later
+    return this.http.post(`${this.apiUrl}/login`, loginData, { headers, withCredentials: true });
   }
 
   logout(): Observable<any> {

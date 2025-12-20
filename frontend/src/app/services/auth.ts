@@ -18,13 +18,13 @@ export class AuthService {
   // ==========================================================
   register(userData: any): Observable<any> {
     const backendUser = {
-      first_name: userData.firstName,
-      last_name: userData.lastName,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
       email: userData.email,
       password_hash: userData.password,
       affiliation: userData.affiliation || 'N/A',
       country: 'Malaysia',
-      category: userData.role || 'Author',
+      role: userData.role || 'Author',
       orcid: userData.orcid || '',
       is_email_verified: 0,
       created_at: new Date().toISOString(),

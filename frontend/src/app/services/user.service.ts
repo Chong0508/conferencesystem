@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class UserService {
 
-  private baseUrl = 'http://localhost:8080/api/users';
+  private baseUrl = 'http://localhost:8080/users';
 
   constructor(private http: HttpClient) { }
 
@@ -37,6 +37,12 @@ export class UserService {
 
   createUser(userData: any): Observable<any> {
     return this.http.post<any>(this.baseUrl, userData, {
+      withCredentials: true
+    });
+  }
+
+  login(loginData: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/login`, loginData, {
       withCredentials: true
     });
   }

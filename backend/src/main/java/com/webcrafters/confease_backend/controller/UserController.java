@@ -3,6 +3,7 @@ package com.webcrafters.confease_backend.controller;
 import com.webcrafters.confease_backend.model.User;
 import com.webcrafters.confease_backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,9 +35,28 @@ public class UserController {
 
     // POST /users — add a new user
     @PostMapping
-    public User createUser(@RequestBody User user) {
-        return userRepository.save(user);
+public ResponseEntity<?> createUser(@RequestBody User user) {
+    try {
+        // 1. Check for Duplicate Email
+        if (userRepository.findByEmail(user.getEmail()) != null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("message", "Email is already registered."));
+        }
+
+        // 2. Set default values for missing fields to avoid SQL errors
+        if (user.getIs_email_verified() == null) user.setIs_email_verified(false);
+        if (user.getCreated_at() == null) user.setCreated_at(new java.sql.Timestamp(System.currentTimeMillis()));
+
+        User savedUser = userRepository.save(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+        
+    } catch (Exception e) {
+        // This will print the exact SQL error in your Java console
+        e.printStackTrace(); 
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(Map.of("message", "Server Error: " + e.getMessage()));
     }
+}
 
     // PUT /users/{id} — update user
     @PutMapping("/{id}")
@@ -83,21 +103,42 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        // 1. Find user by Email
+    try {
+        // Log the incoming request to verify Angular is sending data
+        System.out.println("Login attempt for email: " + loginRequest.getEmail());
+
+        if (loginRequest.getEmail() == null || loginRequest.getPassword() == null) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Email and Password are required"));
+        }
+
         User user = userRepository.findByEmail(loginRequest.getEmail());
 
-        // 2. Check if user exists AND password matches
-        if (user != null && user.getPassword_hash().equals(loginRequest.getPassword())) {
+        if (user == null) {
+            return ResponseEntity.status(401).body(Map.of("message", "User not found"));
+        }
 
-            // 3. Return the user object (Frontend will save this to localStorage)
+        // Check password (matching the field name in your Model)
+        if (user.getPassword_hash() != null && user.getPassword_hash().equals(loginRequest.getPassword())) {
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Login successful");
-            response.put("user", user);
+            
+            // Map the user fields to the CamelCase names Angular expects
+            Map<String, Object> userData = new HashMap<>();
+            userData.put("userId", user.getUser_id());
+            userData.put("firstName", user.getFirst_name());
+            userData.put("role", user.getCategory());
+            
+            response.put("user", userData);
             return ResponseEntity.ok(response);
         }
 
-        return ResponseEntity.status(401).body("Invalid email or password");
+        return ResponseEntity.status(401).body(Map.of("message", "Invalid credentials"));
+
+    } catch (Exception e) {
+        e.printStackTrace(); // This will show the exact error in your Java console
+        return ResponseEntity.status(500).body(Map.of("message", "Internal Server Error: " + e.getMessage()));
     }
+}
 
     // Helper class to read the JSON { "email": "...", "password": "..." }
     public static class LoginRequest {

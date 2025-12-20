@@ -2,6 +2,8 @@ package com.webcrafters.confease_backend.controller;
 
 import com.webcrafters.confease_backend.model.LogActivity;
 import com.webcrafters.confease_backend.repository.LogActivityRepository;
+import com.webcrafters.confease_backend.service.LogActivityService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,12 @@ public class LogActivityController {
     @Autowired
     private LogActivityRepository logActivityRepository;
 
+    private final LogActivityService logActivityService;
+
+    public LogActivityController(LogActivityService logActivityService) {
+        this.logActivityService = logActivityService;
+
+    }
     // Get all log activities
     @GetMapping
     public ResponseEntity<List<LogActivity>> getAllLogActivities() {
@@ -37,9 +45,10 @@ public class LogActivityController {
 
     // Create a new log activity
     @PostMapping
-    public ResponseEntity<LogActivity> createLogActivity(@RequestBody LogActivity logActivity) {
-        LogActivity savedLogActivity = logActivityRepository.save(logActivity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedLogActivity);
+    public ResponseEntity<LogActivity> create(@RequestBody LogActivity logActivity) {
+        // Your Generic Service handles the .save() logic
+        LogActivity saved = logActivityService.create(logActivity);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     // Update an existing log activity
