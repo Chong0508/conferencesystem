@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+@CrossOrigin(origins = {"http://localhost:4200", "http://frontend:4200", "http://host.docker.internal:4200"}, allowCredentials = "true")
 @RestController
 @RequestMapping("/api/reviews")
 public class ReviewController {
@@ -48,7 +49,6 @@ public class ReviewController {
         Optional<Review> optionalReview = reviewRepository.findById(id);
         if (optionalReview.isPresent()) {
             Review review = optionalReview.get();
-            // Update fields
             review.setAssignment_id(reviewDetails.getAssignment_id());
             review.setReviewer_id(reviewDetails.getReviewer_id());
             review.setOverall_score(reviewDetails.getOverall_score());
@@ -58,7 +58,6 @@ public class ReviewController {
             review.setRound_number(reviewDetails.getRound_number());
             review.setDue_date(reviewDetails.getDue_date());
             review.setAttachment(reviewDetails.getAttachment());
-            // Note: reviewed_at is typically not updated, as it's a timestamp for when the review was submitted
 
             Review updatedReview = reviewRepository.save(review);
             return ResponseEntity.ok(updatedReview);

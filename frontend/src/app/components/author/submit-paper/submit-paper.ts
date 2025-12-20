@@ -3,8 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { PaperService } from '../../../services/paper.service';
-import { AuthService } from '../../../services/auth';
-// 1. ADD THIS IMPORT:
+import { AuthService } from '../../../services/auth.service';
 import { TrackService } from '../../../services/track.service';
 
 @Component({
@@ -28,11 +27,11 @@ export class SubmitPaper implements OnInit {
   isLoading: boolean = false;
 
   constructor(
-      private router: Router,
-      private authService: AuthService,
-      private paperService: PaperService,
-      private trackService: TrackService
-    ) {}
+    private router: Router,
+    private authService: AuthService,
+    private paperService: PaperService,
+    private trackService: TrackService
+  ) {}
 
   ngOnInit() {
     this.loadTracks();
@@ -41,17 +40,17 @@ export class SubmitPaper implements OnInit {
   loadTracks() {
     this.trackService.getAllTracks().subscribe({
       next: (data: any[]) => {
-        this.tracks = data;
+        this.tracks = data || [];
       },
-      error: (err: any) => console.error("Failed to load tracks", err)
+      error: (err: any) => console.error('Failed to load tracks', err)
     });
   }
 
   onFileSelected(event: any) {
-    const file = event.target.files[0];
+    const file = event.target.files?.[0];
     if (file) {
       if (file.size > 10 * 1024 * 1024) {
-        alert("File is too large! Max size is 10MB.");
+        alert('File is too large! Max size is 10MB.');
         return;
       }
       this.paperObj.fileName = file.name;
@@ -60,35 +59,35 @@ export class SubmitPaper implements OnInit {
 
   onSubmit() {
     if (!this.paperObj.title || !this.paperObj.abstract || !this.paperObj.trackId || !this.paperObj.fileName) {
-      alert("Please fill in all required fields (*) and upload a file.");
+      alert('Please fill in all required fields (*) and upload a file.');
+      return;
+    }
+
+    const user = this.authService.getCurrentUser?.() ?? null;
+    if (!user) {
+      alert('Session expired. Please login again.');
+      this.router.navigate(['/login']);
       return;
     }
 
     this.isLoading = true;
 
-    this.authService.getLoggedUser().subscribe({
-      next: (user: any) => {
-        const payload = {
-          ...this.paperObj,
-          authorId: user.user_id,
-          status: 'Pending Review'
-        };
+    const payload = {
+      ...this.paperObj,
+      authorId: user.user_id ?? user.id,
+      status: 'Pending Review'
+    };
 
-        this.paperService.submitPaper(payload).subscribe({
-          next: (res: any) => {
-            this.isLoading = false;
-            alert("🎉 Paper Submitted Successfully!");
-            this.router.navigate(['/dashboard/my-submissions']);
-          },
-          error: (err: any) => {
-            this.isLoading = false;
-            alert("Submission failed. Check backend connection.");
-          }
-        });
+    this.paperService.submitPaper(payload).subscribe({
+      next: (res: any) => {
+        this.isLoading = false;
+        alert('🎉 Paper Submitted Successfully!');
+        this.router.navigate(['/dashboard/my-submissions']);
       },
-      error: () => {
-        alert("Session expired. Please login again.");
-        this.router.navigate(['/login']);
+      error: (err: any) => {
+        console.error('Submission error', err);
+        this.isLoading = false;
+        alert('Submission failed. Check backend connection.');
       }
     });
   }

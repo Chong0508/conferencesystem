@@ -1,8 +1,9 @@
 package com.webcrafters.confease_backend.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "paper")
@@ -10,37 +11,53 @@ public class Paper {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long paper_id;
+    @Column(name = "paper_id")
+    private Long paperId;
 
     @JsonProperty("trackId")
     @Column(name = "track_id")
-    private Long track_id;
+    private Long trackId;
+
     private String title;
 
     @JsonProperty("abstract")
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "abstract", columnDefinition = "TEXT")
     private String abstractText;
 
     @JsonProperty("fileName")
     @Column(name = "submission_file")
-    private String submission_file;
-    private String file_type;
+    private String submissionFile;
+
+    @Column(name = "file_type")
+    private String fileType;
+
     private Integer version;
-    private Double plagiarism_score;
+
+    @Column(name = "plagiarism_score")
+    private Double plagiarismScore;
+
     private String status;
 
     @JsonProperty("authorId")
     @Column(name = "submitted_by")
-    private Long submitted_by;
-    private Timestamp submitted_at;
-    private Timestamp last_updated;
+    private Long submittedBy;
 
-    // Getters and Setters
-    public Long getPaper_id() { return paper_id; }
-    public void setPaper_id(Long paper_id) { this.paper_id = paper_id; }
+    @Column(name = "submitted_at")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime submittedAt;
 
-    public Long getTrack_id() { return track_id; }
-    public void setTrack_id(Long track_id) { this.track_id = track_id; }
+    @Column(name = "last_updated")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime lastUpdated;
+
+    public Paper() {}
+
+    // Getters / Setters
+    public Long getPaperId() { return paperId; }
+    public void setPaperId(Long paperId) { this.paperId = paperId; }
+
+    public Long getTrackId() { return trackId; }
+    public void setTrackId(Long trackId) { this.trackId = trackId; }
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
@@ -48,27 +65,27 @@ public class Paper {
     public String getAbstractText() { return abstractText; }
     public void setAbstractText(String abstractText) { this.abstractText = abstractText; }
 
-    public String getSubmission_file() { return submission_file; }
-    public void setSubmission_file(String submission_file) { this.submission_file = submission_file; }
+    public String getSubmissionFile() { return submissionFile; }
+    public void setSubmissionFile(String submissionFile) { this.submissionFile = submissionFile; }
 
-    public String getFile_type() { return file_type; }
-    public void setFile_type(String file_type) { this.file_type = file_type; }
+    public String getFileType() { return fileType; }
+    public void setFileType(String fileType) { this.fileType = fileType; }
 
     public Integer getVersion() { return version; }
     public void setVersion(Integer version) { this.version = version; }
 
-    public Double getPlagiarism_score() { return plagiarism_score; }
-    public void setPlagiarism_score(Double plagiarism_score) { this.plagiarism_score = plagiarism_score; }
+    public Double getPlagiarismScore() { return plagiarismScore; }
+    public void setPlagiarismScore(Double plagiarismScore) { this.plagiarismScore = plagiarismScore; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    public Long getSubmitted_by() { return submitted_by; }
-    public void setSubmitted_by(Long submitted_by) { this.submitted_by = submitted_by; }
+    public Long getSubmittedBy() { return submittedBy; }
+    public void setSubmittedBy(Long submittedBy) { this.submittedBy = submittedBy; }
 
-    public Timestamp getSubmitted_at() { return submitted_at; }
-    public void setSubmitted_at(Timestamp submitted_at) { this.submitted_at = submitted_at; }
+    public LocalDateTime getSubmittedAt() { return submittedAt; }
+    public void setSubmittedAt(LocalDateTime submittedAt) { this.submittedAt = submittedAt; }
 
-    public Timestamp getLast_updated() { return last_updated; }
-    public void setLast_updated(Timestamp last_updated) { this.last_updated = last_updated; }
+    public LocalDateTime getLastUpdated() { return lastUpdated; }
+    public void setLastUpdated(LocalDateTime lastUpdated) { this.lastUpdated = lastUpdated; }
 }

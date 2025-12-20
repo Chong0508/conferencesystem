@@ -26,6 +26,8 @@ export class UserListComponent implements OnInit {
   filteredUsers: User[] = [];
   searchTerm: string = '';
   selectedRole: string = 'All';
+  isLoading: boolean = true;
+  errorMessage: string = '';
 
   constructor(private userService: UserService) { }
 
@@ -33,20 +35,31 @@ export class UserListComponent implements OnInit {
     this.loadUsers();
   }
 
-  // --- Load Real Data ---
+  // --- Load Real Data from Backend ---
   loadUsers() {
-    this.userService.getAllUsers().subscribe(data => {
-        this.users = data.map((u: any) => ({
-          role: u.category || 'Author',
+    this.isLoading = true;
+    this.errorMessage = '';
 
+    this.userService.getAllUsers().subscribe({
+      next: (data) => {
+        this.users = data.map((u: any) => ({
           id: u.user_id,
           firstName: u.first_name,
           lastName: u.last_name,
           email: u.email,
+          role: u.category || 'Author',
           joinDate: u.created_at
         }));
         this.filteredUsers = [...this.users];
-      });
+        this.isLoading = false;
+        console.log('✅ Users loaded:', this.users);
+      },
+      error: (err) => {
+        console.error('❌ Error loading users:', err);
+        this.errorMessage = 'Failed to load users. Is the backend running?';
+        this.isLoading = false;
+      }
+    });
   }
 
   // --- Search ---
@@ -76,16 +89,15 @@ export class UserListComponent implements OnInit {
   }
 
   // --- Delete User ---
-  deleteUser(user: any) {
-    // Use the specific ID from your MySQL model (likely user_id)
-    const userId = user.user_id || user.id;
+  deleteUser(user: User) {
+    const userId = user.id;
 
     if (confirm(`Are you sure you want to delete ${user.firstName} ${user.lastName}?`)) {
-      this.userService.deleteUser(userId).subscribe({
+      this.userService.deleteUser(userId!).subscribe({
         next: (response) => {
-          console.log('✅ Success:', response);
+          console.log('✅ User deleted:', response);
           alert('User deleted successfully.');
-          this.loadUsers(); // Refresh the list from the backend
+          this.loadUsers(); // Refresh list
         },
         error: (err) => {
           console.error('❌ Delete failed:', err);
@@ -94,5 +106,4 @@ export class UserListComponent implements OnInit {
       });
     }
   }
-  }
-
+}

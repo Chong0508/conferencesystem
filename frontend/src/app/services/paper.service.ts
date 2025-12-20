@@ -3,26 +3,20 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class PaperService {
+  private apiUrl = 'http://localhost:8080/api/papers';
 
-  private baseUrl = 'http://localhost:8080/api/papers';
-  private tracksUrl = 'http://localhost:8080/api/tracks';
+  constructor(private http: HttpClient) { }
 
-  constructor(private http: HttpClient) {}
+  // Accept FormData that contains metadata + file
+  submitPaper(formData: FormData): Observable<any> {
+    return this.http.post<any>(this.apiUrl, formData, {
+      withCredentials: true
+      // DO NOT set Content-Type; browser will set multipart/form-data boundary
+    });
+  }
 
-  getAllPapers(): Observable<any[]> {
-      return this.http.get<any[]>(this.baseUrl, { withCredentials: true });
-    }
-
-    submitPaper(payload: any): Observable<any> {
-      return this.http.post('http://localhost:8080/api/papers', payload, {
-        withCredentials: true
-      });
-    }
-
-    getPapersByAuthor(authorId: number): Observable<any[]> {
-      return this.http.get<any[]>(`${this.baseUrl}/author/${authorId}`, { withCredentials: true });
-    }
+  // existing methods...
 }

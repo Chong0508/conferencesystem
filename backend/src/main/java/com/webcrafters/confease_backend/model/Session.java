@@ -1,8 +1,9 @@
 package com.webcrafters.confease_backend.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "session")
@@ -10,64 +11,65 @@ public class Session {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long session_id;
-    private Long event_id;
+    @Column(name = "session_id")
+    private Long sessionId;
+
+    @Column(name = "event_id")
+    private Long eventId;
+
     private String title;
-    private Long chair_id;
+
+    @Column(name = "chair_id")
+    private Long chairId;
 
     @JsonProperty("start_time")
-    private Timestamp start_time;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Column(name = "start_time")
+    private LocalDateTime startTime;
 
     @JsonProperty("end_time")
-    private Timestamp end_time;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @Column(name = "end_time")
+    private LocalDateTime endTime;
+
     private String venue;
 
     @JsonProperty("speaker")
-    private String speaker_name;
+    @Column(name = "speaker")
+    private String speakerName;
 
     @JsonProperty("type")
-    private String session_type;
+    @Column(name = "type")
+    private String sessionType;
 
-    // Getters and Setters
-    public Long getSession_id() { return session_id; }
-    public void setSession_id(Long session_id) { this.session_id = session_id; }
+    // JPA requires a no-arg constructor
+    public Session() {}
 
-    public Long getEvent_id() { return event_id; }
-    public void setEvent_id(Long event_id) { this.event_id = event_id; }
+    // Getters / Setters
+    public Long getSessionId() { return sessionId; }
+    public void setSessionId(Long sessionId) { this.sessionId = sessionId; }
+
+    public Long getEventId() { return eventId; }
+    public void setEventId(Long eventId) { this.eventId = eventId; }
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
 
-    public Long getChair_id() { return chair_id; }
-    public void setChair_id(Long chair_id) { this.chair_id = chair_id; }
+    public Long getChairId() { return chairId; }
+    public void setChairId(Long chairId) { this.chairId = chairId; }
 
-    public Timestamp getStart_time() { return start_time; }
-    public void setStart_time(Timestamp start_time) { this.start_time = start_time; }
+    public LocalDateTime getStartTime() { return startTime; }
+    public void setStartTime(LocalDateTime startTime) { this.startTime = startTime; }
 
-    public Timestamp getEnd_time() { return end_time; }
-    public void setEnd_time(Timestamp end_time) { this.end_time = end_time; }
+    public LocalDateTime getEndTime() { return endTime; }
+    public void setEndTime(LocalDateTime endTime) { this.endTime = endTime; }
 
-    public String getVenue() {
-        return venue;
-    }
+    public String getVenue() { return venue; }
+    public void setVenue(String venue) { this.venue = venue; }
 
-    public void setVenue(String venue) {
-        this.venue = venue;
-    }
+    public String getSpeakerName() { return speakerName; }
+    public void setSpeakerName(String speakerName) { this.speakerName = speakerName; }
 
-    public String getSpeaker_name() {
-        return speaker_name;
-    }
-
-    public void setSpeaker_name(String speaker_name) {
-        this.speaker_name = speaker_name;
-    }
-
-    public String getSession_type() {
-        return session_type;
-    }
-
-    public void setSession_type(String session_type) {
-        this.session_type = session_type;
-    }
+    public String getSessionType() { return sessionType; }
+    public void setSessionType(String sessionType) { this.sessionType = sessionType; }
 }

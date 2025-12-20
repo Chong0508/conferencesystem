@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ReviewService } from '../../../services/review.service';
+import { PaperService } from '../../../services/paper.service';
 
 @Component({
   selector: 'app-grading',
@@ -15,6 +17,8 @@ export class Grading implements OnInit {
   paperId: any;
   paper: any = null;
   currentUser: any = {};
+  isSubmitting: boolean = false;
+  errorMessage: string = '';
 
   // Form Data
   scoreCriteria: any = {
@@ -34,7 +38,12 @@ export class Grading implements OnInit {
       this.scoreCriteria.presentation;
   }
 
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private reviewService: ReviewService,
+    private paperService: PaperService
+  ) {}
 
   ngOnInit() {
     this.paperId = this.route.snapshot.paramMap.get('id');
@@ -49,12 +58,19 @@ export class Grading implements OnInit {
   }
 
   loadPaper() {
-    // Find paper by ID
-    const allPapers = JSON.parse(localStorage.getItem('mock_papers') || '[]');
-    this.paper = allPapers.find((p: any) => p.id == this.paperId);
+    // Fetch paper from backend
+    this.paperService.getPapersByAuthor(this.paperId).subscribe({
+      next: (paperData) => {
+        this.paper = paperData;
+      },
+      error: (err) => {
+        console.error('Error loading paper:', err);
+        this.errorMessage = 'Failed to load paper';
+      }
+    });
   }
 
-  // 👇 FIXED: Ensure data is saved to LocalStorage
+  // Submit Review to Backend
   submitReview() {
     // 1. Validation
     if (this.totalScore === 0) {
@@ -62,35 +78,40 @@ export class Grading implements OnInit {
       return;
     }
 
-    // 2. Create Review Object
-    const newReview = {
-      id: Date.now(),
-      paperId: this.paperId,
-      reviewerEmail: this.currentUser.email, // Important for History
-      score: this.totalScore,
-      breakdown: this.scoreCriteria,
-      recommendation: this.recommendation,
-      comments: this.comments,
-      date: new Date()
-    };
-
-    // 3. Save to 'mock_reviews'
-    const existingReviews = JSON.parse(localStorage.getItem('mock_reviews') || '[]');
-    existingReviews.push(newReview);
-    localStorage.setItem('mock_reviews', JSON.stringify(existingReviews));
-
-    // 4. Update Paper Status to 'Reviewed' in 'mock_papers'
-    const allPapers = JSON.parse(localStorage.getItem('mock_papers') || '[]');
-    const paperIndex = allPapers.findIndex((p: any) => p.id == this.paperId);
-
-    if (paperIndex > -1) {
-      allPapers[paperIndex].status = 'Reviewed'; // Change Status
-      localStorage.setItem('mock_papers', JSON.stringify(allPapers));
+    if (!this.comments.trim()) {
+      alert("Please add comments for the review.");
+      return;
     }
 
-    // 5. Success & Redirect
-    alert("✅ Review Submitted Successfully!");
-    this.router.navigate(['/dashboard/review-history']); // Go to History to verify
+    // 2. Create Review Object
+    const reviewData = {
+      paperId: this.paperId,
+      reviewerId: this.currentUser.user_id,
+      overallScore: this.totalScore,
+      scoreCriteria: this.scoreCriteria,
+      recommendation: this.recommendation,
+      commentsToAuthor: this.comments,
+      commentsToChair: '',
+      roundNumber: 1,
+      dueDate: new Date(),
+      attachment: null
+    };
+
+    // 3. Submit to Backend
+    this.isSubmitting = true;
+    this.reviewService.submitReview(reviewData).subscribe({
+      next: (response) => {
+        alert("✅ Review Submitted Successfully!");
+        this.isSubmitting = false;
+        this.router.navigate(['/dashboard/review-history']);
+      },
+      error: (err) => {
+        console.error('Error submitting review:', err);
+        this.errorMessage = 'Failed to submit review';
+        this.isSubmitting = false;
+        alert("❌ Error submitting review. Please try again.");
+      }
+    });
   }
 
   cancel() {

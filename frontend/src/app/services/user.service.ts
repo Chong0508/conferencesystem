@@ -7,28 +7,61 @@ import { Observable } from 'rxjs';
 })
 export class UserService {
 
-  private baseUrl = 'http://localhost:8080/users';
+  private baseUrl = 'http://localhost:8080/api/users';
 
   constructor(private http: HttpClient) { }
 
   getAllUsers(): Observable<any[]> {
-    return this.http.get<any[]>(this.baseUrl);
+    return this.http.get<any[]>(this.baseUrl, {
+      withCredentials: true
+    });
+  }
+
+  getUserById(id: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/${id}`, {
+      withCredentials: true
+    });
   }
 
   getUserByEmail(email: string): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/${email}`);
+    return this.http.get<any>(`${this.baseUrl}/email/${email}`, {
+      withCredentials: true
+    });
   }
 
   register(user: any): Observable<any> {
-    return this.http.post<any>(this.baseUrl, user);
+    return this.http.post<any>(`${this.baseUrl}/register`, user, {
+      withCredentials: true
+    });
   }
 
-  updateUser(user: any): Observable<any> {
-    return this.http.put<any>(`${this.baseUrl}/${user.email}`, user);
+  createUser(userData: any): Observable<any> {
+    return this.http.post<any>(this.baseUrl, userData, {
+      withCredentials: true
+    });
   }
 
-  deleteUser(id: number): Observable<string> {
-    return this.http.delete<string>(`${this.baseUrl}/${id}`, { responseType: 'text' as 'json' });
+  updateUser(id: number, userData: any): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}/${id}`, userData, {
+      withCredentials: true
+    });
+  }
+
+  deleteUser(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.baseUrl}/${id}`, {
+      withCredentials: true
+    });
+  }
+
+  getUsersByRole(role: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/role/${role}`, {
+      withCredentials: true
+    });
+  }
+
+  updateUserPassword(id: number, passwordData: any): Observable<any> {
+    return this.http.put<any>(`${this.baseUrl}/${id}/password`, passwordData, {
+      withCredentials: true
+    });
   }
 }
-

@@ -20,14 +20,44 @@ export class LogActivityService {
   constructor(private http: HttpClient) { }
 
   getAllLogs(): Observable<LogActivity[]> {
-    return this.http.get<LogActivity[]>(this.apiUrl);
+    return this.http.get<LogActivity[]>(this.apiUrl, {
+      withCredentials: true
+    });
+  }
+
+  getLogById(id: number): Observable<LogActivity> {
+    return this.http.get<LogActivity>(`${this.apiUrl}/${id}`, {
+      withCredentials: true
+    });
   }
 
   createLog(log: LogActivity): Observable<LogActivity> {
-    return this.http.post<LogActivity>(this.apiUrl, log);
+    return this.http.post<LogActivity>(this.apiUrl, log, {
+      withCredentials: true
+    });
+  }
+
+  getLogsByUser(userId: number): Observable<LogActivity[]> {
+    return this.http.get<LogActivity[]>(`${this.apiUrl}/user/${userId}`, {
+      withCredentials: true
+    });
+  }
+
+  getLogsByAction(action: string): Observable<LogActivity[]> {
+    return this.http.get<LogActivity[]>(`${this.apiUrl}/action/${action}`, {
+      withCredentials: true
+    });
   }
 
   deleteLog(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+    return this.http.delete<void>(`${this.apiUrl}/${id}`, {
+      withCredentials: true
+    });
+  }
+
+  deleteAllLogs(): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/all`, {
+      withCredentials: true
+    });
   }
 }

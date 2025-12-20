@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import { PaperService } from '../../../services/paper.service';
+import { ReviewService } from '../../../services/review.service';
 
 @Component({
   selector: 'app-paper-details',
@@ -12,30 +14,52 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class PaperDetails implements OnInit {
 
   paperId: any;
-  paper: any = null;   // To store paper metadata
-  review: any = null;  // To store reviewer's feedback
+  paper: any = null;
+  review: any = null;
   isLoading: boolean = true;
+  errorMessage: string = '';
 
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private paperService: PaperService,
+    private reviewService: ReviewService
+  ) {}
 
   ngOnInit() {
-    // 1. Get the Paper ID from the URL (e.g., /dashboard/paper-details/123)
+    // Get the Paper ID from URL
     this.paperId = this.route.snapshot.paramMap.get('id');
     this.loadData();
   }
 
   loadData() {
-    setTimeout(() => {
-      // 2. Fetch paper details from LocalStorage (Mock DB)
-      const allPapers = JSON.parse(localStorage.getItem('mock_papers') || '[]');
-      this.paper = allPapers.find((p: any) => p.id == this.paperId);
+    this.isLoading = true;
+    this.errorMessage = '';
 
-      // 3. Fetch review data for this specific paper (if it exists)
-      const allReviews = JSON.parse(localStorage.getItem('mock_reviews') || '[]');
-      this.review = allReviews.find((r: any) => r.paperId == this.paperId);
+    // Fetch paper details from backend
+    this.paperService.getPapersByAuthor(this.paperId).subscribe({
+      next: (paperData) => {
+        this.paper = paperData;
 
-      this.isLoading = false;
-    }, 500);
+        // Fetch review data for this paper
+        this.reviewService.getReviewsByPaper(this.paperId).subscribe({
+          next: (reviews) => {
+            this.review = reviews.length > 0 ? reviews[0] : null;
+            this.isLoading = false;
+          },
+          error: (err) => {
+            console.error('Error fetching reviews:', err);
+            this.review = null;
+            this.isLoading = false;
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Error fetching paper:', err);
+        this.errorMessage = 'Failed to load paper details';
+        this.isLoading = false;
+      }
+    });
   }
 
   // Navigate back to the list
