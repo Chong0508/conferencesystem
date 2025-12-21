@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router'; // Ensure RouterLink is imported
+import { Router, RouterLink } from '@angular/router';
+import { PaperService } from '../../../services/paper.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-my-submissions',
@@ -15,29 +17,39 @@ export class MySubmissions implements OnInit {
   isLoading: boolean = true;
 
   // Inject Router for navigation
-  constructor(private router: Router) {}
+  constructor(private router: Router, private paperService: PaperService, private authService: AuthService) {}
 
   ngOnInit() {
     this.loadMyPapers();
   }
 
   loadMyPapers() {
-    // Simulate network delay
-    setTimeout(() => {
-      // 1. Get current logged-in user
-      const currentUser = JSON.parse(localStorage.getItem('loggedUser') || '{}');
+      this.isLoading = true;
 
-      // 2. Fetch all papers from mock database (LocalStorage)
-      const allPapers = JSON.parse(localStorage.getItem('mock_papers') || '[]');
+      // 3. Get the current user from your AuthService
+      const user = this.authService.getCurrentUser();
+      const userId = user?.userId || user?.user_id || user?.id;
 
-      // 3. Filter: Show only papers belonging to the current user
-      if (currentUser.email) {
-        this.myPapers = allPapers.filter((p: any) => p.authorEmail === currentUser.email);
+      if (!userId) {
+        console.error('No User ID found, redirecting to login');
+        this.router.navigate(['/login']);
+        return;
       }
 
-      this.isLoading = false;
-    }, 500);
-  }
+      // 4. Call the Backend via PaperService
+      this.paperService.getAllPapers().subscribe({
+        next: (data: any[]) => {
+          this.myPapers = (data || []).filter(
+            p => p.authorId === Number(userId)
+          );
+          this.isLoading = false;
+        },
+        error: () => {
+          this.isLoading = false;
+        }
+      });
+
+    }
 
   // Helper function to return CSS classes based on status
   getStatusClass(status: string): string {
@@ -53,7 +65,7 @@ export class MySubmissions implements OnInit {
 
   // Navigate to Paper Details page
   viewDetails(paper: any) {
-    this.router.navigate(['/dashboard/paper-details', paper.id]);
+    this.router.navigate(['/dashboard/paper-details', paper.paperId]);
   }
 
   // View Receipt (Only for Registered papers)
