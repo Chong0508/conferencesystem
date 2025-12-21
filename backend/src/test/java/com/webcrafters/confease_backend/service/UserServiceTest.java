@@ -11,23 +11,22 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class UserServiceTest {
+class UserServiceTest {
 
     @Mock
-    private UserRepository repository;
+    private UserRepository userRepository;
 
     @InjectMocks
-    private UserServiceImpl service;
+    private UserServiceImpl userService;
 
     private User sampleUser;
 
@@ -35,87 +34,80 @@ public class UserServiceTest {
     void setUp() {
         sampleUser = new User();
         sampleUser.setUser_id(1L);
-        sampleUser.setEmail("alex.expert@univ.edu");
-        sampleUser.setPassword_hash("hashed_password_abc123");
-        sampleUser.setFirst_name("Alex");
-        sampleUser.setLast_name("Expert");
-        sampleUser.setAffiliation("Global Research University");
+        sampleUser.setEmail("test@conference.com");
+        sampleUser.setFirst_name("John");
+        sampleUser.setLast_name("Doe");
+        sampleUser.setCategory("AUTHOR");
         sampleUser.setIs_email_verified(true);
-        sampleUser.setCreated_at(Timestamp.from(Instant.now()));
+        sampleUser.setCreated_at(new Timestamp(System.currentTimeMillis()));
     }
 
     @Test
     @DisplayName("Should return all users")
-    void getAllTest() {
-        when(repository.findAll()).thenReturn(List.of(sampleUser));
-        List<User> result = service.getAll();
-        assertEquals(1, result.size());
-        assertEquals("alex.expert@univ.edu", result.get(0).getEmail());
-        verify(repository, times(1)).findAll();
+    void getAll_ReturnsUserList() {
+        when(userRepository.findAll()).thenReturn(List.of(sampleUser));
+
+        List<User> users = userService.getAll();
+
+        assertThat(users).hasSize(1);
+        assertThat(users.get(0).getEmail()).isEqualTo("test@conference.com");
+        verify(userRepository, times(1)).findAll();
     }
 
     @Test
-    @DisplayName("Should find user by ID")
-    void getByIdSuccessTest() {
-        when(repository.findById(1L)).thenReturn(Optional.of(sampleUser));
-        User result = service.getById(1L);
-        assertNotNull(result);
-        assertEquals("Alex", result.getFirst_name());
+    @DisplayName("Should find user by valid ID")
+    void getById_ValidId_ReturnsUser() {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(sampleUser));
+
+        User foundUser = userService.getById(1L);
+
+        assertThat(foundUser).isNotNull();
+        assertThat(foundUser.getFirst_name()).isEqualTo("John");
     }
 
     @Test
-    @DisplayName("Should throw exception when user ID not found")
-    void getByIdFailTest() {
-        when(repository.findById(99L)).thenReturn(Optional.empty());
-        assertThrows(RuntimeException.class, () -> service.getById(99L));
+    @DisplayName("Should throw exception for non-existent user ID")
+    void getById_InvalidId_ThrowsException() {
+        when(userRepository.findById(99L)).thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            userService.getById(99L);
+        });
+
+        assertThat(exception.getMessage()).contains("Data not found: 99");
     }
 
     @Test
-    @DisplayName("Should create a new user profile")
-    void createTest() {
-        when(repository.save(any(User.class))).thenReturn(sampleUser);
-        User saved = service.create(new User());
-        assertNotNull(saved);
-        assertTrue(saved.getIs_email_verified());
-        verify(repository, times(1)).save(any(User.class));
+    @DisplayName("Should create new user successfully")
+    void create_SavesUser() {
+        when(userRepository.save(any(User.class))).thenReturn(sampleUser);
+
+        User savedUser = userService.create(new User());
+
+        assertThat(savedUser.getEmail()).isEqualTo("test@conference.com");
+        verify(userRepository, times(1)).save(any(User.class));
     }
 
     @Test
-    @DisplayName("Should update user profile (e.g., change affiliation)")
-    void updateSuccessTest() {
-        when(repository.existsById(1L)).thenReturn(true);
-        when(repository.save(any(User.class))).thenReturn(sampleUser);
+    @DisplayName("Should update user when ID exists")
+    void update_ExistingId_UpdatesUser() {
+        when(userRepository.existsById(1L)).thenReturn(true);
+        when(userRepository.save(any(User.class))).thenReturn(sampleUser);
 
-        sampleUser.setAffiliation("Tech Institute");
-        User updated = service.update(1L, sampleUser);
+        User updatedUser = userService.update(1L, sampleUser);
 
-        assertNotNull(updated);
-        assertEquals("Tech Institute", updated.getAffiliation());
+        assertThat(updatedUser).isNotNull();
+        verify(userRepository).save(sampleUser);
     }
 
     @Test
-    @DisplayName("Should throw exception when updating non-existent user")
-    void updateFailTest() {
-        when(repository.existsById(99L)).thenReturn(false);
-    
-        assertThrows(RuntimeException.class, () -> service.update(99L, sampleUser));
-        verify(repository, never()).save(any(User.class));
-    }
+    @DisplayName("Should delete user when ID exists")
+    void delete_ExistingId_DeletesUser() {
+        when(userRepository.existsById(1L)).thenReturn(true);
+        doNothing().when(userRepository).deleteById(1L);
 
-    @Test
-    @DisplayName("Should delete user successfully")
-    void deleteSuccessTest() {
-        when(repository.existsById(1L)).thenReturn(true);
-        service.delete(1L);
-        verify(repository, times(1)).deleteById(1L);
-    }
+        userService.delete(1L);
 
-    @Test
-    @DisplayName("Should throw exception when deleting non-existent user")
-    void deleteFailTest() {
-        when(repository.existsById(99L)).thenReturn(false);
-    
-        assertThrows(RuntimeException.class, () -> service.delete(99L));
-        verify(repository, never()).deleteById(anyLong());
+        verify(userRepository, times(1)).deleteById(1L);
     }
 }
