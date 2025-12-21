@@ -20,9 +20,15 @@ public class PaperController {
     @Autowired
     private PaperRepository paperRepository;
 
+    // Add this to handle this.paperService.getAllPapers()
+    @GetMapping
+    public ResponseEntity<List<Paper>> getAllPapers() {
+        return ResponseEntity.ok(paperRepository.findAll());
+    }
+
     // Get all papers for a specific author
     @GetMapping("/author/{id}")
-    public ResponseEntity<List<Paper>> getPapersByAuthor(@PathVariable("userId") Long userId) {
+    public ResponseEntity<List<Paper>> getPapersByAuthor(@PathVariable("id") Long userId) {
         // This connects your MySubmissions.ts to your Database rows
         List<Paper> papers = paperRepository.findBySubmittedBy(userId);
         return ResponseEntity.ok(papers);
