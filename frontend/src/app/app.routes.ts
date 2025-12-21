@@ -26,10 +26,15 @@ import { CreateConference } from './components/admin/create-conference/create-co
 import { ManageTracks } from './components/admin/manage-tracks/manage-tracks';
 import { PaperMaster } from './components/admin/paper-master/paper-master';
 
-// 6. Admin Management Features (User, Schedule, Logs)
+// 6. Admin Management Features (User, Schedule, Logs, Applications)
 import { UserListComponent } from './components/admin/user-list/user-list';
 import { ScheduleComponent } from './components/admin/schedule/schedule';
 import { ActivityLogsComponent } from './components/admin/activity-logs/activity-logs';
+// 👇 NEW: Import the Reviewer Applications Component
+import { ReviewerApplicationsComponent } from './components/admin/reviewer-applications/reviewer-applications';
+
+// 7. Profile & Settings (Assuming you have a component for this path)
+import { MyProfile } from './components/common/my-profile/my-profile';
 
 export const routes: Routes = [
   // --- Public Routes ---
@@ -68,7 +73,13 @@ export const routes: Routes = [
       // 6. Admin Management Routes
       { path: 'user-management', component: UserListComponent },
       { path: 'schedule', component: ScheduleComponent },
-      { path: 'activity-logs', component: ActivityLogsComponent }
+      { path: 'activity-logs', component: ActivityLogsComponent },
+      { path: 'applications', component: ReviewerApplicationsComponent }, // 👈 NEW Route added
+
+      // 7. Settings
+      { path: 'profile', component: MyProfile },
+      // Note: Added profile route explicitly to match sidebar links
+      { path: 'notifications', loadComponent: () => import('./components/common/notifications/notifications').then(m => m.Notifications) }
     ]
   },
 

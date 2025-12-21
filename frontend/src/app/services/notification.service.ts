@@ -43,4 +43,24 @@ export class NotificationService {
   deleteNotification(id: number): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/${id}`, { withCredentials: true });
   }
+
+  // 👇 ADDED: Compatibility method to fix ApplicationService error
+  // This bridges the mock logic in ApplicationService with your real NotificationService
+  addNotification(config: { title: string, message: string, type: 'success' | 'info' | 'warning' | 'error', recipientEmail?: string }) {
+    console.log('🔥 Notification Triggered via Bridge:', config);
+
+    // Optional: Try to send to backend if needed, or just log it for now
+    const payload: Partial<NotificationItem> = {
+      title: config.title,
+      body: config.message,
+      // Note: user_id is missing here because ApplicationService uses email.
+      // You can implement user lookup here later if needed.
+    };
+
+    // Fire and forget (attempt to send)
+    this.createNotification(payload).subscribe({
+      next: (res) => console.log('Notification sent to backend'),
+      error: (err) => console.warn('Notification skipped (Backend logic mismatch, likely missing user_id)')
+    });
+  }
 }

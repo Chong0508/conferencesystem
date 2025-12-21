@@ -15,6 +15,12 @@
         </a>
       </li>
 
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/dashboard/notifications" routerLinkActive="active">
+          <i class="bi bi-bell me-2"></i> Message Center
+        </a>
+      </li>
+
       <ng-container *ngIf="loggedUser.role === 'Admin'">
 
         <li class="nav-item">
@@ -42,6 +48,12 @@
         <li class="nav-item">
           <a class="nav-link" routerLink="/dashboard/user-management" routerLinkActive="active">
             <i class="bi bi-people-fill me-2"></i> User Management
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/dashboard/applications" routerLinkActive="active">
+            <i class="bi bi-person-lines-fill me-2"></i> Reviewer Apps
           </a>
         </li>
 
@@ -119,6 +131,11 @@
         <span class="navbar-brand mb-0 h1 text-secondary">Dashboard</span>
 
         <div class="d-flex align-items-center">
+
+          <a routerLink="/dashboard/notifications" class="text-secondary me-4" style="font-size: 1.2rem; cursor: pointer;">
+            <i class="bi bi-bell-fill"></i>
+          </a>
+
           <div class="text-end me-3">
             <p class="mb-0 fw-bold text-dark">
               {{ loggedUser.firstName }} {{ loggedUser.lastName }}

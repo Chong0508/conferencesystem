@@ -1,0 +1,60 @@
+:host {
+  --teal-primary: #11998e;
+  --teal-hover: #0d8a80;
+  --teal-light: #e0f2f1;
+}
+
+.text-teal { color: var(--teal-primary) !important; }
+.bg-teal-light { background-color: var(--teal-light); }
+
+.btn-teal {
+  background-color: var(--teal-primary);
+  color: white;
+  border: none;
+  transition: all 0.2s;
+}
+.btn-teal:hover {
+  background-color: var(--teal-hover);
+  transform: translateY(-1px);
+}
+
+.icon-square {
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Badge colors */
+.bg-warning-subtle { background-color: #fffbeb !important; }
+.text-warning-dark { color: #b45309 !important; }
+.bg-success-subtle { background-color: #d1e7dd !important; color: #0f5132 !important; }
+.bg-danger-subtle { background-color: #f8d7da !important; color: #842029 !important; }
+
+.x-small { font-size: 0.75rem; letter-spacing: 0.5px; text-transform: uppercase; }
+.border-dashed { border-style: dashed !important; border-color: #e2e8f0 !important; }
+
+.app-card {
+  transition: transform 0.2s;
+}
+.app-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.05) !important;
+}
+
+.reason-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

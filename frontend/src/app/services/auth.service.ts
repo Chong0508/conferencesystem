@@ -11,6 +11,8 @@ export class AuthService {
 
   constructor(private http: HttpClient) { }
 
+  // --- API Methods ---
+
   register(userData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/register`, userData, {
       withCredentials: true
@@ -32,6 +34,7 @@ export class AuthService {
       withCredentials: true
     }).pipe(
       tap(() => {
+        // Clear local storage on logout
         localStorage.removeItem('loggedUser');
         localStorage.removeItem('authToken');
         console.log('✅ Logout successful');
@@ -39,9 +42,17 @@ export class AuthService {
     );
   }
 
+  // --- Helper Methods ---
+
+  // Standard method to get user from local storage
   getCurrentUser(): any {
     const user = localStorage.getItem('loggedUser');
     return user ? JSON.parse(user) : null;
+  }
+
+  // 🔥 Fix: Added this alias method because your components call 'getLoggedUser()'
+  getLoggedUser(): any {
+    return this.getCurrentUser();
   }
 
   isLoggedIn(): boolean {
@@ -50,5 +61,10 @@ export class AuthService {
 
   getAuthToken(): string | null {
     return localStorage.getItem('authToken');
+  }
+
+  // 🔥 Helper: Updates the user session in local storage (e.g., when role changes)
+  updateUserSession(updatedUser: any) {
+    localStorage.setItem('loggedUser', JSON.stringify(updatedUser));
   }
 }
