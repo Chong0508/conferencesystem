@@ -21,22 +21,20 @@ public class PaperController {
     @Autowired
     private PaperRepository paperRepository;
 
-    // Get all papers
-    @GetMapping
-    public ResponseEntity<List<Paper>> getAllPapers() {
-        List<Paper> papers = paperRepository.findAll();
+    // Get all papers for a specific author
+    @GetMapping("/author/{id}")
+    public ResponseEntity<List<Paper>> getPapersByAuthor(@PathVariable("userId") Long userId) {
+        // This connects your MySubmissions.ts to your Database rows
+        List<Paper> papers = paperRepository.findBySubmittedBy(userId);
         return ResponseEntity.ok(papers);
     }
 
-    // Get paper by ID
+    // Separate method to get a single paper by its ID (Standard practice)
     @GetMapping("/{id}")
     public ResponseEntity<Paper> getPaperById(@PathVariable Long id) {
-        Optional<Paper> paper = paperRepository.findById(id);
-        if (paper.isPresent()) {
-            return ResponseEntity.ok(paper.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return paperRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     // Create a new paper
