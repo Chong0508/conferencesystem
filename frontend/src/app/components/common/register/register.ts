@@ -28,17 +28,23 @@ export class Register {
   constructor(private router: Router, private authService: AuthService) {}
 
   onRegister() {
-    // 1. Validate Passwords
+    // 1. Validate Password Length
+    if (this.registerObj.password.length < 8) {
+      alert("Security Error: Password must be at least 8 characters long.");
+      return;
+    }
+
+    // 2. Validate Passwords Match
     if (this.registerObj.password !== this.registerObj.confirmPassword) {
       alert("Error: Passwords do not match!");
       return;
     }
 
-    // 2. Check Required Fields
+    // 3. Check Required Fields
     if (this.registerObj.email && this.registerObj.password && this.registerObj.firstName && this.registerObj.role) {
       this.isLoading = true;
 
-      // 3. Call Service to Register
+      // 4. Call Service to Register
       this.authService.register(this.registerObj).subscribe({
               next: (res) => {
                 this.isLoading = false;

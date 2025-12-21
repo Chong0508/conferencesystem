@@ -23,6 +23,9 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
+    private final org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder passwordEncoder = 
+    new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
+
     // GET /users — list all users
     @GetMapping
     public List<User> getAllUsers() {
@@ -40,72 +43,53 @@ public class UserController {
 @PostMapping
 @Transactional
 public ResponseEntity<Map<String, Object>> createUser(@RequestBody User user) {
-    try {
-        System.out.println("=== START createUser endpoint ===");
-        
+    try {        
+        // 1. Password Security Check
+        if (user.getPassword_hash() == null || user.getPassword_hash().length() < 8) {
+             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("message", "Registration failed: Password must be at least 8 characters."));
+        }
+
         long userCount = userRepository.count();
-        System.out.println(">>> Current user count: " + userCount);
         
-        // 3a. If DB empty → create System Admin FIRST with user_id = 1
+        // 2. Automatic System Admin Initialization
         if (userCount == 0) {
-            System.out.println(">>> Database is empty - creating System Admin...");
-            
             User systemAdmin = new User();
-            // Don't set user_id manually - let the database auto-generate
             systemAdmin.setFirst_name("System");
             systemAdmin.setLast_name("Admin");
             systemAdmin.setEmail("admin@test.com");
-            systemAdmin.setPassword_hash("admin123");
+            systemAdmin.setPassword_hash(passwordEncoder.encode("admin123456"));
             systemAdmin.setCategory("Admin");
             systemAdmin.setIs_email_verified(true);
             systemAdmin.setCreated_at(new Timestamp(System.currentTimeMillis()));
             systemAdmin.setUpdated_at(new Timestamp(System.currentTimeMillis()));
             
-            System.out.println(">>> About to save System Admin...");
-            User savedAdmin = userRepository.saveAndFlush(systemAdmin); // Use saveAndFlush
-            System.out.println(">>> ✓ System Admin saved with ID: " + savedAdmin.getUser_id());
-            System.out.println(">>> ✓ System Admin email: " + savedAdmin.getEmail());
-            
-            // Verify it was saved
-            long afterAdminCount = userRepository.count();
-            System.out.println(">>> User count after admin: " + afterAdminCount);
-            
-            if (afterAdminCount == 0) {
-                System.err.println(">>> ✗✗✗ ADMIN WAS NOT SAVED! ✗✗✗");
-            }
-        } else {
-            System.out.println(">>> Database already has " + userCount + " users - skipping admin creation");
+            userRepository.save(systemAdmin);
         }
         
-        // 3b. Check for duplicate email
-        System.out.println(">>> Checking for duplicate email: " + user.getEmail());
+        // 3. Email Duplicate Check (Returns explicit error message to user)
         User existingUser = userRepository.findByEmail(user.getEmail());
         if (existingUser != null) {
-            System.out.println(">>> ✗ Duplicate email found!");
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(Map.of("message", "Email is already registered."));
+                .body(Map.of("message", "This email (" + user.getEmail() + ") is already registered. Please use a different email or login."));
         }
-        System.out.println(">>> ✓ No duplicate - proceeding with user creation");
         
-        // 3c. Default role = Author
+        // 4. Set Category Defaults
         if (user.getCategory() == null || user.getCategory().isEmpty()) {
             user.setCategory("Author");
         }
         
-        // 3d. Set defaults
+        // 5. Set Timestamps and Security Defaults
         if (user.getIs_email_verified() == null) user.setIs_email_verified(false);
         if (user.getCreated_at() == null) user.setCreated_at(new Timestamp(System.currentTimeMillis()));
         user.setUpdated_at(new Timestamp(System.currentTimeMillis()));
         
-        System.out.println(">>> About to save user: " + user.getEmail());
+        // 6. Hash Password and Persist
+        String rawPassword = user.getPassword_hash();
+        user.setPassword_hash(passwordEncoder.encode(rawPassword));
         User savedUser = userRepository.saveAndFlush(user);
-        System.out.println(">>> ✓ User saved with ID: " + savedUser.getUser_id());
         
-        // Final verification
-        long finalCount = userRepository.count();
-        System.out.println(">>> FINAL user count in DB: " + finalCount);
-        
-        // Prepare response
+        // 7. Prepare Clean Response
         Map<String, Object> userData = new HashMap<>();
         userData.put("userId", savedUser.getUser_id());
         userData.put("firstName", savedUser.getFirst_name());
@@ -116,18 +100,15 @@ public ResponseEntity<Map<String, Object>> createUser(@RequestBody User user) {
         
         Map<String, Object> response = new HashMap<>();
         response.put("message", userCount == 0 ? 
-            "System Admin and user created successfully" : 
-            "Registration successful");
+            "System initialized. Admin and your account created successfully!" : 
+            "Registration successful!");
         response.put("user", userData);
         
-        System.out.println("=== END createUser endpoint ===");
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
         
     } catch (Exception e) {
-        System.err.println("=== ✗✗✗ EXCEPTION in createUser ✗✗✗ ===");
-        e.printStackTrace();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(Map.of("message", "Server Error: " + e.getMessage()));
+            .body(Map.of("message", "An unexpected error occurred during registration. Please try again."));
     }
 }
 
@@ -177,39 +158,35 @@ public ResponseEntity<Map<String, Object>> createUser(@RequestBody User user) {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
     try {
-        // Log the incoming request to verify Angular is sending data
-        System.out.println("Login attempt for email: " + loginRequest.getEmail());
-
         if (loginRequest.getEmail() == null || loginRequest.getPassword() == null) {
             return ResponseEntity.badRequest().body(Map.of("message", "Email and Password are required"));
         }
 
         User user = userRepository.findByEmail(loginRequest.getEmail());
 
-        if (user == null) {
-            return ResponseEntity.status(401).body(Map.of("message", "User not found"));
+        // 🔒 Combine both checks into one error message
+        // If user is null OR password doesn't match, return "Invalid email or password"
+        if (user == null || user.getPassword_hash() == null || 
+            !org.mindrot.jbcrypt.BCrypt.checkpw(loginRequest.getPassword(), user.getPassword_hash())) {
+            
+            return ResponseEntity.status(401).body(Map.of("message", "Invalid email or password"));
         }
 
-        // Check password (matching the field name in your Model)
-        if (user.getPassword_hash() != null && user.getPassword_hash().equals(loginRequest.getPassword())) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "Login successful");
-            
-            // Map the user fields to the CamelCase names Angular expects
-            Map<String, Object> userData = new HashMap<>();
-            userData.put("userId", user.getUser_id());
-            userData.put("firstName", user.getFirst_name());
-            userData.put("role", user.getCategory());
-            
-            response.put("user", userData);
-            return ResponseEntity.ok(response);
-        }
-
-        return ResponseEntity.status(401).body(Map.of("message", "Invalid credentials"));
+        // If we reach here, credentials are correct
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Login successful");
+        
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("userId", user.getUser_id());
+        userData.put("firstName", user.getFirst_name());
+        userData.put("role", user.getCategory());
+        
+        response.put("user", userData);
+        return ResponseEntity.ok(response);
 
     } catch (Exception e) {
-        e.printStackTrace(); // This will show the exact error in your Java console
-        return ResponseEntity.status(500).body(Map.of("message", "Internal Server Error: " + e.getMessage()));
+        // Keep this only for true system crashes (e.g., Database offline)
+        return ResponseEntity.status(500).body(Map.of("message", "Server error. Please try again later."));
     }
 }
 

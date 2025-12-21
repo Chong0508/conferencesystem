@@ -14,6 +14,9 @@ public class AdminInitializer implements CommandLineRunner {
     @Autowired
     private UserRepository userRepository;
 
+    private final org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder passwordEncoder = 
+    new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
+
     @Override
     public void run(String... args) {
         try {
@@ -30,7 +33,7 @@ public class AdminInitializer implements CommandLineRunner {
                 systemAdmin.setFirst_name("System");
                 systemAdmin.setLast_name("Admin");
                 systemAdmin.setEmail("admin@test.com");
-                systemAdmin.setPassword_hash("admin123"); // TODO: Hash this properly
+                systemAdmin.setPassword_hash(passwordEncoder.encode("admin123456"));
                 systemAdmin.setCategory("Admin");
                 systemAdmin.setIs_email_verified(true);
                 systemAdmin.setCreated_at(new Timestamp(System.currentTimeMillis()));

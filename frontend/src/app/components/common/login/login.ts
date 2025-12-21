@@ -25,7 +25,6 @@ export class Login {
       return;
     }
 
-
   this.isLoading = true;
 
   this.authService.login(this.loginObj).subscribe({
