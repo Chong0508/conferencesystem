@@ -30,6 +30,7 @@
         <label class="form-label ms-2 fw-bold text-secondary small">I am a...</label>
         <select class="form-control form-select rounded-pill" [(ngModel)]="registerObj.role">
           <option value="Author">Author (Student/Researcher)</option>
+          <option value="Reviewer">Reviewer (Academic/Expert)</option>
         </select>
       </div>
 
@@ -47,7 +48,7 @@
         <div class="col-md-6 mb-3 text-start">
           <label class="form-label ms-2">Password</label>
           <input type="password" class="form-control" [(ngModel)]="registerObj.password" placeholder="******">
-    
+
           <small *ngIf="registerObj.password && registerObj.password.length < 8" class="text-danger ms-2">
             Password must be at least 8 characters.
           </small>
