@@ -1,68 +1,97 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NotificationService, NotificationItem } from '../../../services/notification.service';
+import { Router } from '@angular/router';
+import { NotificationService, AppNotification } from '../../../services/notification.service';
+import { AuthService } from '../../../services/auth';
 
 @Component({
   selector: 'app-notifications',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './notifications.html',
-  styleUrl: './notifications.css',
+  styleUrl: './notifications.css'
 })
 export class Notifications implements OnInit {
 
-  notifications: NotificationItem[] = [];
-  isLoading = true;
-  error = '';
+  notifications: AppNotification[] = [];
+  currentUser: any = null;
 
-  constructor(private notificationService: NotificationService) {}
+  // Note: We don't strictly need unreadCount here for display logic anymore
+  // since the service handles it, but kept for compatibility.
+  unreadCount: number = 0;
 
-  ngOnInit(): void {
-    this.loadNotifications();
+  constructor(
+    private notificationService: NotificationService,
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  ngOnInit() {
+    this.loadData();
   }
 
-  loadNotifications(): void {
-    this.isLoading = true;
-    this.error = '';
-    const userJson = localStorage.getItem('loggedUser');
-    const user = userJson ? JSON.parse(userJson) : null;
-    const userId = user?.user_id ?? user?.id ?? null;
+  loadData() {
+    this.currentUser = this.authService.getLoggedUser();
+    if (this.currentUser) {
+      // Get notifications list
+      this.notificationService.getNotifications(this.currentUser.email, this.currentUser.role)
+        .subscribe((data: AppNotification[]) => {
+          this.notifications = data;
+        });
 
-    const obs = userId
-      ? this.notificationService.getNotificationsByUser(userId)
-      : this.notificationService.getAllNotifications();
-
-    obs.subscribe({
-      next: (data) => {
-        this.notifications = data || [];
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error('Failed to load notifications', err);
-        this.error = 'Failed to load notifications';
-        this.isLoading = false;
-      }
-    });
+      // Also subscribe to count to keep local UI in sync
+      this.notificationService.unreadCount$.subscribe(count => {
+        this.unreadCount = count;
+      });
+    }
   }
 
-  markRead(n: NotificationItem) {
-    if (!n.id || n.read) return;
-    this.notificationService.markAsRead(n.id).subscribe({
-      next: () => { n.read = true; },
-      error: (err) => console.error('Failed to mark read', err)
-    });
+  markAsRead(notification: AppNotification): void {
+    if (!notification.read) {
+      notification.read = true; // Update UI immediately
+
+      // 🔥 Call Service to update storage AND broadcast new count to Dashboard
+      this.notificationService.markAsRead(
+        notification.id,
+        this.currentUser.email,
+        this.currentUser.role
+      );
+    }
+
+    // Navigate if link exists
+    if (notification.link) {
+      this.router.navigate([notification.link]);
+    }
   }
 
-  deleteNotification(n: NotificationItem) {
-    if (!n.id) return;
-    if (!confirm('Delete this notification?')) return;
-    this.notificationService.deleteNotification(n.id).subscribe({
-      next: () => { this.notifications = this.notifications.filter(x => x.id !== n.id); },
-      error: (err) => { console.error('Failed to delete notification', err); alert('Could not delete notification'); }
-    });
+  markAllAsRead(): void {
+    if (this.currentUser) {
+      // Update UI immediately
+      this.notifications.forEach(n => n.read = true);
+
+      // 🔥 Call Service to update storage AND broadcast new count to Dashboard
+      this.notificationService.markAllAsRead(
+        this.currentUser.email,
+        this.currentUser.role
+      );
+    }
   }
 
-  trackById(index: number, item: NotificationItem) {
-    return item.id ?? index;
+  getIconClass(type: string): string {
+    switch (type) {
+      case 'success': return 'bi-check-circle-fill text-success';
+      case 'warning': return 'bi-exclamation-circle-fill text-warning';
+      case 'error': return 'bi-x-circle-fill text-danger';
+      default: return 'bi-info-circle-fill text-primary';
+    }
+  }
+
+  getBgClass(type: string): string {
+    switch (type) {
+      case 'success': return 'bg-success-subtle';
+      case 'warning': return 'bg-warning-subtle';
+      case 'error': return 'bg-danger-subtle';
+      default: return 'bg-primary-subtle';
+    }
   }
 }

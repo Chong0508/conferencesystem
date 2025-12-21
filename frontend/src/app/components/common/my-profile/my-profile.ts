@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common'; // Usually needed
+import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../services/auth.service';
 import { ApplicationService } from '../../../services/application';
 
@@ -11,8 +11,9 @@ import { ApplicationService } from '../../../services/application';
   styleUrl: './my-profile.css',
 })
 export class MyProfile implements OnInit {
-
+  // Properties declared to prevent TS2339 error
   loggedUser: any = null;
+  isLoading: boolean = true;
 
   constructor(
     private authService: AuthService,
@@ -24,31 +25,45 @@ export class MyProfile implements OnInit {
   }
 
   loadUserProfile() {
-    this.loggedUser = this.authService.getLoggedUser();
+    this.isLoading = true;
+    
+    // Attempt to fetch user from AuthService
+    const user = this.authService.getLoggedUser();
+    
+    if (user) {
+      this.loggedUser = user;
+    } else {
+      console.error('User session not found.');
+    }
+
+    this.isLoading = false;
   }
 
-  // --- Feature: Apply for Reviewer Role ---
   applyForReviewer() {
-    // 1. Validation: Check if user is already a Reviewer or Admin
-    if (this.loggedUser.role === 'Reviewer' || this.loggedUser.role === 'Admin') {
+    if (this.loggedUser?.role === 'Reviewer' || this.loggedUser?.role === 'Admin') {
       alert('You are already a Reviewer/Admin!');
       return;
     }
 
-    // 2. Prompt for a reason (Simple interaction)
-    const reason = prompt("Why do you want to become a reviewer? (Optional)");
+    const reason = prompt("Why do you want to become a reviewer? (e.g., expertise, field of study)");
 
-    // 3. If user clicked "OK" (not Cancel)
     if (reason !== null) {
-      this.appService.applyForReviewer(this.loggedUser, reason).subscribe((res: any) => {
-        if (res.success) {
-          alert('Application submitted successfully! Please wait for Admin approval.');
-        } else {
-          // e.g., if they already have a pending application
-          alert(res.message);
+      this.isLoading = true;
+      this.appService.applyForReviewer(this.loggedUser, reason).subscribe({
+        next: (res: any) => {
+          this.isLoading = false;
+          if (res.success) {
+            alert('Application submitted! Pending admin approval.');
+          } else {
+            alert(res.message || 'Submission failed.');
+          }
+        },
+        error: (err) => {
+          this.isLoading = false;
+          alert('Error connecting to server.');
+          console.error(err);
         }
       });
     }
   }
-
 }
