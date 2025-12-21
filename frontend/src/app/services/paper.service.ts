@@ -22,7 +22,7 @@ export class PaperService {
     return this.http.get<any[]>(this.apiUrl, { withCredentials: true });
   }
 
-  getPapersByAuthor(authorId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/author/${authorId}`, { withCredentials: true });
+  getPapersByAuthor(userId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/author/${userId}`, { withCredentials: true });
   }
 }

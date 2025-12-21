@@ -44,7 +44,7 @@
             <div class="fw-bold text-dark mb-1">{{ paper.title }}</div>
             <div class="d-flex align-items-center text-muted small">
               <i class="bi bi-file-earmark-pdf me-1"></i>
-              {{ paper.fileName }}
+              {{ paper.submissionFile }}
             </div>
           </td>
 
@@ -76,14 +76,14 @@
             <div class="d-flex justify-content-end gap-2">
 
               <button class="btn btn-sm btn-light text-primary border"
-                      (click)="viewDetails(paper)"
+                      (click)="viewDetails(paper.paperId)"
                       title="View Details">
                 Details
               </button>
 
               <button *ngIf="paper.status === 'Accepted'"
                       class="btn btn-sm btn-success shadow-sm animate__animated animate__fadeIn"
-                      [routerLink]="['/dashboard/registration', paper.id]">
+                      [routerLink]="['/dashboard/registration', paper.paperId]">
                 Register
               </button>
 

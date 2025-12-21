@@ -76,11 +76,13 @@ onSubmit() {
 
   this.isLoading = true;
 
+  const randomTrackId = Math.floor(1000000 + Math.random() * 9000000);
+
   // DON'T send submittedAt and lastUpdated - let backend handle them
   const payload = {
     title: this.paperObj.title,
     abstract: this.paperObj.abstract,
-    trackId: Number(this.paperObj.trackId),
+    trackId:randomTrackId,
     fileName: this.paperObj.fileName,
     fileType: this.getFileExtension(this.paperObj.fileName),
     authorId: Number(finalUserId),
