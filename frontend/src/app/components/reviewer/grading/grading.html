@@ -8,7 +8,7 @@
     <div class="col-lg-5 mb-4">
       <div class="card border-0 shadow-sm rounded-4 h-100">
         <div class="card-body p-4">
-          <span class="badge bg-light text-dark border mb-3">Paper ID: {{ paper.id }}</span>
+          <span class="badge bg-light text-dark border mb-3">Paper ID: {{ paperId }}</span>
           <h4 class="fw-bold mb-3">{{ paper.title }}</h4>
 
           <h6 class="text-uppercase text-muted small fw-bold">Abstract</h6>
@@ -16,10 +16,15 @@
             {{ paper.abstract }}
           </p>
 
-          <h6 class="text-uppercase text-muted small fw-bold mt-4">Downloads</h6>
-          <button class="btn btn-outline-primary btn-sm rounded-pill w-100">
-            <i class="bi bi-file-earmark-arrow-down me-2"></i> Download Manuscript
+          <button
+            type="button"
+            class="btn btn-outline-primary btn-sm rounded-pill w-100"
+            (click)="downloadManuscript()"
+          >
+            <i class="bi bi-file-earmark-arrow-down me-2">  Download Manuscript</i>
+
           </button>
+
         </div>
       </div>
     </div>

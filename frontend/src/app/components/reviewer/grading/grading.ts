@@ -58,10 +58,10 @@ export class Grading implements OnInit {
   }
 
   loadPaper() {
-    // Fetch paper from backend
-    this.paperService.getPapersByAuthor(this.paperId).subscribe({
+    this.paperService.getPaperById(this.paperId).subscribe({
       next: (paperData) => {
         this.paper = paperData;
+        console.log('Loaded paper:', paperData);
       },
       error: (err) => {
         console.error('Error loading paper:', err);
@@ -70,37 +70,52 @@ export class Grading implements OnInit {
     });
   }
 
+  downloadManuscript() {
+    if (!this.paper) return;
+
+    this.paperService.downloadPaper(this.paper.paperId).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = this.paper.submissionFile?.split('/').pop() || 'manuscript.pdf';
+        a.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        console.error('Download failed', err);
+        alert('❌ Failed to download manuscript');
+      }
+    });
+  }
+
   // Submit Review to Backend
   submitReview() {
-    // 1. Validation
     if (this.totalScore === 0) {
       alert("Please score the paper before submitting.");
       return;
     }
-
     if (!this.comments.trim()) {
       alert("Please add comments for the review.");
       return;
     }
 
-    // 2. Create Review Object
     const reviewData = {
-      paperId: this.paperId,
-      reviewerId: this.currentUser.user_id,
-      overallScore: this.totalScore,
-      scoreCriteria: this.scoreCriteria,
+      assignment_id: this.paperId,                 // paperId → assignment_id
+      reviewer_id: this.currentUser.user_id,       // logged user
+      overall_score: this.totalScore,              // totalScore from frontend calculation
+      comments_to_author: this.comments,
+      comments_to_chair: '',                        // optional
       recommendation: this.recommendation,
-      commentsToAuthor: this.comments,
-      commentsToChair: '',
-      roundNumber: 1,
-      dueDate: new Date(),
-      attachment: null
+      round_number: 1,                              // default round
+      due_date: new Date(),                         // current date
+      attachment: null,                             // optional
+      reviewed_at: new Date()                       // timestamp
     };
 
-    // 3. Submit to Backend
     this.isSubmitting = true;
     this.reviewService.submitReview(reviewData).subscribe({
-      next: (response) => {
+      next: (res) => {
         alert("✅ Review Submitted Successfully!");
         this.isSubmitting = false;
         this.router.navigate(['/dashboard/review-history']);
@@ -109,10 +124,11 @@ export class Grading implements OnInit {
         console.error('Error submitting review:', err);
         this.errorMessage = 'Failed to submit review';
         this.isSubmitting = false;
-        alert("❌ Error submitting review. Please try again.");
+        alert("❌ Error submitting review. Check console.");
       }
     });
   }
+
 
   cancel() {
     this.router.navigate(['/dashboard/reviews']);
