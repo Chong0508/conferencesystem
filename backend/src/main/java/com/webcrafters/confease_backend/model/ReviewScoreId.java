@@ -1,6 +1,7 @@
 package com.webcrafters.confease_backend.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class ReviewScoreId implements Serializable {
     private Long review_id;
@@ -15,4 +16,18 @@ public class ReviewScoreId implements Serializable {
 
     public Integer getCriterion_id() { return criterion_id; }
     public void setCriterion_id(Integer criterion_id) { this.criterion_id = criterion_id; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ReviewScoreId that = (ReviewScoreId) o;
+        return Objects.equals(criterion_id, that.criterion_id) && 
+           Objects.equals(review_id, that.review_id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(criterion_id, review_id);
+    }
 }

@@ -10,7 +10,7 @@
     </div>
   </div>
 
-  <div *ngIf="loggedUser.role === 'Admin'">
+  <div *ngIf="loggedUser.role === 'Admin' || loggedUser.role === 'Super Admin'">
 
     <div class="row g-4 mb-4">
       <div class="col-md-4">

@@ -13,6 +13,15 @@ public class Role {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    // 1. keep the default no-arg constructor for JPA
+    public Role() {}
+
+    // 2. ADD this parameterized constructor for your DataInitializer
+    public Role(String role_name, String description) {
+        this.role_name = role_name;
+        this.description = description;
+    }
+
     // Getters and Setters
     public Integer getRole_id() { return role_id; }
     public void setRole_id(Integer role_id) { this.role_id = role_id; }

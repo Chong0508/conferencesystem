@@ -21,7 +21,19 @@
         </a>
       </li>
 
-      <ng-container *ngIf="loggedUser.role === 'Admin'">
+      <ng-container *ngIf="loggedUser.role === 'Super Admin'">
+        <li class="nav-item">
+          <p class="text-muted small ms-3 mt-3 mb-2 fw-bold">SYSTEM CONTROL</p>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/dashboard/create-admin" routerLinkActive="active">
+            <i class="bi bi-person-plus-fill me-2"></i> Create Admin Account
+          </a>
+        </li>
+      </ng-container>
+
+      <ng-container *ngIf="loggedUser.role === 'Admin' || loggedUser.role === 'Super Admin'">
 
         <li class="nav-item">
           <p class="text-muted small ms-3 mt-3 mb-2 fw-bold">ADMINISTRATION</p>
@@ -71,7 +83,7 @@
 
       </ng-container>
 
-      <ng-container *ngIf="loggedUser.role === 'Author' || loggedUser.role === 'Admin'">
+      <ng-container *ngIf="loggedUser.role === 'Author' || loggedUser.role === 'Admin'  || loggedUser.role === 'Super Admin'">
 
         <li class="nav-item">
           <p class="text-muted small ms-3 mt-3 mb-2 fw-bold">AUTHOR ZONE</p>
@@ -90,7 +102,7 @@
         </li>
       </ng-container>
 
-      <ng-container *ngIf="loggedUser.role === 'Reviewer' || loggedUser.role === 'Admin'">
+      <ng-container *ngIf="loggedUser.role === 'Reviewer' || loggedUser.role === 'Admin' || loggedUser.role === 'Super Admin'">
 
         <li class="nav-item">
           <p class="text-muted small ms-3 mt-3 mb-2 fw-bold">REVIEWER ZONE</p>

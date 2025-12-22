@@ -45,7 +45,7 @@ export class OverviewComponent implements OnInit {
     const papers = JSON.parse(localStorage.getItem('mock_papers') || '[]');
 
     // --- Admin --
-    if (this.loggedUser.role === 'Admin') {
+    if (this.loggedUser.role === 'Admin' || this.loggedUser.role === 'Super Admin') {
       this.stats.totalUsers = users.length;
       this.stats.totalPapers = papers.length;
       this.stats.totalConferences = 3; // 假定数据

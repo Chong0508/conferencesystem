@@ -36,6 +36,8 @@ import { ReviewerApplicationsComponent } from './components/admin/reviewer-appli
 // 7. Profile & Settings (Assuming you have a component for this path)
 import { MyProfile } from './components/common/my-profile/my-profile';
 
+import { CreateAdminComponent } from './components/admin/create-admin/create-admin';
+
 export const routes: Routes = [
   // --- Public Routes ---
   { path: '', component: Landing },
@@ -52,6 +54,7 @@ export const routes: Routes = [
 
       // 2. Overview Page
       { path: 'overview', component: OverviewComponent },
+      { path: 'create-admin', component: CreateAdminComponent },
 
       // 3. Author Routes
       { path: 'submit-paper', component: SubmitPaper },

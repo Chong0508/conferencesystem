@@ -1,0 +1,54 @@
+<div class="container mt-5 animate__animated animate__fadeIn">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card border-0 shadow-lg rounded-4">
+        <div class="card-header bg-white border-0 pt-4 ps-4">
+          <h3 class="fw-bold text-secondary">
+            <i class="bi bi-person-plus-fill me-2 text-primary"></i>
+            Create Admin Account
+          </h3>
+          <p class="text-muted small">Register a new user with administrative privileges.</p>
+        </div>
+
+        <div class="card-body p-4">
+          <div *ngIf="message" class="alert" [ngClass]="isError ? 'alert-danger' : 'alert-success'">
+            {{ message }}
+          </div>
+
+          <form (ngSubmit)="onSubmit()" #adminForm="ngForm">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-bold small">First Name</label>
+                <input type="text" class="form-control shadow-sm" [(ngModel)]="adminData.firstName" name="firstName" required placeholder="John">
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label fw-bold small">Last Name</label>
+                <input type="text" class="form-control shadow-sm" [(ngModel)]="adminData.lastName" name="lastName" required placeholder="Doe">
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold small">Email Address</label>
+              <input type="email" class="form-control shadow-sm" [(ngModel)]="adminData.email" name="email" required placeholder="admin@confease.com">
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-bold small">Temporary Password</label>
+              <input type="password" class="form-control shadow-sm" [(ngModel)]="adminData.password_hash" name="password" required minlength="8" placeholder="Minimum 8 characters">
+            </div>
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary py-2 fw-bold rounded-3" [disabled]="!adminForm.valid || isLoading">
+                <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+                {{ isLoading ? 'Creating Account...' : 'Generate Admin Account' }}
+              </button>
+              <button type="button" class="btn btn-light py-2 text-muted" routerLink="/dashboard/user-management">
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

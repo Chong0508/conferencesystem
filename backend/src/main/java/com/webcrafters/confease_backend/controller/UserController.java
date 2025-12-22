@@ -1,7 +1,11 @@
 package com.webcrafters.confease_backend.controller;
 
+import com.webcrafters.confease_backend.model.Role;
 import com.webcrafters.confease_backend.model.User;
+import com.webcrafters.confease_backend.model.UserRole;
+import com.webcrafters.confease_backend.repository.RoleRepository;
 import com.webcrafters.confease_backend.repository.UserRepository;
+import com.webcrafters.confease_backend.repository.UserRoleRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -23,6 +27,12 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserRoleRepository userRoleRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
+
     private final org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder passwordEncoder = 
     new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
 
@@ -40,77 +50,104 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-@PostMapping
-@Transactional
-public ResponseEntity<Map<String, Object>> createUser(@RequestBody User user) {
-    try {        
-        // 1. Password Security Check
-        if (user.getPassword_hash() == null || user.getPassword_hash().length() < 8) {
-             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("message", "Registration failed: Password must be at least 8 characters."));
-        }
+    @PostMapping
+    @Transactional
+    public ResponseEntity<Map<String, Object>> createUser(@RequestBody User user) {
+        try {        
+            // 1. Password Security Check
+            if (user.getPassword_hash() == null || user.getPassword_hash().length() < 8) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Registration failed: Password must be at least 8 characters."));
+            }
 
-        long userCount = userRepository.count();
-        
-        // 2. Automatic System Admin Initialization
-        if (userCount == 0) {
-            User systemAdmin = new User();
-            systemAdmin.setFirst_name("System");
-            systemAdmin.setLast_name("Admin");
-            systemAdmin.setEmail("admin@test.com");
-            systemAdmin.setPassword_hash(passwordEncoder.encode("admin123456"));
-            systemAdmin.setCategory("Admin");
-            systemAdmin.setIs_email_verified(true);
-            systemAdmin.setCreated_at(new Timestamp(System.currentTimeMillis()));
-            systemAdmin.setUpdated_at(new Timestamp(System.currentTimeMillis()));
+            // 2. Initial System Check (Ensures roles and first admin exist)
+            long userCount = userRepository.count();
+            if (userCount == 0) {
+                initializeSystemAdmin();
+            }
             
-            userRepository.save(systemAdmin);
-        }
-        
-        // 3. Email Duplicate Check (Returns explicit error message to user)
-        User existingUser = userRepository.findByEmail(user.getEmail());
-        if (existingUser != null) {
+            // 3. Manual Email Duplicate Check (Check before attempting save)
+            User existingUser = userRepository.findByEmail(user.getEmail());
+            if (existingUser != null) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("message", "This email (" + user.getEmail() + ") is already registered. Please use a different email or login."));
+            }
+            
+            // 4. Set Defaults
+            if (user.getCategory() == null || user.getCategory().isEmpty()) {
+                user.setCategory("Author");
+            }
+            if (user.getIs_email_verified() == null) user.setIs_email_verified(false);
+            
+            // 5. Hash Password and Set Timestamps
+            user.setPassword_hash(passwordEncoder.encode(user.getPassword_hash()));
+            user.setCreated_at(new Timestamp(System.currentTimeMillis()));
+            user.setUpdated_at(new Timestamp(System.currentTimeMillis()));
+            
+            // 6. Persist and Flush (Flush triggers the DB unique constraint immediately)
+            User savedUser = userRepository.saveAndFlush(user);
+
+            // 7. Link User to Role in the UserRole table
+            assignUserRole(savedUser);
+            
+            // 8. Success Response
+            Map<String, Object> userData = new HashMap<>();
+            userData.put("userId", savedUser.getUser_id());
+            userData.put("email", savedUser.getEmail());
+            userData.put("role", savedUser.getCategory());
+            
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+                "message", "Registration successful!",
+                "user", userData
+            ));
+            
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            // Catch-all for any database constraint issues (like duplicate email)
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(Map.of("message", "This email (" + user.getEmail() + ") is already registered. Please use a different email or login."));
+                .body(Map.of("message", "This email is already registered."));
+                
+        } catch (Exception e) {
+            // Log the actual error in Docker so you can see it
+            System.err.println("Registration Error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("message", "Registration failed: " + e.getMessage()));
         }
-        
-        // 4. Set Category Defaults
-        if (user.getCategory() == null || user.getCategory().isEmpty()) {
-            user.setCategory("Author");
-        }
-        
-        // 5. Set Timestamps and Security Defaults
-        if (user.getIs_email_verified() == null) user.setIs_email_verified(false);
-        if (user.getCreated_at() == null) user.setCreated_at(new Timestamp(System.currentTimeMillis()));
-        user.setUpdated_at(new Timestamp(System.currentTimeMillis()));
-        
-        // 6. Hash Password and Persist
-        String rawPassword = user.getPassword_hash();
-        user.setPassword_hash(passwordEncoder.encode(rawPassword));
-        User savedUser = userRepository.saveAndFlush(user);
-        
-        // 7. Prepare Clean Response
-        Map<String, Object> userData = new HashMap<>();
-        userData.put("userId", savedUser.getUser_id());
-        userData.put("firstName", savedUser.getFirst_name());
-        userData.put("lastName", savedUser.getLast_name());
-        userData.put("email", savedUser.getEmail());
-        userData.put("role", savedUser.getCategory());
-        userData.put("avatarColor", savedUser.getCategory().equalsIgnoreCase("Admin") ? "dc3545" : "0d6efd");
-        
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", userCount == 0 ? 
-            "System initialized. Admin and your account created successfully!" : 
-            "Registration successful!");
-        response.put("user", userData);
-        
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        
-    } catch (Exception e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(Map.of("message", "An unexpected error occurred during registration. Please try again."));
     }
-}
+
+    /**
+     * Helper to link the newly saved user to their corresponding Role ID
+     */
+    private void assignUserRole(User user) {
+        // Find the Role object by the category name (e.g., "Author", "Admin")
+        Role role = roleRepository.findByRoleName(user.getCategory());
+        
+        if (role != null) {
+            UserRole userRole = new UserRole();
+            userRole.setUser_id(user.getUser_id());
+            userRole.setRole_id(role.getRole_id());
+            userRole.setAssigned_at(new Timestamp(System.currentTimeMillis()));
+            
+            userRoleRepository.save(userRole);
+        }
+    }
+
+    /**
+     * Helper to initialize the very first system admin
+     */
+    private void initializeSystemAdmin() {
+        User systemAdmin = new User();
+        systemAdmin.setFirst_name("System");
+        systemAdmin.setLast_name("Admin");
+        systemAdmin.setEmail("admin@test.com");
+        systemAdmin.setPassword_hash(passwordEncoder.encode("admin123456"));
+        systemAdmin.setCategory("Super Admin");
+        systemAdmin.setIs_email_verified(true);
+        systemAdmin.setCreated_at(new Timestamp(System.currentTimeMillis()));
+        systemAdmin.setUpdated_at(new Timestamp(System.currentTimeMillis()));
+        
+        User savedAdmin = userRepository.saveAndFlush(systemAdmin);
+        assignUserRole(savedAdmin); // Also link the system admin to their role
+    }
 
     // PUT /users/{id} — update user
     @PutMapping("/{id}")
@@ -199,5 +236,16 @@ public ResponseEntity<Map<String, Object>> createUser(@RequestBody User user) {
         public void setEmail(String email) { this.email = email; }
         public String getPassword() { return password; }
         public void setPassword(String password) { this.password = password; }
+    }
+
+    @PostMapping("/admin")
+    @Transactional
+    public ResponseEntity<Map<String, Object>> createAdminAccount(@RequestBody User user) {
+        // Explicitly set category to Admin to override any frontend input for security
+        user.setCategory("Admin");
+        user.setIs_email_verified(true); // Admin accounts created by Super Admin are pre-verified
+        
+        // Call your existing createUser logic or inline it as shown below
+        return createUser(user);
     }
 }

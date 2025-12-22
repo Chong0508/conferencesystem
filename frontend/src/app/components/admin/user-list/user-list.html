@@ -2,32 +2,26 @@
 
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="fw-bold text-secondary">User Management</h2>
-    <button class="btn btn-outline-secondary btn-sm" (click)="loadUsers()"> <i class="bi bi-arrow-clockwise"></i> Refresh
+    <button class="btn btn-outline-secondary btn-sm" (click)="loadUsers()"> 
+      <i class="bi bi-arrow-clockwise"></i> Refresh
     </button>
   </div>
 
   <div class="row mb-4">
-    <div class="col-md-6">
+    <div class="col-md-8">
       <div class="input-group shadow-sm">
         <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
         <input type="text" class="form-control border-start-0 ps-0"
-               placeholder="Search users by name or email..."
+               placeholder="Search by name or email..."
                [(ngModel)]="searchTerm" (input)="searchUsers()">
       </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-4">
       <select class="form-select shadow-sm" [(ngModel)]="selectedRole" (change)="filterByRole()">
         <option value="All">All Roles</option>
         <option value="Admin">Admin</option>
         <option value="Author">Author</option>
         <option value="Reviewer">Reviewer</option>
-      </select>
-    </div>
-    <div class="col-md-3">
-      <select class="form-select shadow-sm">
-        <option selected>Active</option>
-        <option value="1">Inactive</option>
-        <option value="2">Banned</option>
       </select>
     </div>
   </div>
@@ -36,54 +30,50 @@
     <div class="card-body p-0">
       <table class="table table-hover align-middle mb-0">
         <thead class="bg-light">
-        <tr>
-          <th class="ps-4 py-3">User</th>
-          <th>Role</th>
-          <th>Status</th>
-          <th>Joined Date</th>
-          <th class="text-end pe-4">Actions</th>
-        </tr>
+          <tr>
+            <th class="ps-4 py-3">Full Name</th>
+            <th>Email Address</th>
+            <th>Role</th>
+            <th>Joined Date</th>
+            <th class="text-end pe-4">Actions</th>
+          </tr>
         </thead>
         <tbody>
-        <tr *ngFor="let user of filteredUsers">
-          <td class="ps-4">
-            <div class="d-flex align-items-center">
-              <img [src]="'https://ui-avatars.com/api/?name=' + user.firstName + '+' + user.lastName + '&background=random&color=fff'"
-                   class="rounded-circle me-3" width="40" height="40" alt="Avatar">
-              <div>
-                <div class="fw-bold text-dark">{{ user.firstName }} {{ user.lastName }}</div>
-                <div class="text-muted small">{{ user.email }}</div>
+          <tr *ngFor="let user of filteredUsers">
+            <td class="ps-4">
+              <div class="d-flex align-items-center">
+                <img [src]="'https://ui-avatars.com/api/?name=' + user.firstName + '+' + user.lastName + '&background=random&color=fff'"
+                     class="rounded-circle me-3" width="35" height="35" alt="Avatar">
+                <span class="fw-bold text-dark">{{ user.firstName }} {{ user.lastName }}</span>
               </div>
-            </div>
-          </td>
-          <td>
+            </td>
+            <td class="text-secondary">{{ user.email }}</td>
+            <td>
               <span class="badge rounded-pill"
                     [ngClass]="{
-                  'bg-primary': user.role === 'Admin',
-                  'bg-info text-dark': user.role === 'Reviewer',
-                  'bg-secondary': user.role === 'Author'
-                }">
+                      'bg-primary': user.role === 'Admin',
+                      'bg-info text-dark': user.role === 'Reviewer',
+                      'bg-secondary': user.role === 'Author'
+                    }">
                 {{ user.role }}
               </span>
-          </td>
-          <td>
-            <span class="badge bg-success-subtle text-success rounded-pill">Active</span>
-          </td>
-          <td class="text-muted small">{{ user.joinDate || 'N/A' }}</td>
-          <td class="text-end pe-4">
-            <button class="btn btn-sm btn-outline-danger rounded-circle"
-                    title="Delete"
-                    (click)="deleteUser(user)"> <i class="bi bi-trash"></i>
-            </button>
-          </td>
-        </tr>
+            </td>
+            <td class="text-muted small">{{ user.joinDate || 'N/A' }}</td>
+            <td class="text-end pe-4">
+              <button class="btn btn-sm btn-outline-danger rounded-circle"
+                      title="Delete User"
+                      (click)="deleteUser(user)"> 
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
 
-        <tr *ngIf="filteredUsers.length === 0">
-          <td colspan="5" class="text-center py-5 text-muted">
-            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
-            No registered users found.
-          </td>
-        </tr>
+          <tr *ngIf="filteredUsers.length === 0">
+            <td colspan="5" class="text-center py-5 text-muted">
+              <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+              No users found matching your criteria.
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
