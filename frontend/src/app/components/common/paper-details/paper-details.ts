@@ -37,22 +37,21 @@ export class PaperDetails implements OnInit {
     this.errorMessage = '';
 
     // Fetch paper details from backend
-    this.paperService.getPapersByAuthor(this.paperId).subscribe({
-      next: (paperData) => {
-        this.paper = paperData;
+     this.paperService.getPaperById(this.paperId).subscribe({
+        next: (paperData) => {
+          this.paper = paperData;
 
-        // Fetch review data for this paper
-        this.reviewService.getReviewsByPaper(this.paperId).subscribe({
-          next: (reviews) => {
-            this.review = reviews.length > 0 ? reviews[0] : null;
-            this.isLoading = false;
-          },
-          error: (err) => {
-            console.error('Error fetching reviews:', err);
-            this.review = null;
-            this.isLoading = false;
-          }
-        });
+          // ✅ 2. Fetch reviews for this paper
+          this.reviewService.getReviewsByPaper(this.paperId).subscribe({
+            next: (reviews) => {
+              this.review = reviews && reviews.length > 0 ? reviews[0] : null;
+              this.isLoading = false;
+            },
+            error: () => {
+              this.review = null;
+              this.isLoading = false;
+            }
+          });
       },
       error: (err) => {
         console.error('Error fetching paper:', err);
