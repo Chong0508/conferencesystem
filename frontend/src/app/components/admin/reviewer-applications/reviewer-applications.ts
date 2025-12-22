@@ -32,10 +32,23 @@ export class ReviewerApplicationsComponent implements OnInit {
     });
   }
 
+  getEvidenceUrl(path: string | undefined): string {
+    if (!path) return '#';
+    // Extracts the filename from the backend path (e.g., 'evidence_3_123.pdf')
+    const fileName = path.split('/').pop();
+    return `http://localhost:8080/users/applications/evidence/${fileName}`;
+  }
+
   process(appId: number, status: 'Approved' | 'Rejected') {
     if (confirm(`Are you sure you want to ${status} this application?`)) {
-      this.appService.processApplication(appId, status).subscribe(() => {
-        this.loadData(); // Refresh list after action
+      this.appService.processApplication(appId, status).subscribe({
+        next: () => {
+          this.loadData();
+        },
+        error: (err) => {
+          console.error('Process failed', err);
+          alert('Failed to process application');
+        }
       });
     }
   }

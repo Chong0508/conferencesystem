@@ -1,0 +1,36 @@
+<div class="container mt-5 animate__animated animate__fadeIn">
+  <div class="card shadow border-0 rounded-4">
+    <div class="card-header bg-white pt-4 ps-4">
+      <h3 class="fw-bold">Reviewer Role Application</h3>
+      <p class="text-muted">Please provide your academic background and evidence.</p>
+    </div>
+    <div class="card-body p-4">
+      <form (ngSubmit)="submitApplication()">
+        <div class="mb-3">
+          <label class="form-label fw-bold">Education Level</label>
+          <select class="form-select" [(ngModel)]="appData.educationLevel" name="edu" required>
+            <option value="Master">Master's Degree</option>
+            <option value="PhD">PhD / Doctorate</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold">Motivation / Reason</label>
+          <textarea class="form-control" rows="4" [(ngModel)]="appData.reason" name="reason" 
+                    placeholder="Describe your expertise..." required></textarea>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label fw-bold">Evidence (CV/Certificates in PDF)</label>
+          <input type="file" class="form-control" (change)="onFileSelected($event)" accept=".pdf" required>
+        </div>
+
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary py-2 fw-bold" [disabled]="isLoading">
+            {{ isLoading ? 'Submitting...' : 'Submit Application' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -57,7 +57,7 @@
 
       <div class="form-actions">
         <button 
-          *ngIf="loggedUser?.role !== 'Reviewer' && loggedUser?.role !== 'Admin'"
+          *ngIf="loggedUser?.role !== 'Reviewer' && loggedUser?.role !== 'Admin' && loggedUser?.role !== 'Super Admin'"
           type="button" 
           class="btn btn-primary" 
           (click)="applyForReviewer()">

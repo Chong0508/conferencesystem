@@ -1,19 +1,21 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
-
-// 👇 Imports: Ensure these point to your actual service files
+import { Observable } from 'rxjs';
 import { NotificationService } from './notification.service';
 import { AuthService } from './auth.service';
 
+// Interface matching your MySQL/Java Entity
 export interface ReviewerApplication {
   id: number;
-  userId: number | string;
-  userName: string;
-  userEmail: string;
-  reason?: string;
-  status: 'Pending' | 'Approved' | 'Rejected';
-  appliedAt: Date;
+  userId: number; 
+  educationLevel: string; 
+  evidencePath: string;
+  reason: string;
+  status: string;
+  submittedAt: Date; 
+  // Optional fields for UI display if you join with User table in backend
+  userName?: string;
+  userEmail?: string;
 }
 
 @Injectable({
@@ -21,120 +23,46 @@ export interface ReviewerApplication {
 })
 export class ApplicationService {
 
-  private storageKey = 'mock_applications';
+  private baseUrl = 'http://localhost:8080/users';
 
   constructor(
+    private http: HttpClient,
     private notificationService: NotificationService,
     private authService: AuthService
   ) {}
 
   // ==========================================
-  // 1. Author: Apply to be Reviewer
+  // 1. Author: Submit Application (Real Backend)
   // ==========================================
-  applyForReviewer(user: any, reason: string): Observable<any> {
-    const apps = this.getData(this.storageKey);
-
-    // Check if already applied and pending
-    const existing = apps.find((a: any) => a.userId === user.id && a.status === 'Pending');
-    if (existing) {
-      return of({ success: false, message: 'You already have a pending application.' });
-    }
-
-    const newApp: ReviewerApplication = {
-      id: Date.now(),
-      userId: user.id,
-      userName: user.firstName + ' ' + user.lastName,
-      userEmail: user.email,
-      reason: reason,
-      status: 'Pending',
-      appliedAt: new Date()
-    };
-
-    apps.push(newApp);
-    this.saveData(this.storageKey, apps);
-
-    // Notify Admin (Uses the compatibility method we added in NotificationService)
-    this.notificationService.addNotification({
-      title: 'New Reviewer Application',
-      message: `${newApp.userName} applied to become a Reviewer.`,
-      type: 'info',
-      recipientEmail: 'Admin'
-    });
-
-    return of({ success: true }).pipe(delay(500));
+  // Note: This matches the Multipart request required by your handleReviewerApplication method
+  submitReviewerApplication(formData: FormData): Observable<any> {
+    return this.http.post(`${this.baseUrl}/apply-reviewer`, formData);
   }
 
   // ==========================================
-  // 2. Admin: Get All Applications
+  // 2. Admin: Get All Applications (Real Backend)
   // ==========================================
   getApplications(): Observable<ReviewerApplication[]> {
-    const apps = this.getData(this.storageKey);
-    // Sort: Pending first, then by date desc
-    return of(apps.sort((a: any, b: any) => {
-      if (a.status === b.status) return new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime();
-      return a.status === 'Pending' ? -1 : 1;
-    })).pipe(delay(300));
+    // Fetches the actual records from the MySQL table
+    return this.http.get<ReviewerApplication[]>(`${this.baseUrl}/applications`);
   }
 
   // ==========================================
   // 3. Admin: Process Application (Approve/Reject)
   // ==========================================
+  // This updates ReviewerApplication, User Category, and UserRole tables in one transaction
   processApplication(appId: number, status: 'Approved' | 'Rejected'): Observable<any> {
-    const apps = this.getData(this.storageKey);
-    const appIndex = apps.findIndex((a: any) => a.id === appId);
-
-    if (appIndex !== -1) {
-      const app = apps[appIndex];
-      app.status = status;
-      this.saveData(this.storageKey, apps);
-
-      if (status === 'Approved') {
-        // 🔥 Update User Role
-        this.updateUserRole(app.userEmail, 'Reviewer');
-
-        // Notify User
-        this.notificationService.addNotification({
-          title: 'Application Approved! 🎉',
-          message: 'You are now a Reviewer! Please re-login to update your dashboard.',
-          type: 'success',
-          recipientEmail: app.userEmail
-        });
-      } else {
-        // Notify User
-        this.notificationService.addNotification({
-          title: 'Application Update',
-          message: 'Your reviewer application was not approved.',
-          type: 'error',
-          recipientEmail: app.userEmail
-        });
-      }
-
-      return of({ success: true }).pipe(delay(500));
-    }
-    return of({ success: false });
+    // Use backticks for template literals and ensure status is passed as a query param
+    return this.http.post(`${this.baseUrl}/applications/${appId}/process?status=${status}`, {});
   }
 
   // ==========================================
-  // 4. Helper: Update User Role directly in mock DB
+  // 4. Evidence Handling: Get File URL
   // ==========================================
-  private updateUserRole(email: string, newRole: string) {
-    const usersString = localStorage.getItem('mock_users');
-    if (usersString) {
-      let users = JSON.parse(usersString);
-      const userIndex = users.findIndex((u: any) => u.email === email);
-      if (userIndex !== -1) {
-        users[userIndex].role = newRole;
-        localStorage.setItem('mock_users', JSON.stringify(users));
-      }
-    }
-  }
-
-  private getData(key: string): any[] {
-    const data = localStorage.getItem(key);
-    return data ? JSON.parse(data) : [];
-  }
-
-  private saveData(key: string, data: any[]) {
-    localStorage.setItem(key, JSON.stringify(data));
+  getEvidenceUrl(path: string): string {
+    if (!path) return '';
+    // Extracts filename from path (e.g., /app/uploads/evidence/file.pdf)
+    const fileName = path.split('/').pop();
+    return `${this.baseUrl}/applications/evidence/${fileName}`;
   }
 }

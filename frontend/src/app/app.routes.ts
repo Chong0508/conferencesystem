@@ -35,6 +35,7 @@ import { ReviewerApplicationsComponent } from './components/admin/reviewer-appli
 
 // 7. Profile & Settings (Assuming you have a component for this path)
 import { MyProfile } from './components/common/my-profile/my-profile';
+import { ApplyReviewerComponent } from './components/author/apply-reviewer/apply-reviewer';
 
 import { CreateAdminComponent } from './components/admin/create-admin/create-admin';
 
@@ -82,7 +83,8 @@ export const routes: Routes = [
       // 7. Settings
       { path: 'profile', component: MyProfile },
       // Note: Added profile route explicitly to match sidebar links
-      { path: 'notifications', loadComponent: () => import('./components/common/notifications/notifications').then(m => m.Notifications) }
+      { path: 'notifications', loadComponent: () => import('./components/common/notifications/notifications').then(m => m.Notifications) },
+      { path: 'apply-reviewer', component: ApplyReviewerComponent },
     ]
   },
 
