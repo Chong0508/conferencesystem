@@ -42,6 +42,26 @@ public class PaperController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/{id}/download")
+    public ResponseEntity<Resource> download(@PathVariable Long id) {
+        Paper paper = paperRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Paper not found"));
+
+        String path = paper.getSubmissionFile();
+        File file = new File(path);
+        if (!file.exists()) {
+            throw new RuntimeException("File not found on disk: " + path);
+        }
+
+        Resource resource = new FileSystemResource(file);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + file.getName() + "\"")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(resource);
+    }
+
     // Create a new paper
     @PostMapping
     public ResponseEntity<?> createPaper(@RequestBody Paper paper) {

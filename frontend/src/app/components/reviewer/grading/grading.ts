@@ -70,24 +70,14 @@ export class Grading implements OnInit {
     });
   }
 
-  downloadManuscript() {
-    if (!this.paper) return;
+  getManuscriptUrl(): string {
+      if (!this.paper) return '#';
+      const path = this.paper.submissionFile || this.paper.fileName;
+      if (!path) return '#';
 
-    this.paperService.downloadPaper(this.paper.paperId).subscribe({
-      next: (blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = this.paper.submissionFile?.split('/').pop() || 'manuscript.pdf';
-        a.click();
-        window.URL.revokeObjectURL(url);
-      },
-      error: (err) => {
-        console.error('Download failed', err);
-        alert('❌ Failed to download manuscript');
-      }
-    });
-  }
+      const fileName = encodeURIComponent(path.split('/').pop() || '');
+      return `http://localhost:8080/papers/manuscript/${fileName}`;
+    }
 
   // Submit Review to Backend
   submitReview() {

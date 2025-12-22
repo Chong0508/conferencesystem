@@ -43,6 +43,11 @@ export class ReviewService {
     return this.http.get<Review[]>(`${this.apiUrl}/paper/${paperId}`, { withCredentials: true });
   }
 
+  getReviewById(id: number): Observable<any> {
+      return this.http.get(`${this.apiUrl}/${id}`, { withCredentials: true });
+    }
+
+
   // submit or update review
   submitReview(payload: any): Observable<any> {
     return this.http.post<any>(this.apiUrl, payload, { withCredentials: true });

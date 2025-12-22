@@ -26,11 +26,14 @@ export class PaperService {
     return this.http.get<any[]>(`${this.apiUrl}/author/${userId}`, { withCredentials: true });
   }
 
-  // paper.service.ts
-  downloadPaper(paperId: number) {
-    return this.http.get(`http://localhost:8080/api/papers/${paperId}/download`, {
-      responseType: 'blob', // important
-      withCredentials: true
-    });
-  }
+  downloadPaper(paperId: number | string) {
+       return this.http.get(
+         `${this.apiUrl}/${paperId}/download`,
+         { responseType: 'blob' }
+       );
+     }
+
+    getReviewsByReviewer(reviewerId: number): Observable<any[]> {
+      return this.http.get<any[]>(`${this.apiUrl}?reviewerId=${reviewerId}`, { withCredentials: true });
+    }
 }

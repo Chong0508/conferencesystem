@@ -16,14 +16,20 @@
             {{ paper.abstract }}
           </p>
 
-          <button
-            type="button"
-            class="btn btn-outline-primary btn-sm rounded-pill w-100"
-            (click)="downloadManuscript()"
+          <a
+            [href]="getManuscriptUrl()"
+            target="_blank"
+            rel="noopener"
+            class="text-decoration-none"
           >
-            <i class="bi bi-file-earmark-arrow-down me-2">  Download Manuscript</i>
-
-          </button>
+            <div class="d-flex align-items-center p-3 border rounded-3 hover-bg-light">
+              <i class="bi bi-file-earmark-pdf-fill text-danger fs-3 me-3"></i>
+              <div>
+                <h6 class="mb-0 fw-bold">{{ paper.fileName || 'Manuscript.pdf' }}</h6>
+                <small class="text-muted">View Manuscript</small>
+              </div>
+            </div>
+          </a>
 
         </div>
       </div>
