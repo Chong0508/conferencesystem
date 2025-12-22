@@ -115,7 +115,7 @@
   </div>
 
 
-  <div *ngIf="loggedUser.role === 'Author'">
+  <div *ngIf="loggedUser.role === 'Author' || loggedUser.role === 'Reviewer'">
     <div class="row g-4 mb-4">
       <div class="col-md-6">
         <div class="card border-0 shadow-sm rounded-4 bg-primary text-white p-4 h-100">
