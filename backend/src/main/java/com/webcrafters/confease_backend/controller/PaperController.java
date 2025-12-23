@@ -1,18 +1,8 @@
 package com.webcrafters.confease_backend.controller;
 
-import com.webcrafters.confease_backend.model.Author;
-import com.webcrafters.confease_backend.model.Keyword;
-import com.webcrafters.confease_backend.model.Paper;
-import com.webcrafters.confease_backend.model.PaperKeyword;
-import com.webcrafters.confease_backend.repository.AuthorRepository;
-import com.webcrafters.confease_backend.repository.KeywordRepository;
-import com.webcrafters.confease_backend.repository.PaperKeywordRepository;
-import com.webcrafters.confease_backend.repository.PaperRepository;
-import com.webcrafters.confease_backend.repository.TrackRepository;
-import com.webcrafters.confease_backend.repository.UserRepository;
-
+import com.webcrafters.confease_backend.model.*;
+import com.webcrafters.confease_backend.repository.*;
 import jakarta.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -40,23 +30,15 @@ import java.util.stream.Collectors;
 @CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 public class PaperController {
 
-    @Autowired
-    private PaperRepository paperRepository;
+    @Autowired private PaperRepository paperRepository;
+    @Autowired private KeywordRepository keywordRepository;
+    @Autowired private PaperKeywordRepository paperKeywordRepository;
+    @Autowired private TrackRepository trackRepository;
+    @Autowired private UserRepository userRepository;
+    @Autowired private AuthorRepository authorRepository;
 
-    @Autowired
-    private KeywordRepository keywordRepository;
-
-    @Autowired
-    private PaperKeywordRepository paperKeywordRepository;
-
-    @Autowired
-    private TrackRepository trackRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private AuthorRepository authorRepository;
+    // ✅ FIXED: Explicitly use the absolute path that matches your Docker volume mapping
+    private final Path rootLocation = Paths.get("/app/uploads/papers");
 
     private void populateSubmitterName(Paper paper) {
         if (paper.getSubmittedBy() != null) {
@@ -108,61 +90,50 @@ public class PaperController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Transactional
     public ResponseEntity<?> createPaper(
             @RequestPart("paperData") Paper paper,
             @RequestPart("file") MultipartFile file) {
 
         try {
-            // 1. Set Timestamps (Asia/Kuala_Lumpur)
             ZoneId klZone = ZoneId.of("Asia/Kuala_Lumpur");
             LocalDateTime nowKL = ZonedDateTime.now(klZone).toLocalDateTime();
             paper.setSubmittedAt(nowKL);
             paper.setLastUpdated(nowKL);
 
-            // 2. Validate Track Existence
             if (paper.getTrackId() == null || !trackRepository.existsById(paper.getTrackId())) {
                 return ResponseEntity.badRequest().body(Map.of("message", "Invalid track ID"));
             }
 
-            // 3. Robust File Handling
             if (file == null || file.isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of("message", "Manuscript file is required"));
+                return ResponseEntity.badRequest().body(Map.of("message", "File is required"));
             }
 
-            // Path: /app/uploads/papers (relative to container/project root)
-            Path uploadDir = Paths.get("uploads/papers").toAbsolutePath().normalize();
-            if (!Files.exists(uploadDir)) {
-                Files.createDirectories(uploadDir);
+            // ✅ FIXED: Ensure directory exists using the absolute rootLocation
+            if (!Files.exists(rootLocation)) {
+                Files.createDirectories(rootLocation);
             }
 
-            // Generate unique filename to avoid collisions
-            String originalName = file.getOriginalFilename() != null ? file.getOriginalFilename() : "document.pdf";
-            String storedFileName = System.currentTimeMillis() + "_" + originalName.replaceAll("\\s+", "_");
-            Path filePath = uploadDir.resolve(storedFileName);
+            String storedFileName = System.currentTimeMillis() + "_" + file.getOriginalFilename().replaceAll("\\s+", "_");
+            Path filePath = rootLocation.resolve(storedFileName);
 
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
             
-            // REFINEMENT: Store ONLY the filename string in the database column
             paper.setSubmissionFile(storedFileName); 
             paper.setFileType(file.getContentType());
 
-            // 4. Save Paper Entity
             Paper savedPaper = paperRepository.save(paper);
 
-            // 5. Handle Many-to-Many Keywords
             if (paper.getKeywords() != null && !paper.getKeywords().isEmpty()) {
                 for (String kwName : paper.getKeywords()) {
                     if (kwName == null || kwName.trim().isEmpty()) continue;
-
                     Keyword kw = keywordRepository.findByKeywordIgnoreCase(kwName.trim())
                             .orElseGet(() -> {
                                 Keyword newKw = new Keyword();
                                 newKw.setKeyword(kwName.trim());
                                 return keywordRepository.save(newKw);
                             });
-
                     PaperKeyword pk = new PaperKeyword();
                     pk.setPaper_id(savedPaper.getPaperId());
                     pk.setKeyword_id(kw.getKeyword_id());
@@ -190,23 +161,19 @@ public class PaperController {
             @RequestPart(value = "file", required = false) MultipartFile file) {
         try {
             return paperRepository.findById(id).map(paper -> {
-                // 1. Update basic text metadata
                 paper.setTitle(paperDetails.getTitle());
                 paper.setAbstractText(paperDetails.getAbstractText());
                 paper.setTrackId(paperDetails.getTrackId());
                 paper.setLastUpdated(LocalDateTime.now());
 
-                // 2. Conditional File Update (Only if a NEW file is uploaded)
                 if (file != null && !file.isEmpty()) {
                     try {
-                        Path uploadDir = Paths.get("uploads/papers").toAbsolutePath().normalize();
-                        if (!Files.exists(uploadDir)) Files.createDirectories(uploadDir);
-
+                        // ✅ FIXED: Use absolute rootLocation for updates
+                        if (!Files.exists(rootLocation)) Files.createDirectories(rootLocation);
                         String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename().replaceAll("\\s+", "_");
-                        Path filePath = uploadDir.resolve(fileName);
+                        Path filePath = rootLocation.resolve(fileName);
                         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
                         
-                        // Update to the new filename
                         paper.setSubmissionFile(fileName);
                         paper.setFileType(file.getContentType());
                     } catch (IOException e) {
@@ -214,7 +181,6 @@ public class PaperController {
                     }
                 }
 
-                // 3. Refresh Keywords (Delete old associations and re-create)
                 paperKeywordRepository.deleteByPaperId(id);
                 if (paperDetails.getKeywords() != null) {
                     for (String kwName : paperDetails.getKeywords()) {
@@ -248,8 +214,8 @@ public class PaperController {
         return paperRepository.findById(id).map(paper -> {
             paperKeywordRepository.deleteByPaperId(id);
             try {
-                // Point to uploads/papers/ + filename
-                Path filePath = Paths.get("uploads/papers").resolve(paper.getSubmissionFile()).normalize();
+                // ✅ FIXED: Point to absolute rootLocation + filename
+                Path filePath = rootLocation.resolve(paper.getSubmissionFile()).normalize();
                 Files.deleteIfExists(filePath);
             } catch (Exception e) {
                 System.err.println("Could not delete file: " + e.getMessage());
@@ -259,11 +225,11 @@ public class PaperController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    // Refined Download mapping to look inside the correct folder
+    // ✅ FIXED: Download mapping now uses the absolute rootLocation to prevent 404 after session resets
     @GetMapping("/download/{fileName}")
     public ResponseEntity<Resource> downloadManuscript(@PathVariable String fileName) {
         try {
-            Path filePath = Paths.get("uploads/papers").resolve(fileName).normalize();
+            Path filePath = rootLocation.resolve(fileName).normalize();
             Resource resource = new UrlResource(filePath.toUri());
 
             if (resource.exists() && resource.isReadable()) {
@@ -272,6 +238,7 @@ public class PaperController {
                     .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
                     .body(resource);
             } else {
+                System.err.println("FILE NOT FOUND AT: " + filePath.toAbsolutePath());
                 return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {

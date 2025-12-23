@@ -1,13 +1,21 @@
 package com.webcrafters.confease_backend.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.webcrafters.confease_backend.model.Review;
+import com.webcrafters.confease_backend.model.ReviewScore;
+import com.webcrafters.confease_backend.repository.PaperRepository;
 import com.webcrafters.confease_backend.repository.ReviewRepository;
+import com.webcrafters.confease_backend.service.ReviewScoreService;
+
+import jakarta.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @CrossOrigin(origins = {"http://localhost:4200", "http://frontend:4200", "http://host.docker.internal:4200"}, allowCredentials = "true")
@@ -17,6 +25,12 @@ public class ReviewController {
 
     @Autowired
     private ReviewRepository reviewRepository;
+
+    @Autowired
+    private ReviewScoreService reviewScoreService;
+
+    @Autowired
+    private PaperRepository paperRepository;
 
     // Get all reviews
     @GetMapping
@@ -74,6 +88,58 @@ public class ReviewController {
             return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/submit-full")
+    @Transactional // Ensures atomicity: all 3 tables update or none do
+    public ResponseEntity<?> submitFullReview(@RequestBody Map<String, Object> payload) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.findAndRegisterModules(); // For Date handling
+
+            // 1. Save the Review
+            Review review = mapper.convertValue(payload.get("review"), Review.class);
+            Review savedReview = reviewRepository.save(review);
+
+            // 2. Save the Review Scores (linking to the new review_id)
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> scoresData = (List<Map<String, Object>>) payload.get("scores");
+            for (Map<String, Object> s : scoresData) {
+                ReviewScore rs = new ReviewScore();
+                rs.setReview_id(savedReview.getReview_id());
+                rs.setCriterion_id((Integer) s.get("criterion_id"));
+                rs.setScore(Double.valueOf(s.get("score").toString()));
+                reviewScoreService.create(rs);
+            }
+
+            // 3. Update Paper Status based on Recommendation
+            paperRepository.findById(savedReview.getAssignment_id()).ifPresent(paper -> {
+                String recommendation = savedReview.getRecommendation();
+                String newStatus;
+
+                // Mapping logic based on your requirement
+                if ("Accept".equalsIgnoreCase(recommendation)) {
+                    newStatus = "Accepted";
+                } else if ("Reject".equalsIgnoreCase(recommendation)) {
+                    newStatus = "Rejected";
+                } else if ("Revision".equalsIgnoreCase(recommendation)) {
+                    newStatus = "Revised";
+                } else {
+                    newStatus = "Reviewed"; // Fallback default
+                }
+
+                paper.setStatus(newStatus); 
+                paperRepository.save(paper);
+            });
+
+            return ResponseEntity.ok(Map.of(
+                "message", "Full review processed successfully",
+                "status", "Success"
+            ));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
 }

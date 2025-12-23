@@ -1,5 +1,4 @@
 <div class="container mt-4 mb-5 animate__animated animate__fadeIn">
-
   <button class="btn btn-link text-decoration-none text-muted mb-3 ps-0" (click)="cancel()">
     <i class="bi bi-arrow-left me-1"></i> Back to List
   </button>
@@ -10,28 +9,22 @@
         <div class="card-body p-4">
           <span class="badge bg-light text-dark border mb-3">Paper ID: {{ paperId }}</span>
           <h4 class="fw-bold mb-3">{{ paper?.title }}</h4>
-
+          
           <h6 class="text-uppercase text-muted small fw-bold">Abstract</h6>
           <p class="text-secondary small text-justify bg-light p-3 rounded mb-4">
-            {{ paper?.paper_abstract || paper?.abstract }}
+            {{ paper?.abstract }}
           </p>
 
           <h6 class="text-uppercase text-muted small fw-bold mb-2">Manuscript</h6>
-            <a [href]="getManuscriptUrl(paper?.fileName)" 
-              target="_blank" 
-              class="text-decoration-none manuscript-link">
-              <div class="d-flex align-items-center p-3 border rounded-3 bg-white shadow-sm hover-bg-light transition-all">
-                <div class="icon-square bg-danger-subtle text-danger rounded-3 me-3 p-2">
-                  <i class="bi bi-file-earmark-pdf-fill fs-3"></i>
-                </div>
-                <div class="overflow-hidden">
-                  <h6 class="mb-0 fw-bold text-dark text-truncate">
-                    {{ getCleanFileName(paper?.fileName) }}
-                  </h6>
-                  <small class="text-muted"><i class="bi bi-box-arrow-up-right me-1"></i>Open in New Tab</small>
-                </div>
+          <a [href]="getManuscriptUrl(paper?.fileName)" target="_blank" class="text-decoration-none">
+            <div class="d-flex align-items-center p-3 border rounded-3 bg-white shadow-sm hover-bg-light transition-all">
+              <i class="bi bi-file-earmark-pdf-fill text-danger fs-3 me-3"></i>
+              <div class="overflow-hidden">
+                <h6 class="mb-0 fw-bold text-dark text-truncate">{{ getCleanFileName(paper?.fileName) }}</h6>
+                <small class="text-muted">Open in New Tab</small>
               </div>
-            </a>
+            </div>
+          </a>
         </div>
       </div>
     </div>
@@ -42,43 +35,58 @@
           <h5 class="fw-bold text-primary mb-0">Evaluation Form</h5>
         </div>
         <div class="card-body p-4">
-
           <form (ngSubmit)="submitReview()">
-            <h6 class="text-uppercase text-muted small fw-bold mb-3">Scoring (0-25 each)</h6>
+            
+            <div class="mb-3">
+              <h6 class="text-uppercase text-muted small fw-bold mb-1">Scoring (0-100 per category)</h6>
+              <small class="text-danger-emphasis x-small d-block mb-3 bg-danger-subtle p-2 rounded border border-danger-subtle">
+                <i class="bi bi-info-circle-fill me-1"></i> Note: Individual category scores cannot exceed 100.
+              </small>
+            </div>
 
             <div class="row g-3 mb-2 align-items-center">
               <label class="col-6 col-form-label">Originality</label>
               <div class="col-6">
-                <input type="number" class="form-control" [(ngModel)]="scoreCriteria.originality" name="orig" min="0" max="25">
-              </div>
-            </div>
-            <div class="row g-3 mb-2 align-items-center">
-              <label class="col-6 col-form-label">Relevance</label>
-              <div class="col-6">
-                <input type="number" class="form-control" [(ngModel)]="scoreCriteria.relevance" name="rel" min="0" max="25">
-              </div>
-            </div>
-            <div class="row g-3 mb-2 align-items-center">
-              <label class="col-6 col-form-label">Quality</label>
-              <div class="col-6">
-                <input type="number" class="form-control" [(ngModel)]="scoreCriteria.quality" name="qual" min="0" max="25">
-              </div>
-            </div>
-            <div class="row g-3 mb-4 align-items-center">
-              <label class="col-6 col-form-label">Presentation</label>
-              <div class="col-6">
-                <input type="number" class="form-control" [(ngModel)]="scoreCriteria.presentation" name="pres" min="0" max="25">
+                <input type="number" class="form-control" [(ngModel)]="scoreCriteria.originality" 
+                       (input)="validateScore('originality')" name="orig" min="0" max="100">
               </div>
             </div>
 
-            <div class="alert alert-primary d-flex justify-content-between align-items-center mb-4">
-              <span class="fw-bold">Total Score</span>
-              <span class="fs-4 fw-bold">{{ totalScore }} / 100</span>
+            <div class="row g-3 mb-2 align-items-center">
+              <label class="col-6 col-form-label">Relevance</label>
+              <div class="col-6">
+                <input type="number" class="form-control" [(ngModel)]="scoreCriteria.relevance" 
+                       (input)="validateScore('relevance')" name="rel" min="0" max="100">
+              </div>
+            </div>
+
+            <div class="row g-3 mb-2 align-items-center">
+              <label class="col-6 col-form-label">Quality</label>
+              <div class="col-6">
+                <input type="number" class="form-control" [(ngModel)]="scoreCriteria.quality" 
+                       (input)="validateScore('quality')" name="qual" min="0" max="100">
+              </div>
+            </div>
+
+            <div class="row g-3 mb-4 align-items-center">
+              <label class="col-6 col-form-label">Presentation</label>
+              <div class="col-6">
+                <input type="number" class="form-control" [(ngModel)]="scoreCriteria.presentation" 
+                       (input)="validateScore('presentation')" name="pres" min="0" max="100">
+              </div>
+            </div>
+
+            <div class="alert alert-primary d-flex justify-content-between align-items-center mb-4 shadow-sm border-0">
+              <div>
+                <span class="fw-bold d-block">Overall Assessment</span>
+                <small class="text-muted">Total sum of all categories</small>
+              </div>
+              <span class="fs-4 fw-bold text-primary">{{ totalScore }} / 400</span>
             </div>
 
             <div class="mb-4">
               <label class="form-label fw-bold">Recommendation</label>
-              <select class="form-select" [(ngModel)]="recommendation" name="recommendation">
+              <select class="form-select shadow-sm" [(ngModel)]="recommendation" name="recommendation">
                 <option value="Accept">Accept</option>
                 <option value="Reject">Reject</option>
                 <option value="Revision">Major Revision</option>
@@ -87,7 +95,8 @@
 
             <div class="mb-4">
               <label class="form-label fw-bold">Comments to Author</label>
-              <textarea class="form-control" rows="4" [(ngModel)]="comments" name="comments" placeholder="Write your feedback here..."></textarea>
+              <textarea class="form-control shadow-sm" rows="4" [(ngModel)]="comments" 
+                        name="comments" placeholder="Describe the strengths and weaknesses..."></textarea>
             </div>
 
             <div class="d-grid">
