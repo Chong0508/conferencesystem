@@ -58,16 +58,24 @@ export class SubmitPaper implements OnInit {
   }
 
   loadPaperData(id: number) {
-    this.http.get<any>(`http://localhost:8080/api/papers/${id}`).subscribe(res => {
+    this.http.get<any>(`http://localhost:8080/api/papers/${id}`).subscribe(res => { 
       this.paperObj = {
         title: res.title,
         abstract: res.abstractText,
         trackId: res.trackId,
         keywords: res.keywords ? res.keywords.join(', ') : '',
-        fileName: res.submissionFile.split(/[\\/]/).pop() // Show only filename
+        // REFINEMENT: This is the name from the DB that persists after logout
+        fileName: res.submissionFile 
       };
     });
   }
+
+  getManuscriptUrl(fileNameFromDB: string | undefined): string {
+  if (!fileNameFromDB) return '#';
+  
+  // No complex string splitting needed because we refined the DB to only store the name
+  return `http://localhost:8080/api/papers/download/${fileNameFromDB}`;
+}
 
   // Add this variable to your class
 selectedFile: File | null = null;
