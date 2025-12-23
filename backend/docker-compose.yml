@@ -40,6 +40,20 @@ services:
     volumes:
       - ./uploads:/app/uploads
 
+  jenkins:
+    image: jenkins/jenkins:lts
+    privileged: true
+    user: root
+    ports:
+      - "9090:8080"
+      - "50000:50000"
+    container_name: jenkins
+    volumes:
+      - jenkins_data:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+
 volumes:
   mysql_data:
+  jenkins_data:
   
