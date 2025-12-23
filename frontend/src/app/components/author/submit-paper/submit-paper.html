@@ -26,10 +26,12 @@
           </div>
           <div class="col-md-5">
             <div class="form-floating">
-              <select class="form-select" id="trackSelect" [(ngModel)]="paperObj.trackId" name="track">
-                <option value="" disabled selected>Choose track...</option>
-                <option *ngFor="let track of tracks" [value]="track.id">{{ track.name }}</option>
-              </select>
+              <select class="form-select" id="trackSelect" [(ngModel)]="paperObj.trackId" name="trackId" required>
+              <option value="" disabled selected>Select a Track</option>
+              <option *ngFor="let track of tracks" [ngValue]="track.track_id">
+                  {{ track.name }}
+              </option>
+              </select> 
               <label for="trackSelect">Select Track <span class="text-danger">*</span></label>
             </div>
           </div>

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { PaperService } from '../../../services/paper.service';
 import { AuthService } from '../../../services/auth.service';
 import { TrackService } from '../../../services/track.service';
@@ -16,6 +17,7 @@ import { TrackService } from '../../../services/track.service';
 export class SubmitPaper implements OnInit {
 
   tracks: any[] = [];
+  selectedKeywordIds: number[] = [];
   paperObj: any = {
     title: '',
     abstract: '',
@@ -27,6 +29,7 @@ export class SubmitPaper implements OnInit {
   isLoading: boolean = false;
 
   constructor(
+    private http: HttpClient,
     private router: Router,
     private authService: AuthService,
     private paperService: PaperService,
@@ -38,80 +41,70 @@ export class SubmitPaper implements OnInit {
   }
 
   loadTracks() {
-    this.trackService.getAllTracks().subscribe({
-      next: (data: any[]) => {
-        this.tracks = data || [];
-      },
-      error: (err: any) => console.error('Failed to load tracks', err)
+    this.http.get<any[]>('http://localhost:8080/api/tracks').subscribe(res => {
+      this.tracks = res;
     });
   }
 
-  onFileSelected(event: any) {
-    const file = event.target.files?.[0];
-    if (file) {
-      if (file.size > 10 * 1024 * 1024) {
-        alert('File is too large! Max size is 10MB.');
-        return;
-      }
-      this.paperObj.fileName = file.name;
-    }
+  // Add this variable to your class
+selectedFile: File | null = null;
+
+onFileSelected(event: any) {
+  const file = event.target.files?.[0];
+  if (file) {
+    this.selectedFile = file; // Store the actual file object
+    this.paperObj.fileName = file.name;
   }
+}
 
 onSubmit() {
-  // Validation
-  if (!this.paperObj.title || !this.paperObj.abstract || !this.paperObj.trackId || !this.paperObj.fileName) {
-    alert('Please fill in all required fields (*) and upload a file.');
+  if (!this.selectedFile) {
+    alert('Please select a file!');
     return;
   }
 
   const user = this.authService.getCurrentUser();
-  const finalUserId = user?.userId || user?.user_id || user?.id;
-
-  if (!finalUserId) {
-    console.warn('User object found but no ID exists:', user);
-    alert('Session expired. Please login again.');
-    this.router.navigate(['/login']);
+  // DEBUG: Check if user exists
+  if (!user) {
+    alert('You must be logged in to submit a paper.');
     return;
   }
 
-  this.isLoading = true;
+  const finalUserId = user.userId || user.user_id || user.id;
 
-  const randomTrackId = Math.floor(1000000 + Math.random() * 9000000);
-
-  // DON'T send submittedAt and lastUpdated - let backend handle them
-  const payload = {
+  const paperData = {
+    trackId: Number(this.paperObj.trackId),
     title: this.paperObj.title,
-    abstract: this.paperObj.abstract,
-    trackId:randomTrackId,
-    fileName: this.paperObj.fileName,
-    fileType: this.getFileExtension(this.paperObj.fileName),
-    authorId: Number(finalUserId),
+    abstract: this.paperObj.abstract, // Jackson will map this to abstractText via @JsonProperty
+    authorId: Number(finalUserId),    // Jackson will map this to submittedBy via @JsonProperty
+    keywords: this.paperObj.keywords ? this.paperObj.keywords.split(',').map((k: string) => k.trim()) : [],
     status: 'Pending Review',
     version: 1
-    // NO submittedAt or lastUpdated here!
   };
 
-  console.log('📤 Submitting payload:', JSON.stringify(payload, null, 2));
+  const formData = new FormData();
+  // Use a blob with explicit type
+  formData.append('paperData', new Blob([JSON.stringify(paperData)], { type: 'application/json' }));
+  formData.append('file', this.selectedFile);
 
-  this.paperService.submitPaper(payload).subscribe({
+  this.isLoading = true;
+
+  this.http.post('http://localhost:8080/api/papers', formData).subscribe({
     next: (res) => {
       this.isLoading = false;
-      console.log('✅ Success response:', res);
-      alert('🎉 Paper Submitted Successfully!');
+      alert('Paper submitted successfully!');
       this.router.navigate(['/dashboard/my-submissions']);
     },
     error: (err) => {
       this.isLoading = false;
-      console.error('❌ Full error:', err);
-      alert('Submission failed: ' + (err.error?.message || err.message));
+      console.error('Full Error Object:', err); // Check this in Chrome DevTools
+      alert('Submission failed! Check the server logs for DB constraint violations.');
     }
   });
 }
 
 getFileExtension(filename: string): string {
-  if (!filename) return 'pdf';
-  const ext = filename.split('.').pop()?.toLowerCase();
-  return ext || 'pdf';
+  return filename.split('.').pop()?.toLowerCase() || 'pdf';
 }
 
   resetForm() {

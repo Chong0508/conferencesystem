@@ -26,13 +26,10 @@ public class KeywordController {
 
     // Get keyword by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Keyword> getKeywordById(@PathVariable Integer id) {
-        Optional<Keyword> keyword = keywordRepository.findById(id);
-        if (keyword.isPresent()) {
-            return ResponseEntity.ok(keyword.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Keyword> getKeywordById(@PathVariable Long id) {
+        return keywordRepository.findById(id) // This will now compile
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     // Create a new keyword
@@ -44,7 +41,7 @@ public class KeywordController {
 
     // Update an existing keyword
     @PutMapping("/{id}")
-    public ResponseEntity<Keyword> updateKeyword(@PathVariable Integer id, @RequestBody Keyword keywordDetails) {
+    public ResponseEntity<Keyword> updateKeyword(@PathVariable Long id, @RequestBody Keyword keywordDetails) {
         Optional<Keyword> optionalKeyword = keywordRepository.findById(id);
         if (optionalKeyword.isPresent()) {
             Keyword keyword = optionalKeyword.get();
@@ -60,12 +57,11 @@ public class KeywordController {
 
     // Delete a keyword
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteKeyword(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteKeyword(@PathVariable Long id) {
         if (keywordRepository.existsById(id)) {
             keywordRepository.deleteById(id);
             return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
         }
+        return ResponseEntity.notFound().build();
     }
 }

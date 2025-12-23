@@ -75,4 +75,44 @@ export class PaperDetails implements OnInit {
       default: return 'bg-secondary text-white'; // Pending
     }
   }
+
+downloadManuscript() {
+  if (!this.paperId) return;
+
+  this.isLoading = true; // Show spinner while downloading
+
+  this.paperService.downloadPaper(this.paperId).subscribe({
+    next: (blob: Blob) => {
+      // Create a local URL for the binary data
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      
+      // Set the download attributes
+      a.href = url;
+      // Get a clean name like "Assignment_2.pdf" instead of the full server path
+      a.download = this.getCleanFileName(this.paper.fileName);
+      
+      // Trigger the download
+      document.body.appendChild(a);
+      a.click();
+      
+      // Cleanup: remove the temporary element and URL
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      
+      this.isLoading = false;
+    },
+    error: (err) => {
+      console.error('Download failed:', err);
+      alert('Could not download file. The file might be missing on the server.');
+      this.isLoading = false;
+    }
+  });
+}
+
+// Helper to strip the /app/uploads/papers/ prefix for the save dialog
+getCleanFileName(fullPath: string): string {
+  if (!fullPath) return 'manuscript.pdf';
+  return fullPath.split('_').pop() || 'manuscript.pdf';
+}
 }
