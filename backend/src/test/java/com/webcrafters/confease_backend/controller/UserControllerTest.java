@@ -2,6 +2,7 @@ package com.webcrafters.confease_backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.webcrafters.confease_backend.model.User;
+import com.webcrafters.confease_backend.model.UserRole;
 import com.webcrafters.confease_backend.model.Role;
 import com.webcrafters.confease_backend.repository.UserRepository;
 import com.webcrafters.confease_backend.repository.RoleRepository;
@@ -99,15 +100,18 @@ class UserControllerTest {
 
     @Test
     void testDeleteUser_Found() throws Exception {
-        // Since your controller doesn't actually have a @DeleteMapping("/users/{id}") 
-        // in the code snippet provided, this test will keep failing with 405.
-        // IF you add @DeleteMapping("/{id}") to your UserController, this will work:
+        Long userId = 1L;
         User user = new User();
-        user.setUser_id(1L);
+        user.setUser_id(userId);
 
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        // Mock finding the user
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        
+        // Mock finding the role mapping (so deleteUser logic doesn't fail)
+        when(userRoleRepository.findByUserId(userId)).thenReturn(new UserRole());
 
-        mockMvc.perform(delete("/users/1"))
-                .andExpect(status().isOk());
+        mockMvc.perform(delete("/users/" + userId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("User deleted successfully."));
     }
 }

@@ -115,6 +115,25 @@ public class UserController {
         }
     }
 
+    @DeleteMapping("/{id}")
+    @Transactional // Ensures both deletions happen as one atomic unit
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        return userRepository.findById(id).map(user -> {
+            // 1. Manually handle the child relationship in UserRole
+            // We search by user_id field (or whatever your repo method is named)
+            UserRole existingRoleLink = userRoleRepository.findByUserId(id);
+            if (existingRoleLink != null) {
+                userRoleRepository.delete(existingRoleLink);
+            }
+
+            // 2. Delete the actual user record
+            userRepository.delete(user);
+
+            return ResponseEntity.ok(Map.of("message", "User deleted successfully."));
+        }).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("message", "User not found.")));
+    }
+
     private void initializeSystemAdmin() {
         User systemAdmin = new User();
         systemAdmin.setFirst_name("System");
