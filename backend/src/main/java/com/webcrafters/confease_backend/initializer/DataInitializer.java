@@ -1,11 +1,7 @@
 package com.webcrafters.confease_backend.initializer;
 
-import com.webcrafters.confease_backend.model.User;
-import com.webcrafters.confease_backend.model.Role;
-import com.webcrafters.confease_backend.model.UserRole;
-import com.webcrafters.confease_backend.repository.UserRepository;
-import com.webcrafters.confease_backend.repository.RoleRepository;
-import com.webcrafters.confease_backend.repository.UserRoleRepository; // Ensure you have this repository
+import com.webcrafters.confease_backend.model.*;
+import com.webcrafters.confease_backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
@@ -29,14 +25,17 @@ public class DataInitializer implements CommandLineRunner {
     @Autowired
     private UserRoleRepository userRoleRepository;
 
+    @Autowired
+    private ScoreCriterionRepository scoreCriterionRepository; // Ensure you create this Repository
+
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Override
-    @Transactional // Ensures all saves happen in one transaction
+    @Transactional 
     public void run(String... args) {
         try {
+            // 1. Initialize Roles and Base Users
             if (roleRepository.count() == 0) {
-                // 1. Create Roles
                 Role superAdminRole = new Role("Super Admin", "Manage all roles");
                 Role adminRole = new Role("Admin", "Manage general users");
                 Role authorRole = new Role("Author", "Submit papers");
@@ -44,17 +43,39 @@ public class DataInitializer implements CommandLineRunner {
                 
                 roleRepository.saveAll(Arrays.asList(superAdminRole, adminRole, authorRole, reviewerRole));
 
-                // 2. Create and Save Users
                 User superUser = createBaseUser("Super", "Admin", "superadmin@test.com", "super123456", "Super Admin");
                 User generalAdmin = createBaseUser("General", "Admin", "admin@test.com", "admin123456", "Admin");
                 
                 userRepository.save(superUser);
                 userRepository.save(generalAdmin);
 
-                // 3. Link Users to Roles in the UserRole table
                 linkUserToRole(superUser.getUser_id(), superAdminRole.getRole_id());
                 linkUserToRole(generalAdmin.getUser_id(), adminRole.getRole_id());
+                System.out.println("✅ Roles and Admin Users Initialized.");
             }
+
+            // 2. Initialize Score Criteria (Matches your Frontend IDs 1, 2, 3, 4)
+            if (scoreCriterionRepository.count() == 0) {
+                ScoreCriterion c1 = new ScoreCriterion();
+                c1.setName("Originality");
+                c1.setDescription("Novelty of the research and contribution to the field.");
+
+                ScoreCriterion c2 = new ScoreCriterion();
+                c2.setName("Relevance");
+                c2.setDescription("Alignment with the conference tracks and themes.");
+
+                ScoreCriterion c3 = new ScoreCriterion();
+                c3.setName("Quality");
+                c3.setDescription("Technical soundness and rigor of the methodology.");
+
+                ScoreCriterion c4 = new ScoreCriterion();
+                c4.setName("Presentation");
+                c4.setDescription("Clarity of writing, structure, and quality of figures/tables.");
+
+                scoreCriterionRepository.saveAll(Arrays.asList(c1, c2, c3, c4));
+                System.out.println("✅ Score Criteria (1-4) Initialized.");
+            }
+
         } catch (Exception e) {
             System.err.println("❌ Initialization Error: " + e.getMessage());
         }
@@ -74,7 +95,7 @@ public class DataInitializer implements CommandLineRunner {
         user.setLast_name(last);
         user.setEmail(email);
         user.setPassword_hash(passwordEncoder.encode(rawPassword));
-        user.setCategory(category); // Keeping your existing category field
+        user.setCategory(category); 
         user.setIs_email_verified(true);
         user.setCreated_at(new Timestamp(System.currentTimeMillis()));
         user.setUpdated_at(new Timestamp(System.currentTimeMillis()));

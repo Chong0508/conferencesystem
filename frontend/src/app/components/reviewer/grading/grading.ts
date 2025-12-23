@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ReviewService } from '../../../services/review.service';
 import { PaperService } from '../../../services/paper.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-grading',
@@ -20,23 +21,11 @@ export class Grading implements OnInit {
   isSubmitting: boolean = false;
   errorMessage: string = '';
 
-  scoreCriteria: any = {
-    originality: 0,
-    relevance: 0,
-    quality: 0,
-    presentation: 0
-  };
   comments: string = '';
   recommendation: string = 'Accept';
 
-  get totalScore(): number {
-    return this.scoreCriteria.originality +
-      this.scoreCriteria.relevance +
-      this.scoreCriteria.quality +
-      this.scoreCriteria.presentation;
-  }
-
   constructor(
+    private http: HttpClient,
     private route: ActivatedRoute,
     private router: Router,
     private reviewService: ReviewService,
@@ -66,40 +55,51 @@ export class Grading implements OnInit {
     });
   }
 
-  submitReview() {
-    if (this.totalScore === 0) {
-      alert("Please score the paper before submitting.");
-      return;
-    }
-    if (!this.comments.trim()) {
-      alert("Please add comments for the review.");
-      return;
-    }
+  // Adjust criteria to 100 each for a 400 total
+  scoreCriteria: any = {
+    originality: 0,   // ID: 1
+    relevance: 0,     // ID: 2
+    quality: 0,       // ID: 3
+    presentation: 0   // ID: 4
+  };
 
-    const reviewData = {
-      assignment_id: this.paperId,
-      reviewer_id: this.currentUser.user_id,
-      overall_score: this.totalScore,
-      comments_to_author: this.comments,
-      comments_to_chair: '',
-      recommendation: this.recommendation,
-      round_number: 1,
-      due_date: new Date(),
-      attachment: null,
-      reviewed_at: new Date()
+  get totalScore(): number {
+    return Object.values(this.scoreCriteria).reduce((a: any, b: any) => a + b, 0) as number;
+  }
+
+  submitReview() {
+    if (this.totalScore === 0) return alert("Please provide scores.");
+
+    const reviewPayload = {
+      // Part 1: General Review Data
+      review: {
+        assignment_id: this.paperId,
+        reviewer_id: this.currentUser.user_id,
+        overall_score: this.totalScore,
+        comments_to_author: this.comments,
+        recommendation: this.recommendation,
+        round_number: 1,
+        reviewed_at: new Date()
+      },
+      // Part 2: Individual Scores for the review_score table
+      scores: [
+        { criterion_id: 1, score: this.scoreCriteria.originality },
+        { criterion_id: 2, score: this.scoreCriteria.relevance },
+        { criterion_id: 3, score: this.scoreCriteria.quality },
+        { criterion_id: 4, score: this.scoreCriteria.presentation }
+      ]
     };
 
     this.isSubmitting = true;
-    this.reviewService.submitReview(reviewData).subscribe({
-      next: (res) => {
-        alert("✅ Review Submitted Successfully!");
-        this.isSubmitting = false;
-        this.router.navigate(['/dashboard/review-history']);
+    // Send to a new unified endpoint
+    this.http.post('http://localhost:8080/api/reviews/submit-full', reviewPayload).subscribe({
+      next: () => {
+        alert("✅ Review & Scores saved. Paper status updated!");
+        this.router.navigate(['/dashboard/reviews']);
       },
       error: (err) => {
-        console.error('Error submitting review:', err);
         this.isSubmitting = false;
-        alert("❌ Error submitting review.");
+        console.error(err);
       }
     });
   }
@@ -119,5 +119,16 @@ export class Grading implements OnInit {
     if (!fullPath) return 'Manuscript.pdf';
     const parts = fullPath.split('_');
     return parts.length > 1 ? parts.slice(1).join('_') : fullPath;
+  }
+
+  validateScore(category: string) {
+    let value = this.scoreCriteria[category];
+
+    // Logic: if input exceeds 100, reset it to 100 automatically
+    if (value > 100) {
+      this.scoreCriteria[category] = 100;
+    } else if (value < 0 || value === null) {
+      this.scoreCriteria[category] = 0;
+    }
   }
 }

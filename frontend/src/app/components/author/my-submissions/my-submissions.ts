@@ -55,12 +55,18 @@ export class MySubmissions implements OnInit {
   // Helper function to return CSS classes based on status
   getStatusClass(status: string): string {
     switch (status) {
-      case 'Accepted': return 'bg-success-subtle text-success border-success'; // Green
-      case 'Rejected': return 'bg-danger-subtle text-danger border-danger';   // Red
-      case 'Revision': return 'bg-warning-subtle text-warning border-warning'; // Yellow
-      case 'Reviewed': return 'bg-info-subtle text-info border-info';          // Blue
-      case 'Registered': return 'bg-success text-white border-0 shadow-sm';    // Solid Green (Paid)
-      default: return 'bg-light text-secondary border-secondary';              // Grey (Pending)
+      case 'Accepted':
+        return 'bg-success-subtle text-success border-success';
+      case 'Rejected':
+        return 'bg-danger-subtle text-danger border-danger';
+      case 'Revised':
+      case 'Reviewed':
+        return 'bg-info-subtle text-info border-info';
+      case 'Registered':
+        return 'bg-primary-subtle text-primary border-primary';
+      case 'Pending Review':
+      default:
+        return 'bg-warning-subtle text-warning border-warning';
     }
   }
 

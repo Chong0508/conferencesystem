@@ -59,17 +59,20 @@
           </td>
 
           <td>
-                            <span class="badge rounded-pill border px-3 py-2 fw-bold"
-                                  [ngClass]="getStatusClass(paper.status)">
-                                <i class="bi"
-                                   [ngClass]="{'bi-check-circle-fill': paper.status === 'Accepted',
-                                               'bi-x-circle-fill': paper.status === 'Rejected',
-                                               'bi-info-circle-fill': paper.status === 'Reviewed',
-                                               'bi-check2-all': paper.status === 'Registered',
-                                               'bi-hourglass-split': paper.status === 'Pending Review'}">
-                                </i>
-                              {{ paper.status }}
-                            </span>
+            <span class="badge rounded-pill border px-3 py-2 fw-bold"
+                  [ngClass]="getStatusClass(paper.status)">
+              <i class="bi me-1"
+                [ngClass]="{
+                  'bi-check-circle-fill': paper.status === 'Accepted',
+                  'bi-x-circle-fill': paper.status === 'Rejected',
+                  'bi-arrow-repeat': paper.status === 'Revised',
+                  'bi-info-circle-fill': paper.status === 'Reviewed',
+                  'bi-check2-all': paper.status === 'Registered',
+                  'bi-hourglass-split': paper.status === 'Pending Review'
+                }">
+              </i>
+              {{ paper.status }}
+            </span>
           </td>
 
           <td class="text-end pe-4">
