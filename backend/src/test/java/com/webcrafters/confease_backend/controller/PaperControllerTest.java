@@ -1,127 +1,120 @@
 package com.webcrafters.confease_backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.webcrafters.confease_backend.model.Paper;
 import com.webcrafters.confease_backend.repository.PaperRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.ArgumentMatchers;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@WebMvcTest(PaperController.class)
 public class PaperControllerTest {
 
+    @Autowired
     private MockMvc mockMvc;
 
-    @Mock
+    @MockitoBean
     private PaperRepository paperRepository;
 
-    @InjectMocks
-    private PaperController paperController;
+    @Autowired
+    private ObjectMapper objectMapper; // Used to convert Objects to JSON strings
 
-    private ObjectMapper objectMapper;
+    private Paper samplePaper;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(paperController).build();
-        
-        // Setup ObjectMapper to handle LocalDateTime
-        objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
+        samplePaper = new Paper();
+        samplePaper.setPaperId(1L);
+        samplePaper.setTitle("Initial Research");
+        samplePaper.setSubmittedBy(101L);
+        samplePaper.setStatus("Pending Review");
     }
 
+    // --- 1. GET ALL PAPERS ---
     @Test
-    void shouldGetAllPapers() throws Exception {
-        Paper p1 = new Paper();
-        p1.setTitle("Study A");
-        Paper p2 = new Paper();
-        p2.setTitle("Study B");
-
-        when(paperRepository.findAll()).thenReturn(Arrays.asList(p1, p2));
+    void getAllPapers_ShouldReturnList() throws Exception {
+        when(paperRepository.findAll()).thenReturn(Arrays.asList(samplePaper));
 
         mockMvc.perform(get("/api/papers"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].title").value("Study A"));
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].title").value("Initial Research"));
     }
 
+    // --- 2. GET PAPERS BY AUTHOR ---
     @Test
-    void shouldGetPapersByAuthor() throws Exception {
-        Paper p1 = new Paper();
-        p1.setSubmittedBy(1L);
-        p1.setTitle("Author's Work");
+    void getPapersByAuthor_ShouldReturnAuthorPapers() throws Exception {
+        // Arrange: Create mock data matching your model
+        Paper paper = new Paper();
+        paper.setPaperId(1L);
+        paper.setTitle("Initial Research");
+        paper.setSubmittedBy(101L); // In Java it is submittedBy, but JSON will be authorId
 
-        when(paperRepository.findBySubmittedBy(1L)).thenReturn(Arrays.asList(p1));
+        // Mock the repository behavior
+        when(paperRepository.findBySubmittedBy(101L)).thenReturn(Arrays.asList(paper));
 
-        mockMvc.perform(get("/api/papers/author/1"))
+        // Act & Assert
+        mockMvc.perform(get("/api/papers/author/101"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].title").value("Author's Work"));
+                // FIX: Change 'submittedBy' to 'authorId' to match @JsonProperty("authorId")
+                .andExpect(jsonPath("$[0].authorId").value(101)); 
     }
 
+    // --- 3. CREATE PAPER (POST) ---
     @Test
-    void shouldCreatePaper() throws Exception {
-        Paper inputPaper = new Paper();
-        inputPaper.setTitle("New Tech");
-        inputPaper.setAbstractText("This is a summary.");
-
-        Paper savedPaper = new Paper();
-        savedPaper.setPaperId(99L);
-        savedPaper.setTitle("New Tech");
-
-        when(paperRepository.save(any(Paper.class))).thenReturn(savedPaper);
+    void createPaper_ShouldReturnCreatedStatus() throws Exception {
+        when(paperRepository.save(ArgumentMatchers.any(Paper.class))).thenReturn(samplePaper);
 
         mockMvc.perform(post("/api/papers")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(inputPaper)))
+                .content(objectMapper.writeValueAsString(samplePaper)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.message").value("Paper submitted successfully"))
-                .andExpect(jsonPath("$.paperId").value(99));
+                .andExpect(jsonPath("$.paperId").value(1));
     }
 
+    // --- 4. UPDATE PAPER (PUT) ---
     @Test
-    void shouldUpdatePaper() throws Exception {
-        Paper existing = new Paper();
-        existing.setPaperId(1L);
-        existing.setTitle("Old Title");
+    void updatePaper_ShouldReturnUpdatedPaper() throws Exception {
+        when(paperRepository.findById(1L)).thenReturn(Optional.of(samplePaper));
+        when(paperRepository.save(ArgumentMatchers.any(Paper.class))).thenReturn(samplePaper);
 
-        Paper updatedDetails = new Paper();
-        updatedDetails.setTitle("Updated Title");
-
-        when(paperRepository.findById(1L)).thenReturn(Optional.of(existing));
-        when(paperRepository.save(any(Paper.class))).thenReturn(existing);
+        samplePaper.setTitle("Updated Title");
 
         mockMvc.perform(put("/api/papers/1")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updatedDetails)))
-                .andExpect(status().isOk());
+                .content(objectMapper.writeValueAsString(samplePaper)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("Updated Title"));
     }
 
+    // --- 5. DELETE PAPER ---
     @Test
-    void shouldDeletePaper() throws Exception {
+    void deletePaper_ShouldReturnNoContent() throws Exception {
         when(paperRepository.existsById(1L)).thenReturn(true);
+        doNothing().when(paperRepository).deleteById(1L);
 
         mockMvc.perform(delete("/api/papers/1"))
                 .andExpect(status().isNoContent());
     }
 
     @Test
-    void shouldReturn404WhenPaperNotFound() throws Exception {
-        when(paperRepository.findById(1L)).thenReturn(Optional.empty());
+    void deletePaper_ShouldReturnNotFoundIfMissing() throws Exception {
+        when(paperRepository.existsById(99L)).thenReturn(false);
 
-        mockMvc.perform(get("/api/papers/1"))
+        mockMvc.perform(delete("/api/papers/99"))
                 .andExpect(status().isNotFound());
     }
 }

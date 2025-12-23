@@ -2,11 +2,19 @@ package com.webcrafters.confease_backend.controller;
 
 import com.webcrafters.confease_backend.model.Paper;
 import com.webcrafters.confease_backend.repository.PaperRepository;
+
+// Correct Spring Framework Imports for Resources and Media
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+// Standard Java Utilities
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;

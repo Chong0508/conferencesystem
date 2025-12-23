@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http'; // Added missing import
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router'; // Added Router
+import { Router } from '@angular/router'; // Added Router
 import { FormsModule } from '@angular/forms'; // Needed if you use ngModel in HTML
 import { AuthService } from '../../../services/auth.service'; // Added to get user data
 
 @Component({
   selector: 'app-apply-reviewer',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './apply-reviewer.html',
   styleUrl: './apply-reviewer.css',
 })
