@@ -34,6 +34,9 @@ pipeline {
 
     // Fixed typo: stages -> stage
     stage('Frontend: Build Check') {
+      tools {
+        nodejs "node" 
+      }
       steps {
         echo "Installing dependencies and verifying Angular build..."
         dir("${FRONTEND_DIR}") {
