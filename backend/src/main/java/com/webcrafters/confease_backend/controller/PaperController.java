@@ -1,12 +1,15 @@
 package com.webcrafters.confease_backend.controller;
 
+import com.webcrafters.confease_backend.model.Author;
 import com.webcrafters.confease_backend.model.Keyword;
 import com.webcrafters.confease_backend.model.Paper;
 import com.webcrafters.confease_backend.model.PaperKeyword;
+import com.webcrafters.confease_backend.repository.AuthorRepository;
 import com.webcrafters.confease_backend.repository.KeywordRepository;
 import com.webcrafters.confease_backend.repository.PaperKeywordRepository;
 import com.webcrafters.confease_backend.repository.PaperRepository;
 import com.webcrafters.confease_backend.repository.TrackRepository;
+import com.webcrafters.confease_backend.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -31,6 +34,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/papers")
@@ -49,6 +53,25 @@ public class PaperController {
     @Autowired
     private TrackRepository trackRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private AuthorRepository authorRepository;
+
+    private void populateSubmitterName(Paper paper) {
+        if (paper.getSubmittedBy() != null) {
+            userRepository.findById(paper.getSubmittedBy()).ifPresent(user -> {
+                paper.setSubmitterName(user.getFirst_name()); 
+            });
+        }
+    }
+
+    private void populateKeywordsAndAuthor(Paper paper) {
+        populateKeywords(paper);
+        populateSubmitterName(paper);
+    }
+
     // ✅ Helper method to populate keywords for a paper
     private void populateKeywords(Paper paper) {
         List<String> keywords = keywordRepository.findKeywordsByPaperId(paper.getPaperId());
@@ -63,7 +86,7 @@ public class PaperController {
     @GetMapping
     public ResponseEntity<List<Paper>> getAllPapers() {
         List<Paper> papers = paperRepository.findAll();
-        populateKeywordsForPapers(papers);  // ✅ Add keywords
+        papers.forEach(this::populateKeywordsAndAuthor); 
         return ResponseEntity.ok(papers);
     }
 
@@ -74,15 +97,23 @@ public class PaperController {
         return ResponseEntity.ok(papers);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Paper> getPaperById(@PathVariable Long id) {
-        return paperRepository.findById(id)
-                .map(paper -> {
-                    populateKeywords(paper);  // ✅ Add keywords
-                    return ResponseEntity.ok(paper);
-                })
-                .orElse(ResponseEntity.notFound().build());
-    }
+// Inside PaperController.java
+@GetMapping("/{id}")
+public ResponseEntity<Paper> getPaperById(@PathVariable Long id) {
+    return paperRepository.findById(id).map(paper -> {
+        populateKeywords(paper);
+        
+        // Fetch all authors for this paper
+        List<Author> authors = authorRepository.findAuthorsByPaperId(id);
+        // Map Author list to a String of names
+        String allAuthorNames = authors.stream()
+            .map(auth -> userRepository.findById(auth.getUser_id()).get().getFirst_name())
+            .collect(Collectors.joining(", "));
+            
+        paper.setSubmitterName(allAuthorNames);
+        return ResponseEntity.ok(paper);
+    }).orElse(ResponseEntity.notFound().build());
+}
 
     @GetMapping("/{id}/download")
     public ResponseEntity<Resource> download(@PathVariable Long id) {

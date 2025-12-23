@@ -62,6 +62,9 @@ public class Paper {
     @Transient
     private List<String> keywords; 
 
+    @Transient
+    private String submitterName;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "track_id", insertable = false, updatable = false)
     private Track track;
@@ -110,4 +113,7 @@ public class Paper {
 
     public List<String> getKeywords() { return keywords; }
     public void setKeywords(List<String> keywords) { this.keywords = keywords; }
+
+    public String getSubmitterName() { return submitterName; }
+    public void setSubmitterName(String submitterName) { this.submitterName = submitterName; }
 }
