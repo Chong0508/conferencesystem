@@ -20,7 +20,6 @@ export class Grading implements OnInit {
   isSubmitting: boolean = false;
   errorMessage: string = '';
 
-  // Form Data
   scoreCriteria: any = {
     originality: 0,
     relevance: 0,
@@ -30,7 +29,6 @@ export class Grading implements OnInit {
   comments: string = '';
   recommendation: string = 'Accept';
 
-  // Helper to calculate total
   get totalScore(): number {
     return this.scoreCriteria.originality +
       this.scoreCriteria.relevance +
@@ -48,7 +46,6 @@ export class Grading implements OnInit {
   ngOnInit() {
     this.paperId = this.route.snapshot.paramMap.get('id');
 
-    // Get Current User (Reviewer)
     const userJson = localStorage.getItem('loggedUser');
     if (userJson) {
       this.currentUser = JSON.parse(userJson);
@@ -61,7 +58,6 @@ export class Grading implements OnInit {
     this.paperService.getPaperById(this.paperId).subscribe({
       next: (paperData) => {
         this.paper = paperData;
-        console.log('Loaded paper:', paperData);
       },
       error: (err) => {
         console.error('Error loading paper:', err);
@@ -70,16 +66,6 @@ export class Grading implements OnInit {
     });
   }
 
-  getManuscriptUrl(): string {
-      if (!this.paper) return '#';
-      const path = this.paper.submissionFile || this.paper.fileName;
-      if (!path) return '#';
-
-      const fileName = encodeURIComponent(path.split('/').pop() || '');
-      return `http://localhost:8080/papers/manuscript/${fileName}`;
-    }
-
-  // Submit Review to Backend
   submitReview() {
     if (this.totalScore === 0) {
       alert("Please score the paper before submitting.");
@@ -91,16 +77,16 @@ export class Grading implements OnInit {
     }
 
     const reviewData = {
-      assignment_id: this.paperId,                 // paperId → assignment_id
-      reviewer_id: this.currentUser.user_id,       // logged user
-      overall_score: this.totalScore,              // totalScore from frontend calculation
+      assignment_id: this.paperId,
+      reviewer_id: this.currentUser.user_id,
+      overall_score: this.totalScore,
       comments_to_author: this.comments,
-      comments_to_chair: '',                        // optional
+      comments_to_chair: '',
       recommendation: this.recommendation,
-      round_number: 1,                              // default round
-      due_date: new Date(),                         // current date
-      attachment: null,                             // optional
-      reviewed_at: new Date()                       // timestamp
+      round_number: 1,
+      due_date: new Date(),
+      attachment: null,
+      reviewed_at: new Date()
     };
 
     this.isSubmitting = true;
@@ -112,15 +98,26 @@ export class Grading implements OnInit {
       },
       error: (err) => {
         console.error('Error submitting review:', err);
-        this.errorMessage = 'Failed to submit review';
         this.isSubmitting = false;
-        alert("❌ Error submitting review. Check console.");
+        alert("❌ Error submitting review.");
       }
     });
   }
 
-
   cancel() {
     this.router.navigate(['/dashboard/reviews']);
+  }
+
+  getManuscriptUrl(fileName: string | undefined): string {
+    if (!fileName) return '#';
+    // Point directly to the refined endpoint - No .split().pop() needed!
+    return `http://localhost:8080/api/papers/download/${fileName}`;
+  }
+
+  // Add a simple helper for the UI text
+  getCleanFileName(fullPath: string | undefined): string {
+    if (!fullPath) return 'Manuscript.pdf';
+    const parts = fullPath.split('_');
+    return parts.length > 1 ? parts.slice(1).join('_') : fullPath;
   }
 }

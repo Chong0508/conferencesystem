@@ -5,12 +5,12 @@
       <div class="d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center">
           <div class="header-icon-box me-3 animate__animated animate__bounceIn" 
-               [ngClass]="isEditMode ? 'bg-warning' : 'bg-primary'">
+               [ngClass]="isEditMode ? 'bg-warning-subtle text-warning' : 'bg-primary-subtle text-primary'">
             <i class="bi" [ngClass]="isEditMode ? 'bi-pencil-square' : 'bi-cloud-arrow-up-fill'"></i>
           </div>
           <div>
             <h4 class="text-dark fw-bold mb-1">{{ isEditMode ? 'Edit Submission' : 'Submit New Paper' }}</h4>
-            <p class="text-muted mb-0 small">{{ isEditMode ? 'Modify your research details below.' : 'Fill in the details below.' }}</p>
+            <p class="text-muted mb-0 small">{{ isEditMode ? 'Review or update your research details.' : 'Fill in the details below to submit your manuscript.' }}</p>
           </div>
         </div>
       </div>
@@ -40,33 +40,50 @@
 
         <div class="form-floating mb-4">
           <textarea class="form-control" placeholder="Abstract Text" id="abstractText" style="height: 150px" [(ngModel)]="paperObj.abstract" name="abstract"></textarea>
-          <label for="abstractText">Abstract (Max 300 words) <span class="text-danger">*</span></label>
+          <label for="abstractText">Abstract (Technical Summary) <span class="text-danger">*</span></label>
         </div>
 
         <div class="mb-4">
-          <label class="form-label small text-muted text-uppercase ls-1">Keyword</label>
+          <label class="form-label small text-muted text-uppercase ls-1 fw-bold">Keywords</label>
           <div class="input-group">
             <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-tags"></i></span>
-            <input type="text" class="form-control border-start-0 ps-0" [(ngModel)]="paperObj.keywords" name="keywords" placeholder="e.g. Machine Learning, IoT, Security">
+            <input type="text" class="form-control border-start-0 ps-0" [(ngModel)]="paperObj.keywords" name="keywords" placeholder="e.g. AI, Blockchain, Cybersecurity">
           </div>
         </div>
 
         <div class="mb-5">
-          <label class="form-label small text-muted text-uppercase ls-1 mb-3">
-            {{ isEditMode ? 'Update Manuscript (Optional)' : 'Upload Manuscript' }} <span *ngIf="!isEditMode" class="text-danger">*</span>
+          <label class="form-label small text-muted text-uppercase ls-1 mb-3 fw-bold">
+            {{ isEditMode ? 'Manuscript Management' : 'Upload Manuscript' }} <span *ngIf="!isEditMode" class="text-danger">*</span>
           </label>
+          
           <div class="file-upload-wrapper">
             <input type="file" class="file-upload-input" (change)="onFileSelected($event)" accept=".pdf">
-            <div class="file-upload-zone">
+            
+            <div class="file-upload-zone" [class.file-exists]="paperObj.fileName">
               <div *ngIf="!paperObj.fileName">
-                <i class="bi bi-file-earmark-pdf animate__animated animate__pulse infinite upload-icon text-primary"></i>
-                <h6 class="fw-bold mt-3">Drag & drop your file here OR click to browse</h6>
-                <p class="text-muted small mb-0">Supported formats: PDF (Max 10MB)</p>
+                <i class="bi bi-file-earmark-pdf upload-icon text-primary animate__animated animate__pulse infinite"></i>
+                <h6 class="fw-bold mt-3">Click to browse or Drag & Drop</h6>
+                <p class="text-muted small">Supported format: PDF (Max 10MB)</p>
               </div>
-              <div *ngIf="paperObj.fileName" class="file-selected-box animate__animated animate__fadeIn text-success">
-                <i class="bi bi-check-circle-fill me-2 fs-4"></i>
-                <span class="text-truncate fw-bold">{{ paperObj.fileName }}</span>
-                <p *ngIf="isEditMode && !selectedFile" class="text-muted small mb-0 d-block">(Existing file will be kept)</p>
+
+              <div *ngIf="paperObj.fileName" class="p-3 animate__animated animate__fadeIn">
+                <div class="d-flex align-items-center justify-content-center mb-2">
+                   <i class="bi bi-check-circle-fill text-success fs-2 me-2"></i>
+                   <span class="fw-bold text-dark text-truncate" style="max-width: 250px;">{{ paperObj.fileName }}</span>
+                </div>
+                
+                <div class="d-flex justify-content-center gap-3 mt-2">
+                  <a *ngIf="isEditMode && !selectedFile" 
+                     [href]="getManuscriptUrl(paperObj.fileName)" 
+                     target="_blank" 
+                     class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                    <i class="bi bi-eye-fill me-1"></i> View Current PDF
+                  </a>
+                  <span *ngIf="selectedFile" class="badge bg-success-subtle text-success border border-success rounded-pill px-3 py-2">
+                    <i class="bi bi-file-earmark-arrow-up me-1"></i> New File Ready
+                  </span>
+                </div>
+                <p class="text-muted x-small mt-2" *ngIf="isEditMode && !selectedFile">Click the zone again to replace this file</p>
               </div>
             </div>
           </div>
@@ -75,20 +92,25 @@
         <hr class="my-4 text-muted opacity-25">
 
         <div class="d-flex justify-content-end gap-3 align-items-center">
-          <button type="button" class="btn btn-light px-4 rounded-pill" (click)="resetForm()" [disabled]="isLoading">
+          <button type="button" class="btn btn-light px-4 rounded-pill border" (click)="resetForm()" [disabled]="isLoading">
             <i class="bi bi-arrow-counterclockwise me-2"></i>Reset
           </button>
+          
           <button type="button" 
                   [ngClass]="isEditMode ? 'btn-warning' : 'btn-gradient-success'"
-                  class="btn px-5 py-3 rounded-pill text-white shadow-sm" 
+                  class="btn px-5 py-3 rounded-pill text-white shadow-sm fw-bold" 
                   (click)="onSubmit()" 
                   [disabled]="isLoading">
-            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
-            <span *ngIf="!isLoading">
+            
+            <ng-container *ngIf="!isLoading">
               <i class="bi" [ngClass]="isEditMode ? 'bi-save-fill' : 'bi-send-fill'"></i> 
               {{ isEditMode ? 'Update Changes' : 'Submit Paper' }}
-            </span>
-            <span *ngIf="isLoading">{{ isEditMode ? 'Updating...' : 'Submitting...' }}</span>
+            </ng-container>
+
+            <ng-container *ngIf="isLoading">
+              <span class="spinner-border spinner-border-sm me-2"></span>
+              {{ isEditMode ? 'Updating...' : 'Submitting...' }}
+            </ng-container>
           </button>
         </div>
       </form>
