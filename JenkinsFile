@@ -1,0 +1,73 @@
+pipeline {
+  agent any
+
+  environment {
+    BACKEND_DIR = "backend"
+    FRONTEND_DIR = "frontend"
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        // Pulls the code from Github
+        checkout scm
+        echo "Source code checkout out successfully."
+      }
+    }
+
+    stage('Backend: Unit Tests') {
+      steps {
+        echo "Running Spring Boot Unit Tests..."
+        dir("${BACKEND_DIR}") {
+          // Makes the Maven wrapper executable and runs tests
+          sh """
+              chmod +x mvw
+              ./mvnw clean test -B
+          """
+        }
+      }
+      post {
+        always {
+          // This generates the 'Automation' report in Jenkins
+          junit "${BACKEND_DIR}/target/surefire-reports/*.xml"
+        }
+      }
+    }
+
+    stages('Frontend: Build Check') {
+      steps {
+        echo "Installing dependencies and verifying Angular build..."
+        dir("${FRONTEND_DIR}") {
+          // Verifies that the frontend compiles without errors
+          sh """
+              npm install
+              npm run build -- --configuration=production
+          """
+        }
+      }
+    }
+
+    stage('Reports: Allure') {
+      steps {
+        echo "Generating Allure Report..."
+        // This triggers the Allure Jenkins Plugin 
+        allure includeProperties: false,
+               jdk: '',
+               results: [[path: "${BACKEND_DIR}/target/allure-results"]]
+      }
+    }
+  }
+
+  post {
+    always {
+      echo "Cleaning up workspace..."
+      cleanWs()
+    }
+    success {
+      echo "Build Success! You can view the Allure Report on the left sidebar."
+    }
+    failure {
+      echo "Build Failed. Please check the 'Console Output' or 'Allure Report' for details."
+    }
+  }
+}

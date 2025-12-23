@@ -8,6 +8,7 @@ import com.webcrafters.confease_backend.repository.RoleRepository;
 import com.webcrafters.confease_backend.repository.UserRoleRepository; // Ensure you have this repository
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,7 @@ import java.sql.Timestamp;
 import java.util.Arrays;
 
 @Component
+@Profile("!test")
 public class DataInitializer implements CommandLineRunner {
 
     @Autowired
