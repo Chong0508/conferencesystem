@@ -19,6 +19,13 @@ export class LogActivityService {
 
   constructor(private http: HttpClient) { }
 
+  getRecentLogs(limit = 5): Observable<LogActivity[]> {
+      return this.http.get<LogActivity[]>(
+        `${this.apiUrl}?limit=${limit}`,
+        { withCredentials: true }
+      );
+    }
+
   getAllLogs(): Observable<LogActivity[]> {
     return this.http.get<LogActivity[]>(this.apiUrl, {
       withCredentials: true
