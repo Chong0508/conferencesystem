@@ -35,7 +35,7 @@ pipeline {
     // Fixed typo: stages -> stage
     stage('Frontend: Build Check') {
       tools {
-        nodejs "node20" 
+        nodejs "node-v22" 
       }
       steps {
         echo "Installing dependencies and verifying Angular build..."
