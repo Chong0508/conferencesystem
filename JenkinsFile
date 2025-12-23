@@ -18,7 +18,6 @@ pipeline {
       steps {
         echo "Running Spring Boot Unit Tests..."
         dir("${BACKEND_DIR}") {
-          // Fixed typo: mvw -> mvnw
           sh """
               chmod +x mvnw
               ./mvnw clean test -B 
@@ -32,7 +31,6 @@ pipeline {
       }
     }
 
-    // Fixed typo: stages -> stage
     stage('Frontend: Build Check') {
       tools {
         nodejs "node-v22" 

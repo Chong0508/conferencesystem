@@ -27,7 +27,7 @@ public class PaperKeywordController {
 
     // Get paper keyword by composite ID (paper_id and keyword_id)
     @GetMapping("/{paperId}/{keywordId}")
-    public ResponseEntity<PaperKeyword> getPaperKeywordById(@PathVariable Long paperId, @PathVariable Integer keywordId) {
+    public ResponseEntity<PaperKeyword> getPaperKeywordById(@PathVariable Long paperId, @PathVariable Long keywordId) {
         PaperKeywordId id = new PaperKeywordId();
         Optional<PaperKeyword> paperKeyword = paperKeywordRepository.findById(id);
         if (paperKeyword.isPresent()) {
@@ -46,7 +46,7 @@ public class PaperKeywordController {
 
     // Update an existing paper keyword (since it's composite key, update might not change IDs)
     @PutMapping("/{paperId}/{keywordId}")
-    public ResponseEntity<PaperKeyword> updatePaperKeyword(@PathVariable Long paperId, @PathVariable Integer keywordId, @RequestBody PaperKeyword paperKeywordDetails) {
+    public ResponseEntity<PaperKeyword> updatePaperKeyword(@PathVariable Long paperId, @PathVariable Long keywordId, @RequestBody PaperKeyword paperKeywordDetails) {
         PaperKeywordId id = new PaperKeywordId();
         Optional<PaperKeyword> optionalPaperKeyword = paperKeywordRepository.findById(id);
         if (optionalPaperKeyword.isPresent()) {
@@ -62,7 +62,7 @@ public class PaperKeywordController {
 
     // Delete a paper keyword
     @DeleteMapping("/{paperId}/{keywordId}")
-    public ResponseEntity<Void> deletePaperKeyword(@PathVariable Long paperId, @PathVariable Integer keywordId) {
+    public ResponseEntity<Void> deletePaperKeyword(@PathVariable Long paperId, @PathVariable Long keywordId) {
         PaperKeywordId id = new PaperKeywordId();
         if (paperKeywordRepository.existsById(id)) {
             paperKeywordRepository.deleteById(id);

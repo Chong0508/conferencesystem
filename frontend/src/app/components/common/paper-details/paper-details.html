@@ -30,9 +30,10 @@
 
           <h6 class="text-uppercase text-muted small fw-bold ls-1 mb-2">Keywords</h6>
           <div class="d-flex flex-wrap gap-2 mb-4">
-                        <span class="badge bg-secondary-subtle text-secondary fw-normal px-3 py-2">
-                            {{ paper.keywords || 'None' }}
-                        </span>
+              <span *ngFor="let kw of paper?.keywords" class="badge bg-secondary-subtle text-secondary fw-normal px-3 py-2">
+                  {{ kw }}
+              </span>
+              <span *ngIf="!paper?.keywords || paper.keywords.length === 0" class="badge bg-light text-muted">None</span>
           </div>
 
           <hr class="text-muted opacity-25 my-4">
@@ -41,11 +42,11 @@
             <div class="d-flex align-items-center">
               <i class="bi bi-file-earmark-pdf-fill text-danger fs-3 me-3"></i>
               <div>
-                <h6 class="mb-0 fw-bold">{{ paper.fileName }}</h6>
+                <h6 class="mb-0 fw-bold">{{ getCleanFileName(paper.fileName) }}</h6>
                 <small class="text-muted">Original Submission</small>
               </div>
             </div>
-            <button class="btn btn-outline-dark btn-sm rounded-pill">
+            <button (click)="downloadManuscript()" class="btn btn-outline-dark btn-sm rounded-pill">
               <i class="bi bi-download me-1"></i> Download
             </button>
           </div>

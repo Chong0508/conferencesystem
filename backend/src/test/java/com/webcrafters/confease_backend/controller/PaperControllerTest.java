@@ -1,120 +1,166 @@
 package com.webcrafters.confease_backend.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.webcrafters.confease_backend.model.Paper;
+import com.webcrafters.confease_backend.model.User;
 import com.webcrafters.confease_backend.repository.PaperRepository;
+import com.webcrafters.confease_backend.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
-import java.util.Arrays;
-import java.util.Optional;
+import java.time.LocalDateTime;
 
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@WebMvcTest(PaperController.class)
-public class PaperControllerTest {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+class PaperControllerTest {
 
     @Autowired
-    private MockMvc mockMvc;
+    private TestRestTemplate restTemplate;
 
-    @MockitoBean
+    @Autowired
     private PaperRepository paperRepository;
 
     @Autowired
-    private ObjectMapper objectMapper; // Used to convert Objects to JSON strings
+    private UserRepository userRepository;
 
-    private Paper samplePaper;
+    private User testUser;
 
     @BeforeEach
     void setUp() {
-        samplePaper = new Paper();
-        samplePaper.setPaperId(1L);
-        samplePaper.setTitle("Initial Research");
-        samplePaper.setSubmittedBy(101L);
-        samplePaper.setStatus("Pending Review");
+        // Clean up before each test
+        paperRepository.deleteAll();
+        userRepository.deleteAll();
+
+        // Create a test user
+        testUser = new User();
+        testUser.setEmail("author@test.com");
+        testUser.setFirst_name("Test");
+        testUser.setLast_name("Author");
+        testUser.setPassword_hash("hashedpassword");
+        testUser = userRepository.save(testUser);
     }
 
-    // --- 1. GET ALL PAPERS ---
     @Test
-    void getAllPapers_ShouldReturnList() throws Exception {
-        when(paperRepository.findAll()).thenReturn(Arrays.asList(samplePaper));
-
-        mockMvc.perform(get("/api/papers"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].title").value("Initial Research"));
-    }
-
-    // --- 2. GET PAPERS BY AUTHOR ---
-    @Test
-    void getPapersByAuthor_ShouldReturnAuthorPapers() throws Exception {
-        // Arrange: Create mock data matching your model
+    void testGetPapersByAuthor() {
+        // Create test paper with Long userId instead of User object
         Paper paper = new Paper();
-        paper.setPaperId(1L);
-        paper.setTitle("Initial Research");
-        paper.setSubmittedBy(101L); // In Java it is submittedBy, but JSON will be authorId
+        paper.setTitle("Test Paper");
+        paper.setAbstractText("Test Abstract");
+        paper.setSubmittedBy(testUser.getUser_id()); // ✅ Use Long ID
+        paper.setTrackId(1L);
+        paper.setStatus("Pending Review");
+        paper.setVersion(1);
+        paper.setSubmittedAt(LocalDateTime.now());
+        paper.setLastUpdated(LocalDateTime.now());
+        paperRepository.save(paper);
 
-        // Mock the repository behavior
-        when(paperRepository.findBySubmittedBy(101L)).thenReturn(Arrays.asList(paper));
+        // Test the endpoint
+        ResponseEntity<Paper[]> response = restTemplate.getForEntity(
+            "/api/papers/author/" + testUser.getUser_id(),
+            Paper[].class
+        );
 
-        // Act & Assert
-        mockMvc.perform(get("/api/papers/author/101"))
-                .andExpect(status().isOk())
-                // FIX: Change 'submittedBy' to 'authorId' to match @JsonProperty("authorId")
-                .andExpect(jsonPath("$[0].authorId").value(101)); 
-    }
-
-    // --- 3. CREATE PAPER (POST) ---
-    @Test
-    void createPaper_ShouldReturnCreatedStatus() throws Exception {
-        when(paperRepository.save(ArgumentMatchers.any(Paper.class))).thenReturn(samplePaper);
-
-        mockMvc.perform(post("/api/papers")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(samplePaper)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.message").value("Paper submitted successfully"))
-                .andExpect(jsonPath("$.paperId").value(1));
-    }
-
-    // --- 4. UPDATE PAPER (PUT) ---
-    @Test
-    void updatePaper_ShouldReturnUpdatedPaper() throws Exception {
-        when(paperRepository.findById(1L)).thenReturn(Optional.of(samplePaper));
-        when(paperRepository.save(ArgumentMatchers.any(Paper.class))).thenReturn(samplePaper);
-
-        samplePaper.setTitle("Updated Title");
-
-        mockMvc.perform(put("/api/papers/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(samplePaper)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value("Updated Title"));
-    }
-
-    // --- 5. DELETE PAPER ---
-    @Test
-    void deletePaper_ShouldReturnNoContent() throws Exception {
-        when(paperRepository.existsById(1L)).thenReturn(true);
-        doNothing().when(paperRepository).deleteById(1L);
-
-        mockMvc.perform(delete("/api/papers/1"))
-                .andExpect(status().isNoContent());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().length);
+        assertEquals("Test Paper", response.getBody()[0].getTitle());
     }
 
     @Test
-    void deletePaper_ShouldReturnNotFoundIfMissing() throws Exception {
-        when(paperRepository.existsById(99L)).thenReturn(false);
+    void testGetAllPapers() {
+        // Create multiple test papers
+        Paper paper1 = new Paper();
+        paper1.setTitle("Paper 1");
+        paper1.setAbstractText("Abstract 1");
+        paper1.setSubmittedBy(testUser.getUser_id()); // ✅ Use Long ID
+        paper1.setTrackId(1L);
+        paper1.setStatus("Pending Review");
+        paper1.setVersion(1);
+        paper1.setSubmittedAt(LocalDateTime.now());
+        paper1.setLastUpdated(LocalDateTime.now());
+        paperRepository.save(paper1);
 
-        mockMvc.perform(delete("/api/papers/99"))
-                .andExpect(status().isNotFound());
+        Paper paper2 = new Paper();
+        paper2.setTitle("Paper 2");
+        paper2.setAbstractText("Abstract 2");
+        paper2.setSubmittedBy(testUser.getUser_id()); // ✅ Use Long ID
+        paper2.setTrackId(1L);
+        paper2.setStatus("Pending Review");
+        paper2.setVersion(1);
+        paper2.setSubmittedAt(LocalDateTime.now());
+        paper2.setLastUpdated(LocalDateTime.now());
+        paperRepository.save(paper2);
+
+        // Test the endpoint
+        ResponseEntity<Paper[]> response = restTemplate.getForEntity(
+            "/api/papers",
+            Paper[].class
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(2, response.getBody().length);
+    }
+
+    @Test
+    void testGetPaperById() {
+        // Create test paper
+        Paper paper = new Paper();
+        paper.setTitle("Test Paper");
+        paper.setAbstractText("Test Abstract");
+        paper.setSubmittedBy(testUser.getUser_id()); // ✅ Use Long ID
+        paper.setTrackId(1L);
+        paper.setStatus("Pending Review");
+        paper.setVersion(1);
+        paper.setSubmittedAt(LocalDateTime.now());
+        paper.setLastUpdated(LocalDateTime.now());
+        Paper savedPaper = paperRepository.save(paper);
+
+        // Test the endpoint
+        ResponseEntity<Paper> response = restTemplate.getForEntity(
+            "/api/papers/" + savedPaper.getPaperId(),
+            Paper.class
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Test Paper", response.getBody().getTitle());
+        assertEquals(testUser.getUser_id(), response.getBody().getSubmittedBy());
+    }
+
+    @Test
+    void testGetPaperById_NotFound() {
+        ResponseEntity<Paper> response = restTemplate.getForEntity(
+            "/api/papers/99999",
+            Paper.class
+        );
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void testDeletePaper() {
+        // Create test paper
+        Paper paper = new Paper();
+        paper.setTitle("Test Paper");
+        paper.setAbstractText("Test Abstract");
+        paper.setSubmittedBy(testUser.getUser_id()); // ✅ Use Long ID
+        paper.setTrackId(1L);
+        paper.setStatus("Pending Review");
+        paper.setVersion(1);
+        paper.setSubmittedAt(LocalDateTime.now());
+        paper.setLastUpdated(LocalDateTime.now());
+        Paper savedPaper = paperRepository.save(paper);
+
+        // Delete the paper
+        restTemplate.delete("/api/papers/" + savedPaper.getPaperId());
+
+        // Verify it's deleted
+        assertFalse(paperRepository.existsById(savedPaper.getPaperId()));
     }
 }

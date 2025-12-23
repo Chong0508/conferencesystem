@@ -34,11 +34,11 @@ public class PaperKeywordServiceTest {
     void setUp() {
         sampleId = new PaperKeywordId();
         sampleId.setPaper_id(100L);
-        sampleId.setKeyword_id(5);
+        sampleId.setKeyword_id(5L);
 
         sampleMapping = new PaperKeyword();
         sampleMapping.setPaper_id(100L);
-        sampleMapping.setKeyword_id(5);
+        sampleMapping.setKeyword_id(5L);
     }
 
     @Test

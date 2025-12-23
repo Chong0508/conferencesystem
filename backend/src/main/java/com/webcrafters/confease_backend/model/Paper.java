@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "paper")
@@ -20,10 +21,12 @@ public class Paper {
 
     private String title;
 
-    @JsonProperty("abstract")
-    @Column(name = "abstract", columnDefinition = "TEXT")
+    @JsonProperty("abstract") // Matches the 'abstract' key in your Angular paperData object
+    @Column(name = "paper_abstract", columnDefinition = "TEXT")
     private String abstractText;
 
+
+    // We use @JsonProperty("fileName") so it maps from your Angular 'fileName'
     @JsonProperty("fileName")
     @Column(name = "submission_file")
     private String submissionFile;
@@ -51,6 +54,17 @@ public class Paper {
     @Column(name = "last_updated")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime lastUpdated;
+
+    @Transient
+    @JsonProperty("keywordIds")
+    private List<Long> keywordIds;
+
+    @Transient
+    private List<String> keywords; 
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "track_id", insertable = false, updatable = false)
+    private Track track;
 
     public Paper() {}
 
@@ -90,4 +104,10 @@ public class Paper {
 
     public LocalDateTime getLastUpdated() { return lastUpdated; }
     public void setLastUpdated(LocalDateTime lastUpdated) { this.lastUpdated = lastUpdated; }
+
+    public List<Long> getKeywordIds() { return keywordIds; }
+    public void setKeywordIds(List<Long> keywordIds) { this.keywordIds = keywordIds; }
+
+    public List<String> getKeywords() { return keywords; }
+    public void setKeywords(List<String> keywords) { this.keywords = keywords; }
 }

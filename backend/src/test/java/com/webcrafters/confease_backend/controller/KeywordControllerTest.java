@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.webcrafters.confease_backend.model.Keyword;
 import com.webcrafters.confease_backend.repository.KeywordRepository;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -12,11 +11,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.List;
+import java.util.Arrays;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -26,7 +25,7 @@ public class KeywordControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockitoBean 
+    @MockitoBean
     private KeywordRepository keywordRepository;
 
     @Autowired
@@ -37,25 +36,23 @@ public class KeywordControllerTest {
     @BeforeEach
     void setUp() {
         sampleKeyword = new Keyword();
-        sampleKeyword.setKeyword_id(1);
+        sampleKeyword.setKeyword_id(1L); 
         sampleKeyword.setKeyword("Machine Learning");
     }
 
     @Test
-    @DisplayName("GET /api/keywords - Success")
-    void getAllKeywords_ReturnsList() throws Exception {
-        when(keywordRepository.findAll()).thenReturn(List.of(sampleKeyword));
+    void getAllKeywords_ShouldReturnList() throws Exception {
+        when(keywordRepository.findAll()).thenReturn(Arrays.asList(sampleKeyword));
 
         mockMvc.perform(get("/api/keywords"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].keyword").value("Machine Learning"))
-                .andExpect(jsonPath("$[0].keyword_id").value(1));
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].keyword").value("Machine Learning"));
     }
 
     @Test
-    @DisplayName("GET /api/keywords/{id} - Found")
-    void getKeywordById_Found_ReturnsKeyword() throws Exception {
-        when(keywordRepository.findById(1)).thenReturn(Optional.of(sampleKeyword));
+    void getKeywordById_WhenFound_ShouldReturnKeyword() throws Exception {
+        when(keywordRepository.findById(1L)).thenReturn(Optional.of(sampleKeyword));
 
         mockMvc.perform(get("/api/keywords/1"))
                 .andExpect(status().isOk())
@@ -63,17 +60,15 @@ public class KeywordControllerTest {
     }
 
     @Test
-    @DisplayName("GET /api/keywords/{id} - Not Found")
-    void getKeywordById_NotFound_Returns404() throws Exception {
-        when(keywordRepository.findById(99)).thenReturn(Optional.empty());
+    void getKeywordById_WhenNotFound_ShouldReturn404() throws Exception {
+        when(keywordRepository.findById(99L)).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/api/keywords/99"))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    @DisplayName("POST /api/keywords - Created")
-    void createKeyword_Returns201() throws Exception {
+    void createKeyword_ShouldReturnCreatedStatus() throws Exception {
         when(keywordRepository.save(any(Keyword.class))).thenReturn(sampleKeyword);
 
         mockMvc.perform(post("/api/keywords")
@@ -84,24 +79,28 @@ public class KeywordControllerTest {
     }
 
     @Test
-    @DisplayName("PUT /api/keywords/{id} - Success")
-    void updateKeyword_ValidId_ReturnsUpdated() throws Exception {
-        when(keywordRepository.findById(1)).thenReturn(Optional.of(sampleKeyword));
+    void updateKeyword_WhenExists_ShouldReturnUpdatedKeyword() throws Exception {
+        when(keywordRepository.findById(1L)).thenReturn(Optional.of(sampleKeyword));
         when(keywordRepository.save(any(Keyword.class))).thenReturn(sampleKeyword);
+
+        Keyword updateInfo = new Keyword();
+        updateInfo.setKeyword("Deep Learning");
 
         mockMvc.perform(put("/api/keywords/1")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(sampleKeyword)))
+                .content(objectMapper.writeValueAsString(updateInfo)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.keyword").value("Machine Learning"));
+                .andExpect(jsonPath("$.keyword").value("Deep Learning"));
     }
 
     @Test
-    @DisplayName("DELETE /api/keywords/{id} - Success")
-    void deleteKeyword_ValidId_Returns204() throws Exception {
-        when(keywordRepository.existsById(1)).thenReturn(true);
+    void deleteKeyword_WhenExists_ShouldReturnNoContent() throws Exception {
+        when(keywordRepository.existsById(1L)).thenReturn(true);
+        doNothing().when(keywordRepository).deleteById(1L);
 
         mockMvc.perform(delete("/api/keywords/1"))
                 .andExpect(status().isNoContent());
+
+        verify(keywordRepository, times(1)).deleteById(1L);
     }
 }
