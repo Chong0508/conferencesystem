@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PaperService } from '../../../services/paper.service';
 import { AuthService } from '../../../services/auth.service';
 import { TrackService } from '../../../services/track.service';
@@ -15,7 +15,8 @@ import { TrackService } from '../../../services/track.service';
   styleUrl: './submit-paper.css'
 })
 export class SubmitPaper implements OnInit {
-
+  isEditMode: boolean = false;
+  editPaperId: number | null = null;
   tracks: any[] = [];
   selectedKeywordIds: number[] = [];
   paperObj: any = {
@@ -29,6 +30,7 @@ export class SubmitPaper implements OnInit {
   isLoading: boolean = false;
 
   constructor(
+    private route: ActivatedRoute,
     private http: HttpClient,
     private router: Router,
     private authService: AuthService,
@@ -38,11 +40,32 @@ export class SubmitPaper implements OnInit {
 
   ngOnInit() {
     this.loadTracks();
+
+    // Check for "edit" query parameter
+    this.route.queryParams.subscribe(params => {
+      if (params['edit']) {
+        this.isEditMode = true;
+        this.editPaperId = params['edit'];
+        this.loadPaperData(params['edit']);
+      }
+    });
   }
 
   loadTracks() {
     this.http.get<any[]>('http://localhost:8080/api/tracks').subscribe(res => {
       this.tracks = res;
+    });
+  }
+
+  loadPaperData(id: number) {
+    this.http.get<any>(`http://localhost:8080/api/papers/${id}`).subscribe(res => {
+      this.paperObj = {
+        title: res.title,
+        abstract: res.abstractText,
+        trackId: res.trackId,
+        keywords: res.keywords ? res.keywords.join(', ') : '',
+        fileName: res.submissionFile.split(/[\\/]/).pop() // Show only filename
+      };
     });
   }
 
@@ -58,50 +81,49 @@ onFileSelected(event: any) {
 }
 
 onSubmit() {
-  if (!this.selectedFile) {
-    alert('Please select a file!');
-    return;
-  }
+    const user = this.authService.getCurrentUser();
+    const finalUserId = user?.userId || user?.user_id || user?.id;
 
-  const user = this.authService.getCurrentUser();
-  // DEBUG: Check if user exists
-  if (!user) {
-    alert('You must be logged in to submit a paper.');
-    return;
-  }
+    const paperData = {
+      paperId: this.editPaperId, // Include ID if editing
+      trackId: Number(this.paperObj.trackId),
+      title: this.paperObj.title,
+      abstract: this.paperObj.abstract,
+      authorId: Number(finalUserId),
+      keywords: this.paperObj.keywords ? this.paperObj.keywords.split(',').map((k: any) => k.trim()) : [],
+      status: 'Pending Review'
+    };
 
-  const finalUserId = user.userId || user.user_id || user.id;
-
-  const paperData = {
-    trackId: Number(this.paperObj.trackId),
-    title: this.paperObj.title,
-    abstract: this.paperObj.abstract, // Jackson will map this to abstractText via @JsonProperty
-    authorId: Number(finalUserId),    // Jackson will map this to submittedBy via @JsonProperty
-    keywords: this.paperObj.keywords ? this.paperObj.keywords.split(',').map((k: string) => k.trim()) : [],
-    status: 'Pending Review',
-    version: 1
-  };
-
-  const formData = new FormData();
-  // Use a blob with explicit type
-  formData.append('paperData', new Blob([JSON.stringify(paperData)], { type: 'application/json' }));
-  formData.append('file', this.selectedFile);
-
-  this.isLoading = true;
-
-  this.http.post('http://localhost:8080/api/papers', formData).subscribe({
-    next: (res) => {
-      this.isLoading = false;
-      alert('Paper submitted successfully!');
-      this.router.navigate(['/dashboard/my-submissions']);
-    },
-    error: (err) => {
-      this.isLoading = false;
-      console.error('Full Error Object:', err); // Check this in Chrome DevTools
-      alert('Submission failed! Check the server logs for DB constraint violations.');
+    const formData = new FormData();
+    formData.append('paperData', new Blob([JSON.stringify(paperData)], { type: 'application/json' }));
+    
+    // Only append file if a new one was selected
+    if (this.selectedFile) {
+      formData.append('file', this.selectedFile);
+    } else if (!this.isEditMode) {
+      alert('Please select a file!');
+      return;
     }
-  });
-}
+
+    this.isLoading = true;
+
+    // Smart logic: If edit mode, use PUT. Otherwise, use POST.
+    const request = this.isEditMode 
+      ? this.http.put(`http://localhost:8080/api/papers/${this.editPaperId}`, formData)
+      : this.http.post('http://localhost:8080/api/papers', formData);
+
+    request.subscribe({
+      next: () => {
+        this.isLoading = false;
+        alert(this.isEditMode ? 'Paper updated successfully!' : 'Paper submitted successfully!');
+        this.router.navigate(['/dashboard/my-submissions']);
+      },
+      error: (err) => {
+        this.isLoading = false;
+        console.error('Operation failed:', err);
+      }
+    });
+  }
 
 getFileExtension(filename: string): string {
   return filename.split('.').pop()?.toLowerCase() || 'pdf';

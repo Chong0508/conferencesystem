@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -174,33 +175,81 @@ public class PaperController {
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Paper> updatePaper(@PathVariable Long id, @RequestBody Paper paperDetails) {
-        return paperRepository.findById(id).map(paper -> {
-            paper.setTrackId(paperDetails.getTrackId());
-            paper.setTitle(paperDetails.getTitle());
-            paper.setAbstractText(paperDetails.getAbstractText());
-            paper.setSubmissionFile(paperDetails.getSubmissionFile());
-            paper.setFileType(paperDetails.getFileType());
-            paper.setVersion(paperDetails.getVersion());
-            paper.setPlagiarismScore(paperDetails.getPlagiarismScore());
-            paper.setStatus(paperDetails.getStatus());
-            paper.setSubmittedBy(paperDetails.getSubmittedBy());
-            paper.setLastUpdated(LocalDateTime.now());
-            
-            Paper updatedPaper = paperRepository.save(paper);
-            populateKeywords(updatedPaper);  // ✅ Add keywords
-            return ResponseEntity.ok(updatedPaper);
-        }).orElse(ResponseEntity.notFound().build());
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Transactional
+    public ResponseEntity<?> updatePaper(
+            @PathVariable Long id,
+            @RequestPart("paperData") Paper paperDetails,
+            @RequestPart(value = "file", required = false) MultipartFile file) {
+        try {
+            return paperRepository.findById(id).map(paper -> {
+                // 1. Update text fields
+                paper.setTitle(paperDetails.getTitle());
+                paper.setAbstractText(paperDetails.getAbstractText());
+                paper.setTrackId(paperDetails.getTrackId());
+                paper.setLastUpdated(LocalDateTime.now());
+
+                // 2. Update file ONLY if a new one is provided
+                if (file != null && !file.isEmpty()) {
+                    try {
+                        Path uploadDir = Paths.get("uploads/papers").toAbsolutePath().normalize();
+                        Files.createDirectories(uploadDir);
+                        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename().replaceAll("\\s+", "_");
+                        Path filePath = uploadDir.resolve(fileName);
+                        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+                        
+                        paper.setSubmissionFile(filePath.toString());
+                        paper.setFileType(file.getContentType());
+                    } catch (IOException e) {
+                        throw new RuntimeException("File storage failed: " + e.getMessage());
+                    }
+                }
+
+                // 3. Update Keywords (Delete old links and add new ones)
+                paperKeywordRepository.deleteByPaperId(id);
+                if (paperDetails.getKeywords() != null) {
+                    for (String kwName : paperDetails.getKeywords()) {
+                        Keyword kw = keywordRepository.findByKeywordIgnoreCase(kwName.trim())
+                                .orElseGet(() -> {
+                                    Keyword newKw = new Keyword();
+                                    newKw.setKeyword(kwName.trim());
+                                    return keywordRepository.save(newKw);
+                                });
+
+                        PaperKeyword pk = new PaperKeyword();
+                        pk.setPaper_id(id);
+                        pk.setKeyword_id(kw.getKeyword_id());
+                        paperKeywordRepository.save(pk);
+                    }
+                }
+
+                paperRepository.save(paper);
+                return ResponseEntity.ok(Map.of("message", "Paper updated successfully"));
+            }).orElse(ResponseEntity.notFound().build());
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Update failed: " + e.getMessage()));
+        }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePaper(@PathVariable Long id) {
-        if (paperRepository.existsById(id)) {
-            paperRepository.deleteById(id);
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    @Transactional
+    public ResponseEntity<?> deletePaper(@PathVariable Long id) {
+        return paperRepository.findById(id).map(paper -> {
+            // 1. Delete associated keywords in link table first
+            paperKeywordRepository.deleteByPaperId(id);
+            
+            // 2. Delete the physical file (Optional but recommended)
+            try {
+                Files.deleteIfExists(Paths.get(paper.getSubmissionFile()));
+            } catch (Exception e) {
+                System.err.println("Could not delete file: " + e.getMessage());
+            }
+
+            // 3. Delete from DB
+            paperRepository.delete(paper);
+            return ResponseEntity.ok(Map.of("message", "Deleted successfully"));
+        }).orElse(ResponseEntity.notFound().build());
     }
 }

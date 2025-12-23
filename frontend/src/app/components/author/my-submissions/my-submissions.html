@@ -74,26 +74,26 @@
 
           <td class="text-end pe-4">
             <div class="d-flex justify-content-end gap-2">
-
-              <button class="btn btn-sm btn-light text-primary border"
-                      (click)="viewDetails(paper)"
-                      title="View Details">
+              
+              <button class="btn btn-sm btn-light text-primary border" (click)="viewDetails(paper)">
                 Details
               </button>
 
-              <button *ngIf="paper.status === 'Accepted'"
-                      class="btn btn-sm btn-success shadow-sm animate__animated animate__fadeIn"
-                      [routerLink]="['/dashboard/registration', paper.paperId]">
+              <button *ngIf="paper.status === 'Pending Review'" 
+                      class="btn btn-sm btn-outline-secondary" 
+                      (click)="editPaper(paper)">
+                <i class="bi bi-pencil"></i>
+              </button>
+
+              <button *ngIf="paper.status === 'Pending Review'" 
+                      class="btn btn-sm btn-outline-danger" 
+                      (click)="onDelete(paper.paperId)">
+                <i class="bi bi-trash"></i>
+              </button>
+
+              <button *ngIf="paper.status === 'Accepted'" class="btn btn-sm btn-success shadow-sm" [routerLink]="['/dashboard/registration', paper.paperId]">
                 Register
               </button>
-
-              <button *ngIf="paper.status === 'Registered'"
-                      class="btn btn-sm btn-outline-success border-2 fw-bold animate__animated animate__fadeIn"
-                      (click)="viewReceipt(paper)"
-                      title="View Official Receipt">
-                <i class="bi bi-receipt me-1"></i> Receipt
-              </button>
-
             </div>
           </td>
         </tr>

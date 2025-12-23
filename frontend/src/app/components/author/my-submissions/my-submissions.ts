@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { PaperService } from '../../../services/paper.service';
 import { AuthService } from '../../../services/auth.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-my-submissions',
@@ -17,7 +18,7 @@ export class MySubmissions implements OnInit {
   isLoading: boolean = true;
 
   // Inject Router for navigation
-  constructor(private router: Router, private paperService: PaperService, private authService: AuthService) {}
+  constructor(private router: Router, private paperService: PaperService, private http: HttpClient,private authService: AuthService) {}
 
   ngOnInit() {
     this.loadMyPapers();
@@ -66,6 +67,27 @@ export class MySubmissions implements OnInit {
   // Navigate to Paper Details page
   viewDetails(paper: any) {
     this.router.navigate(['/dashboard/paper-details', paper.paperId]);
+  }
+
+  onDelete(id: number) {
+    if (confirm('Are you sure you want to delete this submission? This action cannot be undone.')) {
+      this.http.delete(`http://localhost:8080/api/papers/${id}`).subscribe({
+        next: () => {
+          alert('Submission deleted successfully');
+          this.loadMyPapers(); // Refresh the list
+        },
+        error: (err) => {
+          console.error('Delete failed', err);
+          alert('Could not delete the paper.');
+        }
+      });
+    }
+  }
+
+  // Logic to edit a paper (Redirects to submission page with ID)
+  editPaper(paper: any) {
+    // You can use the same submit-paper component but pass the ID to "edit mode"
+    this.router.navigate(['/dashboard/submit-paper'], { queryParams: { edit: paper.paperId } });
   }
 
   // View Receipt (Only for Registered papers)
