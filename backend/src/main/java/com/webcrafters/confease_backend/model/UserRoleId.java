@@ -3,6 +3,9 @@ package com.webcrafters.confease_backend.model;
 import java.io.Serializable;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class UserRoleId implements Serializable {
     private Long user_id;
     private Integer role_id;

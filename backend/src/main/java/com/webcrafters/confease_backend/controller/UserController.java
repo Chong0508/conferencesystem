@@ -48,7 +48,8 @@ public class UserController {
     @Autowired
     private ReviewerApplicationRepository applicationRepository;
 
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     // ==========================================
     // 1. USER MANAGEMENT
