@@ -34,7 +34,10 @@ class UserControllerTest {
     private UserController userController;
 
     private ObjectMapper objectMapper = new ObjectMapper();
-    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    @Mock
+    private BCryptPasswordEncoder passwordEncoder;
+
 
     @BeforeEach
     void setUp() {
@@ -51,6 +54,7 @@ class UserControllerTest {
 
         when(userRepository.count()).thenReturn(1L); // Not first user
         when(userRepository.findByEmail(anyString())).thenReturn(null);
+        when(passwordEncoder.encode(anyString())).thenReturn("hashed_password");
         when(userRepository.saveAndFlush(any(User.class))).thenReturn(user);
 
         mockMvc.perform(post("/users")

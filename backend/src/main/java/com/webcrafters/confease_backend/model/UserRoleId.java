@@ -14,6 +14,24 @@ public class UserRoleId implements Serializable {
         this.role_id = role_id;
     }
 
+    // Getters
+    public Long getUser_id() {
+        return user_id;
+    }
+
+    public Integer getRole_id() {
+        return role_id;
+    }
+
+    // Setters
+    public void setUser_id(Long user_id) {
+        this.user_id = user_id;
+    }
+
+    public void setRole_id(Integer role_id) {
+        this.role_id = role_id;
+    }
+
     // Hibernate uses these to differentiate between different link records
     @Override
     public boolean equals(Object o) {
