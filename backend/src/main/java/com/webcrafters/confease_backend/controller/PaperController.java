@@ -38,13 +38,15 @@ public class PaperController {
     @Autowired private AuthorRepository authorRepository;
     @Autowired private ReviewRepository reviewRepository;
 
-    // ✅ FIXED: Explicitly use the absolute path that matches your Docker volume mapping
+    // Explicitly use the absolute path that matches Docker volume mapping
     private final Path rootLocation = Paths.get("/app/uploads/papers");
 
     private void populateSubmitterName(Paper paper) {
         if (paper.getSubmittedBy() != null) {
             userRepository.findById(paper.getSubmittedBy()).ifPresent(user -> {
-                paper.setSubmitterName(user.getFirst_name()); 
+                // ✅ CHANGE: Combine First Name and Last Name
+                String fullName = user.getFirst_name() + " " + user.getLast_name();
+                paper.setSubmitterName(fullName); 
             });
         }
     }
@@ -82,8 +84,12 @@ public class PaperController {
         return paperRepository.findById(id).map(paper -> {
             populateKeywords(paper);
             List<Author> authors = authorRepository.findAuthorsByPaperId(id);
+            
+            // ✅ CHANGE: Ensure names are collected as Full Names
             String allAuthorNames = authors.stream()
-                .map(auth -> userRepository.findById(auth.getUser_id()).map(u -> u.getFirst_name()).orElse("Unknown"))
+                .map(auth -> userRepository.findById(auth.getUser_id())
+                    .map(u -> u.getFirst_name() + " " + u.getLast_name()) // Combine here too
+                    .orElse("Unknown"))
                 .collect(Collectors.joining(", "));
                 
             paper.setSubmitterName(allAuthorNames);

@@ -3,9 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PaperService } from '../../../services/paper.service';
 import { AuthService } from '../../../services/auth.service';
-import { TrackService } from '../../../services/track.service';
 
 @Component({
   selector: 'app-submit-paper',
@@ -17,32 +15,39 @@ import { TrackService } from '../../../services/track.service';
 export class SubmitPaper implements OnInit {
   isEditMode: boolean = false;
   editPaperId: number | null = null;
+  
   tracks: any[] = [];
-  selectedKeywordIds: number[] = [];
+  conferences: any[] = []; 
+  
   paperObj: any = {
     title: '',
     abstract: '',
     trackId: '',
+    conferenceId: '', 
     keywords: '',
     fileName: ''
   };
 
   isLoading: boolean = false;
+  selectedFile: File | null = null;
 
   constructor(
     private route: ActivatedRoute,
     private http: HttpClient,
     private router: Router,
-    private authService: AuthService,
-    private paperService: PaperService,
-    private trackService: TrackService
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
     this.loadTracks();
+    this.loadConferences();
 
-    // Check for "edit" query parameter
     this.route.queryParams.subscribe(params => {
+      // Auto-select conference if the user clicked 'Submit' from a specific conference page
+      if (params['confId']) {
+        this.paperObj.conferenceId = Number(params['confId']);
+      }
+
       if (params['edit']) {
         this.isEditMode = true;
         this.editPaperId = params['edit'];
@@ -52,9 +57,11 @@ export class SubmitPaper implements OnInit {
   }
 
   loadTracks() {
-    this.http.get<any[]>('http://localhost:8080/api/tracks').subscribe(res => {
-      this.tracks = res;
-    });
+    this.http.get<any[]>('http://localhost:8080/api/tracks').subscribe(res => this.tracks = res);
+  }
+
+  loadConferences() {
+    this.http.get<any[]>('http://localhost:8080/api/conferences').subscribe(res => this.conferences = res);
   }
 
   loadPaperData(id: number) {
@@ -63,59 +70,52 @@ export class SubmitPaper implements OnInit {
         title: res.title,
         abstract: res.abstractText,
         trackId: res.trackId,
+        conferenceId: res.conferenceId,
         keywords: res.keywords ? res.keywords.join(', ') : '',
-        // REFINEMENT: This is the name from the DB that persists after logout
         fileName: res.submissionFile 
       };
     });
   }
 
-  getManuscriptUrl(fileNameFromDB: string | undefined): string {
-  if (!fileNameFromDB) return '#';
-  
-  // No complex string splitting needed because we refined the DB to only store the name
-  return `http://localhost:8080/api/papers/download/${fileNameFromDB}`;
-}
-
-  // Add this variable to your class
-selectedFile: File | null = null;
-
-onFileSelected(event: any) {
-  const file = event.target.files?.[0];
-  if (file) {
-    this.selectedFile = file; // Store the actual file object
-    this.paperObj.fileName = file.name;
+  onFileSelected(event: any) {
+    const file = event.target.files?.[0];
+    if (file) {
+      this.selectedFile = file; 
+      this.paperObj.fileName = file.name;
+    }
   }
-}
 
-onSubmit() {
+  onSubmit() {
     const user = this.authService.getCurrentUser();
     const finalUserId = user?.userId || user?.user_id || user?.id;
 
+    if (!this.paperObj.conferenceId) {
+      alert("Please select a conference to participate in.");
+      return;
+    }
+
     const paperData = {
-      paperId: this.editPaperId, // Include ID if editing
+      paperId: this.editPaperId,
+      conferenceId: Number(this.paperObj.conferenceId), 
       trackId: Number(this.paperObj.trackId),
       title: this.paperObj.title,
       abstract: this.paperObj.abstract,
       authorId: Number(finalUserId),
       keywords: this.paperObj.keywords ? this.paperObj.keywords.split(',').map((k: any) => k.trim()) : [],
-      status: 'Pending Review'
+      status: 'Pending Review' 
     };
 
     const formData = new FormData();
     formData.append('paperData', new Blob([JSON.stringify(paperData)], { type: 'application/json' }));
     
-    // Only append file if a new one was selected
     if (this.selectedFile) {
       formData.append('file', this.selectedFile);
     } else if (!this.isEditMode) {
-      alert('Please select a file!');
+      alert('Please upload your manuscript.');
       return;
     }
 
     this.isLoading = true;
-
-    // Smart logic: If edit mode, use PUT. Otherwise, use POST.
     const request = this.isEditMode 
       ? this.http.put(`http://localhost:8080/api/papers/${this.editPaperId}`, formData)
       : this.http.post('http://localhost:8080/api/papers', formData);
@@ -123,21 +123,18 @@ onSubmit() {
     request.subscribe({
       next: () => {
         this.isLoading = false;
-        alert(this.isEditMode ? 'Paper updated successfully!' : 'Paper submitted successfully!');
+        alert('Paper submitted successfully for review!');
         this.router.navigate(['/dashboard/my-submissions']);
       },
       error: (err) => {
         this.isLoading = false;
-        console.error('Operation failed:', err);
+        console.error('Submission Error:', err);
       }
     });
   }
 
-getFileExtension(filename: string): string {
-  return filename.split('.').pop()?.toLowerCase() || 'pdf';
-}
-
   resetForm() {
-    this.paperObj = { title: '', abstract: '', trackId: '', keywords: '', fileName: '' };
+    this.paperObj = { title: '', abstract: '', trackId: '', conferenceId: '', keywords: '', fileName: '' };
+    this.selectedFile = null;
   }
 }

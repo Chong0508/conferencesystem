@@ -19,6 +19,10 @@ public class Paper {
     @Column(name = "track_id")
     private Long trackId;
 
+    @JsonProperty("conferenceId") 
+    @Column(name = "conference_id") 
+    private Long conferenceId;
+
     private String title;
 
     @JsonProperty("abstract") // Matches the 'abstract' key in your Angular paperData object
@@ -116,4 +120,7 @@ public class Paper {
 
     public String getSubmitterName() { return submitterName; }
     public void setSubmitterName(String submitterName) { this.submitterName = submitterName; }
+
+    public Long getConferenceId() { return conferenceId; }
+    public void setConferenceId(Long conferenceId) { this.conferenceId = conferenceId; }
 }

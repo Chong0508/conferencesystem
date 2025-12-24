@@ -1,17 +1,17 @@
 <div class="container mt-5 animate__animated animate__fadeIn">
   
   <div class="text-center mb-5">
-    <h2 class="fw-bold text-dark mb-2">Conference Proceedings</h2>
-    <p class="text-muted">Explore research papers finalized by track and author.</p>
+    <h2 class="fw-bold text-dark mb-2">Research Archive</h2>
+    <p class="text-muted">Search through finalized proceedings from all our academic conferences.</p>
     
     <div class="row justify-content-center mt-4">
       <div class="col-md-7">
-        <div class="input-group input-group-lg shadow-sm">
-          <span class="input-group-text bg-white border-end-0">
+        <div class="input-group input-group-lg shadow-sm rounded-pill overflow-hidden border">
+          <span class="input-group-text bg-white border-0 ps-4">
             <i class="bi bi-search text-primary"></i>
           </span>
-          <input type="text" class="form-control border-start-0 ps-0" 
-                 placeholder="Search by title, track, author or keywords..." 
+          <input type="text" class="form-control border-0 ps-2" 
+                 placeholder="Search by title, conference (e.g. IAI25), or author..." 
                  [(ngModel)]="searchQuery" (input)="onSearch()">
         </div>
       </div>
@@ -20,54 +20,52 @@
 
   <div *ngIf="isLoading" class="text-center py-5">
     <div class="spinner-grow text-primary" role="status"></div>
-    <p class="text-muted mt-2">Fetching proceedings...</p>
+    <p class="text-muted mt-2">Loading digital library...</p>
   </div>
 
   <div *ngIf="!isLoading">
     
-    <div *ngIf="filteredPapers.length === 0" class="text-center py-5 bg-white rounded-4 shadow-sm border border-dashed">
+    <div *ngIf="filteredPapers.length === 0" class="text-center py-5 bg-light rounded-4 border-dashed border-2">
       <i class="bi bi-journal-x display-1 text-muted opacity-25"></i>
-      <h4 class="mt-3 text-secondary fw-bold">No Papers Found</h4>
-      <p class="text-muted mb-0">We couldn't find any registered papers matching your criteria.</p>
-      <button *ngIf="searchQuery" class="btn btn-link text-primary mt-2" (click)="searchQuery=''; onSearch()">
-        Clear search filters
-      </button>
+      <h4 class="mt-3 text-secondary fw-bold">No Manuscripts Found</h4>
+      <p class="text-muted mb-0">Try adjusting your search terms or clearing the filter.</p>
+      <button class="btn btn-link text-primary mt-2" (click)="searchQuery=''; onSearch()">Clear All Filters</button>
     </div>
 
-    <div class="row" *ngIf="filteredPapers.length > 0">
+    <div class="row g-4" *ngIf="filteredPapers.length > 0">
       <div class="col-md-6 col-lg-4 mb-4" *ngFor="let paper of filteredPapers">
-        <div class="card h-100 border-0 shadow-sm hover-shadow transition-all rounded-4 overflow-hidden d-flex flex-column">
-          <div class="py-1" [style.background-color]="'#3b82f6'"></div>
+        <div class="card h-100 border-0 shadow-sm rounded-4 hover-shadow transition-all overflow-hidden d-flex flex-column bg-white">
+          <div class="py-1 bg-primary"></div>
           
           <div class="card-body p-4 d-flex flex-column">
-            <div class="mb-3">
-              <span class="badge bg-primary text-white px-3 py-2 rounded-pill shadow-sm">
-                <i class="bi bi-layers-half me-1"></i>
+            <div class="d-flex gap-2 mb-3 flex-wrap">
+              <span class="badge bg-dark-subtle text-dark rounded-pill px-3">
+                <i class="bi bi-award me-1"></i>{{ getConferenceAcronym(paper.conferenceId) }}
+              </span>
+              <span class="badge bg-primary-subtle text-primary rounded-pill px-3">
                 {{ getTrackName(paper.trackId) }}
               </span>
             </div>
             
-            <h5 class="fw-bold text-dark mb-2 text-truncate-2" [title]="paper.title">
+            <h5 class="fw-bold text-dark mb-2 text-truncate-3" style="min-height: 3.6em;" [title]="paper.title">
               {{ paper.title }}
             </h5>
 
             <div class="d-flex align-items-center mb-3">
-              <i class="bi bi-person-circle text-secondary me-2"></i>
-              <span class="text-secondary small fw-medium text-truncate">
-                {{ paper.submitterName || 'Lead Author' }}
-              </span>
+              <i class="bi bi-person-circle text-muted me-2"></i>
+              <span class="text-muted small fw-medium">{{ paper.submitterName || 'Lead Author' }}</span>
             </div>
             
             <p class="text-muted small mb-4 text-truncate-3" style="height: 4.5em;">
-              {{ paper.abstractText || paper.abstract || 'No abstract available for this manuscript.' }}
+              {{ paper.abstractText || paper.abstract || 'Abstract details for this archived manuscript are available upon opening the PDF.' }}
             </p>
 
             <div class="border-top pt-3 mt-auto">
               <div class="d-flex justify-content-between align-items-center">
-                <small class="text-muted">Paper ID: #{{ paper.paperId }}</small>
-                <button class="btn btn-sm btn-outline-primary rounded-pill px-3" 
+                <small class="text-muted font-monospace">ID: #{{ paper.paperId }}</small>
+                <button class="btn btn-primary btn-sm rounded-pill px-4 shadow-sm" 
                         (click)="viewManuscript(paper.submissionFile || paper.fileName)">
-                  <i class="bi bi-file-earmark-pdf me-1"></i> Open PDF
+                  <i class="bi bi-file-earmark-pdf-fill me-1"></i> Open PDF
                 </button>
               </div>
             </div>

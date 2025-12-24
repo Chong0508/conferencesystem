@@ -25,6 +25,7 @@ import { ConferenceList } from './components/admin/conference-list/conference-li
 import { CreateConference } from './components/admin/create-conference/create-conference';
 import { ManageTracks } from './components/admin/manage-tracks/manage-tracks';
 import { PaperMaster } from './components/admin/paper-master/paper-master';
+import { ConferenceDetail } from './components/common/conference-detail/conference-detail';
 
 // 6. Admin Management Features (User, Schedule, Logs, Applications)
 import { UserListComponent } from './components/admin/user-list/user-list';
@@ -39,6 +40,8 @@ import { ApplyReviewerComponent } from './components/author/apply-reviewer/apply
 
 import { CreateAdminComponent } from './components/admin/create-admin/create-admin';
 import { SearchPapers } from './components/common/search-papers/search-papers';
+import { ConferenceRegistration } from './components/common/conference-registration/conference-registration';
+
 
 export const routes: Routes = [
   // --- Public Routes ---
@@ -58,6 +61,7 @@ export const routes: Routes = [
       { path: 'overview', component: OverviewComponent },
       { path: 'create-admin', component: CreateAdminComponent },
       { path: 'searchPapers', component: SearchPapers },
+      { path: 'conference-registration/:id', component: ConferenceRegistration },
 
       // 3. Author Routes
       { path: 'submit-paper', component: SubmitPaper },
@@ -75,6 +79,7 @@ export const routes: Routes = [
       { path: 'create-conference', component: CreateConference },
       { path: 'tracks', component: ManageTracks },
       { path: 'all-papers', component: PaperMaster },
+      { path: 'conference-detail/:id', component: ConferenceDetail },
 
       // 6. Admin Management Routes
       { path: 'user-management', component: UserListComponent },

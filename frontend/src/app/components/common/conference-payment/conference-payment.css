@@ -1,0 +1,20 @@
+.ls-1 {
+  letter-spacing: 1px;
+}
+
+.hover-up {
+  transition: transform 0.2s ease;
+}
+
+.hover-up:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.file-drop-area {
+  border: 2px dashed #dee2e6 !important;
+}
+
+.x-small {
+  font-size: 0.75rem;
+}

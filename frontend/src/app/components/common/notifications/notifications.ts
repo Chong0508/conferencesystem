@@ -12,12 +12,8 @@ import { AuthService } from '../../../services/auth';
   styleUrl: './notifications.css'
 })
 export class Notifications implements OnInit {
-
   notifications: AppNotification[] = [];
   currentUser: any = null;
-
-  // Note: We don't strictly need unreadCount here for display logic anymore
-  // since the service handles it, but kept for compatibility.
   unreadCount: number = 0;
 
   constructor(
@@ -33,13 +29,11 @@ export class Notifications implements OnInit {
   loadData() {
     this.currentUser = this.authService.getLoggedUser();
     if (this.currentUser) {
-      // Get notifications list
       this.notificationService.getNotifications(this.currentUser.email, this.currentUser.role)
         .subscribe((data: AppNotification[]) => {
           this.notifications = data;
         });
 
-      // Also subscribe to count to keep local UI in sync
       this.notificationService.unreadCount$.subscribe(count => {
         this.unreadCount = count;
       });
@@ -48,9 +42,7 @@ export class Notifications implements OnInit {
 
   markAsRead(notification: AppNotification): void {
     if (!notification.read) {
-      notification.read = true; // Update UI immediately
-
-      // 🔥 Call Service to update storage AND broadcast new count to Dashboard
+      notification.read = true; 
       this.notificationService.markAsRead(
         notification.id,
         this.currentUser.email,
@@ -58,7 +50,6 @@ export class Notifications implements OnInit {
       );
     }
 
-    // Navigate if link exists
     if (notification.link) {
       this.router.navigate([notification.link]);
     }
@@ -66,10 +57,7 @@ export class Notifications implements OnInit {
 
   markAllAsRead(): void {
     if (this.currentUser) {
-      // Update UI immediately
       this.notifications.forEach(n => n.read = true);
-
-      // 🔥 Call Service to update storage AND broadcast new count to Dashboard
       this.notificationService.markAllAsRead(
         this.currentUser.email,
         this.currentUser.role
@@ -77,21 +65,27 @@ export class Notifications implements OnInit {
     }
   }
 
+  // UPDATED: Added Registration and Payment Types
   getIconClass(type: string): string {
     switch (type) {
+      case 'payment': return 'bi-credit-card-fill text-success';
+      case 'registration': return 'bi-person-check-fill text-primary';
       case 'success': return 'bi-check-circle-fill text-success';
       case 'warning': return 'bi-exclamation-circle-fill text-warning';
       case 'error': return 'bi-x-circle-fill text-danger';
-      default: return 'bi-info-circle-fill text-primary';
+      default: return 'bi-bell-fill text-secondary';
     }
   }
 
+  // UPDATED: Added Registration and Payment Backgrounds
   getBgClass(type: string): string {
     switch (type) {
+      case 'payment': return 'bg-success-subtle';
+      case 'registration': return 'bg-primary-subtle';
       case 'success': return 'bg-success-subtle';
       case 'warning': return 'bg-warning-subtle';
       case 'error': return 'bg-danger-subtle';
-      default: return 'bg-primary-subtle';
+      default: return 'bg-light';
     }
   }
 }
