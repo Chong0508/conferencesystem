@@ -38,5 +38,46 @@ In conclusion, this project demonstrates the successful implementation of a mode
 
 ## References (Not less than 20)
 
+1. Sajiharan, M. (n.d.). *An e-conference Management System “EasyChair.”* [https://doi.org/10.15224/978-1-63248-169-6-07](https://doi.org/10.15224/978-1-63248-169-6-07)
+
+2. Richard. (2012). *CyberChair: A Web-Based Groupware Application to Facilitate the Paper Reviewing Process.* ArXiv (Cornell University). [https://doi.org/10.48550/arxiv.1206.1833](https://doi.org/10.48550/arxiv.1206.1833)
+
+3. Massimo, R., Zenezini, G., Ottaviani, F. M., & De Marco, A. (2025). Project Management Information Systems: A Systematic Review. *Procedia Computer Science, 256,* 1739–1747. [https://doi.org/10.1016/j.procs.2025.02.313](https://doi.org/10.1016/j.procs.2025.02.313)
+
+4. Zhao, X., & Zhang, Y. (2022). Reviewer assignment algorithms for peer review automation: A survey. *Information Processing & Management, 59*(5), 103028. [https://doi.org/10.1016/j.ipm.2022.103028](https://doi.org/10.1016/j.ipm.2022.103028)
+
+5. Nowack, B. (2006). CONFOTO: Browsing and annotating conference photos on the Semantic web. *Journal of Web Semantics, 4*(4), 263–266. [https://doi.org/10.1016/j.websem.2006.09.001](https://doi.org/10.1016/j.websem.2006.09.001)
+
+6. Ferrada, X., Núñez, D., Neyem, A., Serpell, A., & Sepúlveda, M. (2016). A Lessons-learned System for Construction Project Management: A Preliminary Application. *Procedia - Social and Behavioral Sciences, 226,* 302–309. [https://doi.org/10.1016/j.sbspro.2016.06.192](https://doi.org/10.1016/j.sbspro.2016.06.192)
+
+7. Leyton-Brown, K., Mausam, Nandwani, Y., Hedayat Zarkoob, Cameron, C., Newman, N., & Raghu, D. (2024). Matching Papers and Reviewers at Large Conferences. *Artificial Intelligence, 331,* 104119. [https://doi.org/10.1016/j.artint.2024.104119](https://doi.org/10.1016/j.artint.2024.104119)
+
+8. Aksoy, M., Yanik, S., & Amasyali, M. F. (2023). Reviewer Assignment Problem: A Systematic Review of the Literature. ArXiv (Cornell University). [https://doi.org/10.48550/arxiv.2304.00353](https://doi.org/10.48550/arxiv.2304.00353)
+
+9. Stelmakh, I., Shah, N. B., & Singh, A. (2018). PeerReview4All: Fair and Accurate Reviewer Assignment in Peer Review. ArXiv (Cornell University). [https://doi.org/10.48550/arxiv.1806.06237](https://doi.org/10.48550/arxiv.1806.06237)
+
+10. Mathews, G. J., & Jacobs, B. E. (1996). Electronic management of the peer review process. *Computer Networks and ISDN Systems, 28*(7–11), 1523–1538. [https://doi.org/10.1016/0169-7552(96)00057-8](https://doi.org/10.1016/0169-7552(96)00057-8)
+
+11. Hsieh, J.-Y., Raghunathan, A., & Shah, N. B. (2024). Vulnerability of Text-Matching in ML/AI Conference Reviewer Assignments to Collusions. ArXiv (Cornell University). [https://doi.org/10.48550/arxiv.2412.06606](https://doi.org/10.48550/arxiv.2412.06606)
+
+12. Payan, J., & Zick, Y. (2021). I Will Have Order! Optimizing Orders for Fair Reviewer Assignment. ArXiv (Cornell University). [https://doi.org/10.48550/arxiv.2108.02126](https://doi.org/10.48550/arxiv.2108.02126)
+
+13. Utomo, M. N. Y. (2022). Sistem Manajemen Konferensi Ilmiah Berbasis Web Menggunakan Metode Pengembangan Waterfall. *Jurnal Teknologi Elekterika, 6*(1), 1. [https://doi.org/10.31963/elekterika.v6i1.2751](https://doi.org/10.31963/elekterika.v6i1.2751)
+
+14. Ming, T. R., Norowi, N. M., Wirza, R., & Kamaruddin, A. (2021). Designing a Collaborative Virtual Conference Application: Challenges, Requirements and Guidelines. *Future Internet, 13*(10), 253. [https://doi.org/10.3390/fi13100253](https://doi.org/10.3390/fi13100253)
+
+15. Spring Boot Reference Documentation. (n.d.). *Docs.spring.io.* [https://docs.spring.io/spring-boot/docs/current/reference/html/](https://docs.spring.io/spring-boot/docs/current/reference/html/)
+
+16. Docker: Lightweight Linux Containers for Consistent Development and Deployment | Linux Journal. (n.d.). *Www.linuxjournal.com.* [https://www.linuxjournal.com/content/docker-lightweight-linux-containers-consistent-development-and-deployment](https://www.linuxjournal.com/content/docker-lightweight-linux-containers-consistent-development-and-deployment)
+
+17. Ren, Q., Wei, X., Gao, C., & Lyu, M. (2021). Three-dimensional BP Imaging Algorithm using MIMO System. *Procedia Computer Science, 187,* 103–108. [https://doi.org/10.1016/j.procs.2021.04.038](https://doi.org/10.1016/j.procs.2021.04.038)
+
+18. Li, C., Liu, J., & Wang, C. (2021). Influence of Noise Level on MSTAR Images Recognition Performance. *Procedia Computer Science, 187,* 97–102. [https://doi.org/10.1016/j.procs.2021.04.039](https://doi.org/10.1016/j.procs.2021.04.039)
+
+19. Hijazi, H., Al-Kateb, G., & Alkhawaldeh, E. (2020). Investigating the Awareness and Usage of Moodle Features at Hashemite University. *International Journal of Advanced Computer Science and Applications, 11*(6). [https://doi.org/10.14569/ijacsa.2020.0110625](https://doi.org/10.14569/ijacsa.2020.0110625)
+
+20. Sangati, N. S. T. R. (2022). Web Application Development using SpringBoot and Angular. *International Journal of Scientific Research in Engineering and Management, 06*(06). [https://doi.org/10.55041/ijsrem14292](https://doi.org/10.55041/ijsrem14292)
+
+
 ## Link for the YouTube Presentation
 
