@@ -28,18 +28,18 @@ export class MyProfile implements OnInit {
     const user = this.authService.getLoggedUser();
     if (user) {
       this.loggedUser = user;
+      console.log('Profile loaded:', this.loggedUser);
     }
     this.isLoading = false;
   }
 
-  // 3. Updated method to redirect
   applyForReviewer() {
-    if (this.loggedUser?.role === 'Reviewer' || this.loggedUser?.role === 'Admin' || this.loggedUser?.role === 'Super Admin') {
+    if (this.loggedUser?.role === 'Reviewer' ||
+      this.loggedUser?.role === 'Admin' ||
+      this.loggedUser?.role === 'Super Admin') {
       alert('You already have Reviewer or Admin privileges!');
       return;
     }
-
-    // Redirect to the route you defined in app.routes.ts
     this.router.navigate(['/dashboard/apply-reviewer']);
   }
 }

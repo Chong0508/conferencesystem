@@ -25,75 +25,58 @@ export class MySubmissions implements OnInit {
   }
 
   loadMyPapers() {
-      this.isLoading = true;
+    this.isLoading = true;
+    const user = this.authService.getLoggedUser();
+    const userId = user?.user_id || user?.userId || user?.id;
 
-      // 3. Get the current user from your AuthService
-      const user = this.authService.getCurrentUser();
-      const userId = user?.userId || user?.user_id || user?.id;
-
-      if (!userId) {
-        console.error('No User ID found, redirecting to login');
-        this.router.navigate(['/login']);
-        return;
-      }
-
-      // 4. Call the Backend via PaperService
-      this.paperService.getAllPapers().subscribe({
-        next: (data: any[]) => {
-          this.myPapers = (data || []).filter(
-            p => p.authorId === Number(userId)
-          );
-          this.isLoading = false;
-        },
-        error: () => {
-          this.isLoading = false;
-        }
-      });
-
+    if (!userId) {
+      console.error('No User ID found');
+      this.router.navigate(['/login']);
+      return;
     }
 
-  // Helper function to return CSS classes based on status
+    this.paperService.getPapersByAuthor(Number(userId)).subscribe({
+      next: (data: any[]) => {
+        this.myPapers = data || [];
+        console.log('Author papers:', this.myPapers);
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error loading papers:', err);
+        this.isLoading = false;
+      }
+    });
+  }
+
   getStatusClass(status: string): string {
     switch (status) {
-      case 'Accepted':
-        return 'bg-success-subtle text-success border-success';
-      case 'Rejected':
-        return 'bg-danger-subtle text-danger border-danger';
-      case 'Revised':
-      case 'Reviewed':
-        return 'bg-info-subtle text-info border-info';
-      case 'Registered':
-        return 'bg-primary-subtle text-primary border-primary';
-      case 'Pending Review':
-      default:
-        return 'bg-warning-subtle text-warning border-warning';
+      case 'Accepted': return 'bg-success-subtle text-success border-success';
+      case 'Rejected': return 'bg-danger-subtle text-danger border-danger';
+      case 'Revised': case 'Reviewed': return 'bg-info-subtle text-info border-info';
+      case 'Registered': return 'bg-primary-subtle text-primary border-primary';
+      default: return 'bg-warning-subtle text-warning border-warning';
     }
   }
 
-  // Navigate to Paper Details page
   viewDetails(paper: any) {
+    console.log('Navigating to paper:', paper.paperId);
     this.router.navigate(['/dashboard/paper-details', paper.paperId]);
   }
 
-  onDelete(id: number) {
-    if (confirm('Are you sure you want to delete this submission? This action cannot be undone.')) {
-      this.http.delete(`http://localhost:8080/api/papers/${id}`).subscribe({
-        next: () => {
-          alert('Submission deleted successfully');
-          this.loadMyPapers(); // Refresh the list
-        },
-        error: (err) => {
-          console.error('Delete failed', err);
-          alert('Could not delete the paper.');
-        }
-      });
-    }
+  editPaper(paper: any) {
+    this.router.navigate(['/dashboard/submit-paper'], { queryParams: { edit: paper.paperId } });
   }
 
-  // Logic to edit a paper (Redirects to submission page with ID)
-  editPaper(paper: any) {
-    // You can use the same submit-paper component but pass the ID to "edit mode"
-    this.router.navigate(['/dashboard/submit-paper'], { queryParams: { edit: paper.paperId } });
+  onDelete(id: number) {
+    if (confirm('Delete this paper?')) {
+      this.paperService.deletePaper(id).subscribe({
+        next: () => {
+          this.myPapers = this.myPapers.filter(p => p.paperId !== id);
+          alert('Paper deleted');
+        },
+        error: (err) => alert('Delete failed: ' + err.error?.message)
+      });
+    }
   }
 
   // View Receipt (Only for Registered papers)
