@@ -21,6 +21,12 @@
         </a>
       </li>
 
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/dashboard/searchPapers" routerLinkActive="active">
+          <i class="bi bi-search me-2"></i> Search Papers
+        </a>
+      </li>
+
       <ng-container *ngIf="loggedUser.role === 'Super Admin'">
         <li class="nav-item">
           <p class="text-muted small ms-3 mt-3 mb-2 fw-bold">SYSTEM CONTROL</p>

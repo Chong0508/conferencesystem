@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { PaperService } from '../../../services/paper.service'; // Ensure this service is imported
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-paper-master',
@@ -15,26 +17,34 @@ export class PaperMaster implements OnInit {
   allPapers: any[] = [];
   filteredPapers: any[] = [];
   isLoading: boolean = true;
-
-  // Filter
   statusFilter: string = 'All';
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router, 
+    private paperService: PaperService,
+    private http: HttpClient
+  ) {}
 
   ngOnInit() {
     this.loadPapers();
   }
 
   loadPapers() {
-    setTimeout(() => {
-      // 1. Get all papers from Mock DB
-      this.allPapers = JSON.parse(localStorage.getItem('mock_papers') || '[]');
-      this.applyFilter();
-      this.isLoading = false;
-    }, 500);
+    this.isLoading = true;
+    // 1. Fetch from your Real Backend Controller
+    this.paperService.getAllPapers().subscribe({
+      next: (data) => {
+        this.allPapers = data;
+        this.applyFilter();
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error fetching papers from backend:', err);
+        this.isLoading = false;
+      }
+    });
   }
 
-  // Filter Logic
   applyFilter() {
     if (this.statusFilter === 'All') {
       this.filteredPapers = this.allPapers;
@@ -43,56 +53,61 @@ export class PaperMaster implements OnInit {
     }
   }
 
-  // Helper for Status Color
   getStatusClass(status: string): string {
     switch (status) {
       case 'Accepted': return 'bg-success-subtle text-success border-success';
       case 'Rejected': return 'bg-danger-subtle text-danger border-danger';
-      case 'Revision': return 'bg-warning-subtle text-warning border-warning';
+      case 'Revised': return 'bg-warning-subtle text-warning border-warning';
       case 'Reviewed': return 'bg-info-subtle text-info border-info';
       case 'Registered': return 'bg-success text-white';
+      case 'Pending Review': return 'bg-secondary-subtle text-secondary border-secondary';
       default: return 'bg-light text-secondary border-secondary';
     }
   }
 
-  // --- Admin Actions ---
-
-  // 1. Accept Paper (This enables Registration for Author)
+  // Admin Decision: Accept
   acceptPaper(paper: any) {
-    if (confirm(`Are you sure you want to ACCEPT "${paper.title}"?`)) {
-      this.updateStatus(paper.id, 'Accepted');
+    if (confirm(`Accept "${paper.title}"? This allows the author to pay the publication fee.`)) {
+      this.updateStatusOnBackend(paper.paperId, 'Accepted');
     }
   }
 
-  // 2. Reject Paper
+  // Admin Decision: Reject
   rejectPaper(paper: any) {
-    if (confirm(`Are you sure you want to REJECT "${paper.title}"?`)) {
-      this.updateStatus(paper.id, 'Rejected');
+    if (confirm(`Reject "${paper.title}"?`)) {
+      this.updateStatusOnBackend(paper.paperId, 'Rejected');
     }
   }
 
-  // 3. Delete Paper (Cleanup)
+  // Admin Decision: Delete
   deletePaper(paperId: number) {
-    if (confirm("⚠️ Warning: This will permanently delete the paper. Continue?")) {
-      this.allPapers = this.allPapers.filter(p => p.id !== paperId);
-      this.filteredPapers = this.filteredPapers.filter(p => p.id !== paperId);
-      localStorage.setItem('mock_papers', JSON.stringify(this.allPapers));
+    if (confirm("⚠️ Permanently delete this paper and its file from the server?")) {
+      this.paperService.deletePaper(paperId).subscribe({
+        next: () => {
+          this.allPapers = this.allPapers.filter(p => p.paperId !== paperId);
+          this.applyFilter();
+        },
+        error: (err) => alert("Delete failed: " + err.message)
+      });
     }
   }
 
-  // View Details (Reuse Author's detail page or Reviewer's)
   viewDetails(paperId: number) {
-    // For Admin, we can reuse the Paper Details page
     this.router.navigate(['/dashboard/paper-details', paperId]);
   }
 
-  // Internal Helper to save status
-  updateStatus(id: number, newStatus: string) {
-    const index = this.allPapers.findIndex(p => p.id === id);
-    if (index !== -1) {
-      this.allPapers[index].status = newStatus;
-      localStorage.setItem('mock_papers', JSON.stringify(this.allPapers));
-      this.applyFilter(); // Refresh list
-    }
+  // PERSISTENCE: Save status change to the real MySQL Database
+  updateStatusOnBackend(id: number, newStatus: string) {
+    // You can add a specific PATCH endpoint in your backend or use the existing update logic
+    this.http.put(`http://localhost:8080/api/papers/${id}/status`, { status: newStatus }).subscribe({
+      next: () => {
+        const index = this.allPapers.findIndex(p => p.paperId === id);
+        if (index !== -1) {
+          this.allPapers[index].status = newStatus;
+          this.applyFilter();
+        }
+      },
+      error: (err) => console.error("Failed to update status", err)
+    });
   }
 }
