@@ -10,7 +10,7 @@
 
 ## Title of your application (a unique title)
 ## Abstract (in 300 words)
-  ## 1. Background ##
+  ## 1. Background 
 This project focuses on the development of a full-stack Conference Management System (CMS) inspired by the EasyChair platform, which is widely used for managing academic conferences. As conferences grow in scale and complexity, managing submissions, reviews, and communication manually becomes inefficient and error-prone. To address these challenges, the project integrates Angular for the frontend and Spring Boot for the backend to create a dynamic, responsive, and centralized web application. The system aims to support essential conference management activities while demonstrating modern web development practices.
 
    ## 2. Problem Statement (from article) ##
