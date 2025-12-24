@@ -24,28 +24,39 @@ export class ReviewList implements OnInit {
      this.loadPapers();
 }
 
-  loadPapers() {
-      this.isLoading = true;
+loadPapers() {
+  this.isLoading = true;
 
-      if (!this.currentUser) {
-        console.error('User not logged in');
-        this.isLoading = false;
-        return;
-      }
+  // 1. Check for the user ID using multiple common keys
+  const currentUserId = this.currentUser?.user_id || this.currentUser?.userId || this.currentUser?.id;
 
-      this.paperService.getAllPapers().subscribe({
-        next: (data) => {
-          // Optional: filter papers assigned to this user
-          // For example, only show papers not authored by current user
-          this.papers = data.filter(p => p.authorId !== this.currentUser.user_id);
-          this.isLoading = false;
-        },
-        error: (err) => {
-          console.error("Fetch error:", err);
-          this.isLoading = false;
-        }
+  if (!currentUserId) {
+    console.error('User ID not found in localStorage');
+    this.isLoading = false;
+    return;
+  }
+
+  this.paperService.getAllPapers().subscribe({
+    next: (data) => {
+      // 2. Filter logic using the verified currentUserId
+      this.papers = data.filter(p => {
+        // Must be 'Pending Review'
+        const isPending = p.status === 'Pending Review';
+        
+        // Must NOT be the current user (using Number() to ensure type match)
+        const isNotMine = Number(p.authorId) !== Number(currentUserId);
+        
+        return isPending && isNotMine;
       });
+      
+      this.isLoading = false;
+    },
+    error: (err) => {
+      console.error("Fetch error:", err);
+      this.isLoading = false;
     }
+  });
+}
 
     onGrade(paperId: number) {
       if (!paperId) {
