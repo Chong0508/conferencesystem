@@ -94,7 +94,9 @@ export const routes: Routes = [
 
       // 7. Settings
       { path: 'profile', component: MyProfile },
-      // Note: Added profile route explicitly to match sidebar links
+      { path: 'applications', component: ReviewerApplicationsComponent},
+      { path: 'paper-details/:id', component: PaperDetails },
+      { path: 'review/:id', component: Grading },
       { path: 'notifications', loadComponent: () => import('./components/common/notifications/notifications').then(m => m.Notifications) },
       { path: 'apply-reviewer', component: ApplyReviewerComponent },
     ]
