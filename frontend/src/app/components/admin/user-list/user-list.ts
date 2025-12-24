@@ -52,12 +52,15 @@ export class UserListComponent implements OnInit {
         }
 
         this.users = data.map((u: any) => ({
+
+          // Ensure keys match exactly what your Java Entity/DTO returns
           id: u.user_id || u.id,
-          firstName: u.first_name || u.firstName || '',
-          lastName: u.last_name || u.lastName || '',
-          email: u.email || '',
-          role: u.category || u.role || 'Author', // Backend uses 'category'
-          joinDate: u.created_at || u.createdAt || new Date()
+          firstName: u.first_name || u.firstName,
+          lastName: u.last_name || u.lastName,
+          email: u.email,
+          // Check for 'category' or 'role' depending on your Java model
+          role: u.category || u.role || 'Author',
+          joinDate: u.created_at || u.createdAt
         }));
 
         this.filteredUsers = [...this.users];
@@ -121,10 +124,9 @@ export class UserListComponent implements OnInit {
     if (confirm(`Are you sure you want to delete ${user.firstName} ${user.lastName}?`)) {
       this.userService.deleteUser(userId).subscribe({
         next: (response) => {
-          alert('✅ User deleted successfully.');
-          // FIX 4: Remove from list instead of reloading (better UX)
-          this.users = this.users.filter(u => u.id !== userId);
-          this.applyFilters(); // Re-apply filters to update filtered list
+          alert('User deleted successfully.');
+          this.loadUsers();
+
         },
         error: (err) => {
           console.error('❌ Delete failed:', err);

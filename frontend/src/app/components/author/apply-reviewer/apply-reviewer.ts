@@ -41,24 +41,16 @@ export class ApplyReviewerComponent implements OnInit {
   }
 
   submitApplication() {
-    if (!this.selectedFile) {
-      alert('Please upload PDF evidence.');
-      return;
-    }
 
-    if (!this.appData.reason || this.appData.reason.trim() === '') {
-      alert('Please provide your motivation/reason.');
-      return;
-    }
-
-    if (!this.loggedUser) {
-      alert('User session expired. Please log in again.');
-      return;
-    }
+    if (!this.selectedFile) return alert('Please upload PDF evidence.');
+    if (!this.loggedUser) return alert('User session expired. Please log in again.');
 
     this.isLoading = true;
     const formData = new FormData();
-    formData.append('userId', this.loggedUser.user_id || this.loggedUser.userId);
+
+    // 4. Using the properties now correctly defined above
+    formData.append('userId', this.loggedUser.userId);
+
     formData.append('educationLevel', this.appData.educationLevel);
     formData.append('reason', this.appData.reason);
     formData.append('evidence', this.selectedFile);

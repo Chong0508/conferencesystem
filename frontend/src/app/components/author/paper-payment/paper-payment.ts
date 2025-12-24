@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { PaperService } from '../../../services/paper.service';
+import { NotificationService } from '../../../services/notification.service';
 
 @Component({
   selector: 'app-paper-payment',
@@ -27,10 +28,11 @@ export class PaperPayment implements OnInit {
   };
 
   constructor(
-    private route: ActivatedRoute, 
-    private router: Router, 
+    private route: ActivatedRoute,
+    private router: Router,
     private http: HttpClient,
-    private paperService: PaperService
+    private paperService: PaperService,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit() {
@@ -51,25 +53,44 @@ export class PaperPayment implements OnInit {
   }
 
   onPay() {
-    this.isLoading = true;
-    const paymentPayload = {
-      registration_id: Number(this.paperId),
-      amount: this.publicationFee,
-      currency: 'MYR'
-    };
+      this.isLoading = true;
+      const paymentPayload = {
+        registration_id: Number(this.paperId),
+        amount: this.publicationFee,
+        currency: 'MYR'
+      };
 
-    this.http.post('http://localhost:8080/api/payments', paymentPayload).subscribe({
-      next: (res: any) => {
-        this.isLoading = false;
-        alert(res.message); // "Payment processed successfully in KL Time"
-        this.router.navigate(['/dashboard/my-submissions']);
-      },
-      error: (err) => {
-        this.isLoading = false;
-        alert("Error: " + err.error);
-      }
-    });
-  }
+      this.http.post('http://localhost:8080/api/payments', paymentPayload).subscribe({
+        next: (res: any) => {
+          this.isLoading = false;
+
+          // ============================================================
+          // 3. TRIGGER NOTIFICATION
+          // ============================================================
+          // Robust ID check (handle id, userId, or user_id)
+          const userId = this.currentUser.id || this.currentUser.user_id || this.currentUser.userId;
+
+          if (userId) {
+            const paperTitle = this.paper ? this.paper.title : 'Paper';
+
+            this.notificationService.createNotification(
+              Number(userId),
+              `Payment of RM${this.publicationFee} for "${paperTitle}" was successful.`,
+              'success'
+            );
+          } else {
+            console.warn('User ID missing, notification skipped.');
+          }
+
+          alert(res.message);
+          this.router.navigate(['/dashboard/my-submissions']);
+        },
+        error: (err) => {
+          this.isLoading = false;
+          alert("Error: " + (err.error?.message || err.error || "Payment failed"));
+        }
+      });
+    }
 
   goBack() { this.router.navigate(['/dashboard/my-submissions']); }
 }
