@@ -180,16 +180,32 @@ public class UserController {
     @PostMapping("/admin")
     @Transactional
     public ResponseEntity<Map<String, Object>> createAdmin(@RequestBody User user) {
-        try {
-            // Ensure the category is set to Admin regardless of what frontend sends
-            user.setCategory("Admin");
-            
-            // Use your existing createUser logic or call it
-            return createUser(user); 
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("message", "Admin creation failed: " + e.getMessage()));
+        // Validate input
+        if (user.getEmail() == null || user.getEmail().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Email is required"));
         }
+
+        // Check if user exists
+        User existingUser = userRepository.findByEmail(user.getEmail());
+        if (existingUser != null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "User already exists"));
+        }
+
+        // Create new admin user
+        user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
+        user.setCategory("Admin");
+        user.setCreated_at(new Timestamp(System.currentTimeMillis()));
+        User savedUser = userRepository.save(user);
+
+        // Assign Admin role
+        Role adminRole = roleRepository.findByRoleName("Admin");
+        UserRole userRole = new UserRole();
+        userRole.setUser_id(savedUser.getUser_id());
+        userRole.setRole_id(adminRole.getRole_id());
+        userRole.setAssigned_at(new Timestamp(System.currentTimeMillis()));
+        userRoleRepository.save(userRole);
+
+        return ResponseEntity.ok(Map.of("message", "Admin created successfully", "userId", savedUser.getUser_id()));
     }
 
     // ==========================================
