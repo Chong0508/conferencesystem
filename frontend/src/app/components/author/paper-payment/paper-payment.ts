@@ -55,7 +55,7 @@ export class PaperPayment implements OnInit {
     const paymentPayload = {
       registration_id: Number(this.paperId),
       amount: this.publicationFee,
-      currency: 'USD'
+      currency: 'MYR'
     };
 
     this.http.post('http://localhost:8080/api/payments', paymentPayload).subscribe({

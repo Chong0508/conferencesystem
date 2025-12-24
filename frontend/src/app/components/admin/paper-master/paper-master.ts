@@ -81,13 +81,19 @@ export class PaperMaster implements OnInit {
 
   // Admin Decision: Delete
   deletePaper(paperId: number) {
-    if (confirm("⚠️ Permanently delete this paper and its file from the server?")) {
+    if (confirm("⚠️ Permanently delete this paper and its file? (Note: Review records will be preserved but marked as 'Deleted by Admin')")) {
+      this.isLoading = true;
       this.paperService.deletePaper(paperId).subscribe({
         next: () => {
           this.allPapers = this.allPapers.filter(p => p.paperId !== paperId);
           this.applyFilter();
+          this.isLoading = false;
+          alert("✅ Paper removed. Review history has been updated.");
         },
-        error: (err) => alert("Delete failed: " + err.message)
+        error: (err) => {
+          this.isLoading = false;
+          alert("Delete failed: " + (err.error?.message || "Check backend logs"));
+        }
       });
     }
   }

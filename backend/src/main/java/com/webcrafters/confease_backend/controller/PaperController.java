@@ -36,6 +36,7 @@ public class PaperController {
     @Autowired private TrackRepository trackRepository;
     @Autowired private UserRepository userRepository;
     @Autowired private AuthorRepository authorRepository;
+    @Autowired private ReviewRepository reviewRepository;
 
     // ✅ FIXED: Explicitly use the absolute path that matches your Docker volume mapping
     private final Path rootLocation = Paths.get("/app/uploads/papers");
@@ -212,16 +213,33 @@ public class PaperController {
     @Transactional
     public ResponseEntity<?> deletePaper(@PathVariable Long id) {
         return paperRepository.findById(id).map(paper -> {
+            // 1. Find all reviews associated with this paper
+            // We update them to 'Deleted by Admin' so the history remains
+            List<Review> reviews = reviewRepository.findAll().stream()
+                    .filter(r -> r.getAssignment_id().equals(id))
+                    .collect(Collectors.toList());
+            
+            for (Review r : reviews) {
+                r.setRecommendation("Deleted by Admin");
+                // You could also set overall_score to 0 or null if desired
+                reviewRepository.save(r);
+            }
+
+            // 2. Clean up paper-specific metadata (Keywords)
             paperKeywordRepository.deleteByPaperId(id);
+
+            // 3. Delete the physical file from storage
             try {
-                // ✅ FIXED: Point to absolute rootLocation + filename
                 Path filePath = rootLocation.resolve(paper.getSubmissionFile()).normalize();
                 Files.deleteIfExists(filePath);
             } catch (Exception e) {
-                System.err.println("Could not delete file: " + e.getMessage());
+                System.err.println("File deletion failed: " + e.getMessage());
             }
+
+            // 4. Delete the Paper record
             paperRepository.delete(paper);
-            return ResponseEntity.ok(Map.of("message", "Deleted successfully"));
+            
+            return ResponseEntity.ok(Map.of("message", "Paper deleted. Associated reviews preserved and marked as Deleted by Admin."));
         }).orElse(ResponseEntity.notFound().build());
     }
 
