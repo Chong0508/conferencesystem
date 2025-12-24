@@ -41,18 +41,20 @@ export class UserListComponent implements OnInit {
     this.errorMessage = '';
 
     this.userService.getAllUsers().subscribe({
-      next: (data) => {
+      next: (data: any[]) => {
         this.users = data.map((u: any) => ({
-          id: u.user_id,
-          firstName: u.first_name,
-          lastName: u.last_name,
+          // Ensure keys match exactly what your Java Entity/DTO returns
+          id: u.user_id || u.id, 
+          firstName: u.first_name || u.firstName, 
+          lastName: u.last_name || u.lastName,
           email: u.email,
-          role: u.category || 'Author',
-          joinDate: u.created_at
+          // Check for 'category' or 'role' depending on your Java model
+          role: u.category || u.role || 'Author', 
+          joinDate: u.created_at || u.createdAt
         }));
         this.filteredUsers = [...this.users];
         this.isLoading = false;
-        console.log('✅ Users loaded:', this.users);
+        console.log('✅ Users processed:', this.users);
       },
       error: (err) => {
         console.error('❌ Error loading users:', err);
@@ -90,18 +92,23 @@ export class UserListComponent implements OnInit {
 
   // --- Delete User ---
   deleteUser(user: User) {
+    // NEW SECURITY CHECK: Prevent deletion of SuperAdmins
+    if (user.role === 'Super Admin') {
+      alert('⛔ Access Denied: SuperAdmin accounts cannot be deleted for security reasons.');
+      return;
+    }
+
     const userId = user.id;
 
     if (confirm(`Are you sure you want to delete ${user.firstName} ${user.lastName}?`)) {
       this.userService.deleteUser(userId!).subscribe({
         next: (response) => {
-          console.log('✅ User deleted:', response);
           alert('User deleted successfully.');
-          this.loadUsers(); // Refresh list
+          this.loadUsers(); 
         },
         error: (err) => {
           console.error('❌ Delete failed:', err);
-          alert('Could not delete user. Check console for details.');
+          alert('Could not delete user. This may be due to active dependencies.');
         }
       });
     }

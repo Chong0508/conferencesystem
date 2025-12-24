@@ -1,40 +1,42 @@
 <div class="container mt-4 animate__animated animate__fadeIn">
 
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold text-secondary">User Management</h2>
-    <button class="btn btn-outline-secondary btn-sm" (click)="loadUsers()"> 
-      <i class="bi bi-arrow-clockwise"></i> Refresh
+    <div>
+      <h2 class="fw-bold text-dark mb-1">User Management</h2>
+      <p class="text-muted small">Manage system access and protected administrative roles.</p>
+    </div>
+    <button class="btn btn-outline-primary btn-sm rounded-pill px-3" (click)="loadUsers()"> 
+      <i class="bi bi-arrow-clockwise me-1"></i> Refresh
     </button>
   </div>
 
-  <div class="row mb-4">
-    <div class="col-md-8">
-      <div class="input-group shadow-sm">
-        <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
-        <input type="text" class="form-control border-start-0 ps-0"
-               placeholder="Search by name or email..."
-               [(ngModel)]="searchTerm" (input)="searchUsers()">
+  <div class="row mb-4 g-3">
+    <div class="col-md-7">
+      <div class="input-group shadow-sm border rounded-pill overflow-hidden bg-white">
+        <span class="input-group-text bg-white border-0 ps-3"><i class="bi bi-search"></i></span>
+        <input type="text" class="form-control border-0" placeholder="Search by name..." [(ngModel)]="searchTerm" (input)="searchUsers()">
       </div>
     </div>
-    <div class="col-md-4">
-      <select class="form-select shadow-sm" [(ngModel)]="selectedRole" (change)="filterByRole()">
+    <div class="col-md-5">
+      <select class="form-select shadow-sm border rounded-pill" [(ngModel)]="selectedRole" (change)="filterByRole()">
         <option value="All">All Roles</option>
+        <option value="Super Admin">Super Admin</option>
         <option value="Admin">Admin</option>
-        <option value="Author">Author</option>
         <option value="Reviewer">Reviewer</option>
+        <option value="Author">Author</option>
       </select>
     </div>
   </div>
 
-  <div class="card border-0 shadow-sm rounded-4">
-    <div class="card-body p-0">
+  <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="table-responsive">
       <table class="table table-hover align-middle mb-0">
-        <thead class="bg-light">
+        <thead class="bg-light text-uppercase small fw-bold">
           <tr>
-            <th class="ps-4 py-3">Full Name</th>
-            <th>Email Address</th>
+            <th class="ps-4 py-3">User</th>
+            <th>Email</th>
             <th>Role</th>
-            <th>Joined Date</th>
+            <th>Joined</th>
             <th class="text-end pe-4">Actions</th>
           </tr>
         </thead>
@@ -43,35 +45,41 @@
             <td class="ps-4">
               <div class="d-flex align-items-center">
                 <img [src]="'https://ui-avatars.com/api/?name=' + user.firstName + '+' + user.lastName + '&background=random&color=fff'"
-                     class="rounded-circle me-3" width="35" height="35" alt="Avatar">
+                     class="rounded-circle me-3 shadow-sm" width="38" height="38">
                 <span class="fw-bold text-dark">{{ user.firstName }} {{ user.lastName }}</span>
               </div>
             </td>
             <td class="text-secondary">{{ user.email }}</td>
             <td>
-              <span class="badge rounded-pill"
+              <span class="badge rounded-pill px-3 py-2 fw-bold shadow-sm"
                     [ngClass]="{
                       'bg-primary': user.role === 'Admin',
                       'bg-info text-dark': user.role === 'Reviewer',
                       'bg-secondary': user.role === 'Author'
-                    }">
+                    }"
+                    [style.background-color]="user.role === 'Super Admin' ? '#6610f2' : ''"
+                    [style.color]="user.role === 'Super Admin' ? '#fff' : ''">
+                <i class="bi me-1" [ngClass]="{
+                  'bi-gem': user.role === 'Super Admin',
+                  'bi-shield-check': user.role === 'Admin',
+                  'bi-person-badge': user.role === 'Reviewer',
+                  'bi-pencil-square': user.role === 'Author'
+                }"></i>
                 {{ user.role }}
               </span>
             </td>
-            <td class="text-muted small">{{ user.joinDate || 'N/A' }}</td>
+            <td class="text-muted small">{{ user.joinDate | date:'mediumDate' }}</td>
             <td class="text-end pe-4">
-              <button class="btn btn-sm btn-outline-danger rounded-circle"
-                      title="Delete User"
-                      (click)="deleteUser(user)"> 
-                <i class="bi bi-trash"></i>
-              </button>
-            </td>
-          </tr>
-
-          <tr *ngIf="filteredUsers.length === 0">
-            <td colspan="5" class="text-center py-5 text-muted">
-              <i class="bi bi-inbox fs-1 d-block mb-2"></i>
-              No users found matching your criteria.
+              <ng-container *ngIf="user.role !== 'SuperAdmin'; else lockIcon">
+                <button class="btn btn-sm btn-outline-danger border-0 rounded-circle" (click)="deleteUser(user)">
+                  <i class="bi bi-trash3-fill"></i>
+                </button>
+              </ng-container>
+              <ng-template #lockIcon>
+                <span class="badge bg-light text-muted border rounded-pill">
+                  <i class="bi bi-lock-fill me-1"></i> Protected
+                </span>
+              </ng-template>
             </td>
           </tr>
         </tbody>
