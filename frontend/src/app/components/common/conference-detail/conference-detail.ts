@@ -16,7 +16,7 @@ export class ConferenceDetail implements OnInit {
   relatedPapers: any[] = [];
   isLoading: boolean = true;
   error: string = '';
-  isConferenceClosed: boolean = false;
+  isConferenceClosed: boolean = false; //
 
   constructor(
     private route: ActivatedRoute,
@@ -36,7 +36,7 @@ export class ConferenceDetail implements OnInit {
     this.confService.getConferenceById(id).subscribe({
       next: (data) => {
         this.conference = data;
-        this.checkConferenceStatus(); // Malaysia Time Check
+        this.checkConferenceStatus(); // Logic for Malaysia Time
         this.loadConferencePapers(id);
         this.isLoading = false;
       },
@@ -48,28 +48,25 @@ export class ConferenceDetail implements OnInit {
   }
 
   /**
-   * Checks status based on Malaysia Time (UTC+8)
+   * Status check based on Malaysia Standard Time (UTC+8)
    */
   checkConferenceStatus() {
-    if (!this.conference.start_date) return;
+    if (!this.conference || !this.conference.start_date) return;
 
-    // Get current time in Malaysia (UTC+8)
     const now = new Date();
     const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
     const malaysiaTime = new Date(utc + (3600000 * 8));
+    const todayStr = malaysiaTime.toISOString().split('T')[0];
 
-    // Assuming conference.start_date is in 'YYYY-MM-DD' format
-    const confStartDate = new Date(this.conference.start_date);
-    
-    // If current Malaysia date is after the start date, we consider it "Closed" for submissions
-    this.isConferenceClosed = malaysiaTime > confStartDate;
+    // If today is after the conference start date, it is closed
+    this.isConferenceClosed = todayStr > this.conference.start_date;
   }
 
   loadConferencePapers(confId: number) {
     this.paperService.getAllPapers().subscribe({
       next: (allPapers) => {
         this.relatedPapers = allPapers.filter((p: any) => 
-          p.conferenceId === confId && (p.status === 'Registered' || p.status === 'Pending Review' || p.status === 'Accepted')
+          p.conferenceId === confId && (p.status === 'Registered' || p.status === 'Pending Review')
         );
       }
     });

@@ -1,56 +1,25 @@
-<div class="container mt-5 animate__animated animate__fadeIn">
+<div class="container mt-5">
   <div class="row justify-content-center">
     <div class="col-lg-5">
-      
       <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-        <div class="bg-dark py-3 text-center text-white">
-          <h6 class="mb-0 fw-bold ls-1 small">PAYMENT VERIFICATION</h6>
-        </div>
-        
-        <div class="card-body p-4 p-md-5">
+        <div class="bg-dark py-3 text-center text-white fw-bold">PAYMENT VERIFICATION</div>
+        <div class="card-body p-4">
           <div class="text-center mb-4" *ngIf="conference">
-            <span class="badge bg-primary-subtle text-primary rounded-pill px-3 mb-2">{{ conference.acronym }}</span>
-            <h4 class="fw-bold mb-1">Total Fee</h4>
             <h2 class="text-primary fw-bold">RM {{ amount | number:'1.2-2' }}</h2>
           </div>
-
-          <div class="bg-light rounded-4 p-3 border mb-4">
-            <label class="small text-uppercase fw-bold text-muted d-block mb-2">Malaysia Bank Transfer</label>
-            <div class="d-flex justify-content-between mb-1">
-              <span class="small">Bank:</span>
-              <span class="small fw-bold">Maybank Berhad</span>
-            </div>
-            <div class="d-flex justify-content-between mb-1">
-              <span class="small">Account Name:</span>
-              <span class="small fw-bold">CONFEASE WEBCRAFTERS</span>
-            </div>
-            <div class="d-flex justify-content-between">
-              <span class="small">Account No:</span>
-              <span class="small fw-bold text-primary">5123 4455 6677</span>
-            </div>
-          </div>
-
           <div class="mb-4">
-            <label class="form-label small fw-bold text-uppercase">Upload Receipt (PDF/JPG)</label>
-            <div class="file-drop-area border rounded-3 p-3 text-center bg-white shadow-sm">
-              <input type="file" class="form-control form-control-sm" (change)="onFileSelected($event)" accept=".pdf,image/*">
-              <p class="text-muted x-small mt-2 mb-0">Please ensure the transaction reference is visible.</p>
-            </div>
+            <label class="form-label fw-bold small text-uppercase">Upload Receipt</label>
+            <input type="file" class="form-control" (change)="onFileSelected($event)" accept=".pdf,image/*">
           </div>
-
-          <button (click)="processPayment()" 
-                  class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow transition-all hover-up" 
-                  [disabled]="isProcessing || !selectedFile">
+          <button (click)="processPayment()" class="btn btn-primary w-100 rounded-pill py-3 fw-bold" [disabled]="isProcessing || !selectedFile">
             <span *ngIf="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
-            {{ isProcessing ? 'Processing Transaction...' : 'Confirm Payment & Register' }}
+            Confirm Payment
           </button>
-
-          <button class="btn btn-link w-100 text-muted small mt-3 text-decoration-none" [routerLink]="['/dashboard/conferences']">
+          <button type="button" class="btn btn-link w-100 text-muted small mt-3 text-decoration-none" [routerLink]="['/dashboard/conferences']">
             Cancel Registration
           </button>
         </div>
       </div>
-
     </div>
   </div>
 </div>

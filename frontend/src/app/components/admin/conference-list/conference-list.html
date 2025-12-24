@@ -3,39 +3,32 @@
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
       <h2 class="fw-bold text-dark mb-0">Academic Conferences</h2>
-      <p class="text-muted small">Active conferences are shown at the top (Malaysia Time UTC+8)</p>
+      <p class="text-muted small">
+        Current Malaysia Time: <strong>{{ currentMalaysiaTime | date:'medium' }} (MYT)</strong>
+      </p>
     </div>
     <a routerLink="/dashboard/create-conference" class="btn btn-primary shadow-sm rounded-pill px-4">
-      <i class="bi bi-plus-circle me-2"></i>Create New Conference
+      <i class="bi bi-plus-circle me-2"></i>New Conference
     </a>
-  </div>
-
-  <div class="row mb-4">
-    <div class="col-md-12">
-      <div class="input-group shadow-sm rounded-pill overflow-hidden border bg-white">
-        <span class="input-group-text bg-white border-0 ps-3"><i class="bi bi-search text-muted"></i></span>
-        <input type="text" class="form-control border-0 ps-2 py-2" placeholder="Search by title, acronym or location...">
-      </div>
-    </div>
-  </div>
-
-  <div *ngIf="errorMessage" class="alert alert-danger rounded-4">
-    <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ errorMessage }}
   </div>
 
   <div *ngIf="isLoading" class="text-center py-5">
     <div class="spinner-grow text-primary" role="status"></div>
-    <p class="text-muted mt-2">Syncing with Malaysia Server...</p>
+    <p class="text-muted mt-2">Checking conference schedules...</p>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert alert-danger rounded-4 shadow-sm">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ errorMessage }}
   </div>
 
   <div class="row g-4" *ngIf="!isLoading && !errorMessage">
     <div class="col-md-4" *ngFor="let conf of conferenceList">
       <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden transition-all hover-up"
-           [ngClass]="{'opacity-75 bg-light': conf.computedStatus === 'Inactive'}">
+           [ngClass]="{'inactive-card': conf.computedStatus === 'Inactive'}">
         
         <div class="py-1" [ngClass]="conf.computedStatus === 'Active' ? 'bg-success' : 'bg-secondary'"></div>
 
-        <div class="card-body p-4">
+        <div class="card-body p-4 d-flex flex-column">
           <div class="d-flex justify-content-between align-items-start mb-3">
             <span class="badge bg-primary-subtle text-primary border rounded-pill px-3">{{ conf.acronym }}</span>
             <span class="badge rounded-pill px-3 py-2 shadow-sm" [ngClass]="getStatusClass(conf.computedStatus)">
@@ -48,7 +41,7 @@
 
           <div class="small text-muted mb-2">
             <i class="bi bi-calendar-event me-2 text-primary"></i>
-            <span class="fw-medium">{{ conf.start_date | date:'mediumDate' }}</span>
+            {{ conf.start_date | date:'longDate' }}
           </div>
 
           <div class="small text-muted mb-3">
@@ -57,14 +50,14 @@
           </div>
 
           <p class="card-text text-secondary small text-truncate-3 mb-4" style="height: 4.5em;">
-            {{ conf.description || 'No description provided for this academic event.' }}
+            {{ conf.description || 'Registration and submissions are handled via the conference dashboard.' }}
           </p>
 
           <div class="mt-auto">
             <a [routerLink]="['/dashboard/conference-detail', conf.conference_id]" 
                class="btn w-100 rounded-pill fw-bold transition-all"
                [ngClass]="conf.computedStatus === 'Active' ? 'btn-outline-primary' : 'btn-outline-secondary'">
-              {{ conf.computedStatus === 'Active' ? 'Join Conference' : 'View Summary' }}
+              {{ conf.computedStatus === 'Active' ? 'Register & Join' : 'View Archive' }}
             </a>
           </div>
         </div>
