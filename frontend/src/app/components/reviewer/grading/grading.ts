@@ -24,6 +24,14 @@ export class Grading implements OnInit {
   comments: string = '';
   recommendation: string = 'Accept';
 
+  // Criteria IDs matched with Database Initializer
+  scoreCriteria: any = {
+    originality: 0,   // ID: 1
+    relevance: 0,     // ID: 2
+    quality: 0,       // ID: 3
+    presentation: 0   // ID: 4
+  };
+
   constructor(
     private http: HttpClient,
     private route: ActivatedRoute,
@@ -55,33 +63,40 @@ export class Grading implements OnInit {
     });
   }
 
-  // Adjust criteria to 100 each for a 400 total
-  scoreCriteria: any = {
-    originality: 0,   // ID: 1
-    relevance: 0,     // ID: 2
-    quality: 0,       // ID: 3
-    presentation: 0   // ID: 4
-  };
-
   get totalScore(): number {
-    return Object.values(this.scoreCriteria).reduce((a: any, b: any) => a + b, 0) as number;
+    return Number(this.scoreCriteria.originality) + 
+           Number(this.scoreCriteria.relevance) + 
+           Number(this.scoreCriteria.quality) + 
+           Number(this.scoreCriteria.presentation);
+  }
+
+  validateScore(category: string) {
+    let value = this.scoreCriteria[category];
+    if (value > 100) {
+      this.scoreCriteria[category] = 100;
+    } else if (value < 0 || value === null) {
+      this.scoreCriteria[category] = 0;
+    }
   }
 
   submitReview() {
     if (this.totalScore === 0) return alert("Please provide scores.");
+    if (!this.comments.trim()) return alert("Please add comments.");
+
+    // REFINEMENT: Ensure reviewer_id matches the key stored in your localStorage ('userId' or 'user_id')
+    const reviewerId = this.currentUser.userId || this.currentUser.user_id;
 
     const reviewPayload = {
-      // Part 1: General Review Data
       review: {
         assignment_id: this.paperId,
-        reviewer_id: this.currentUser.user_id,
+        reviewer_id: reviewerId,
         overall_score: this.totalScore,
         comments_to_author: this.comments,
         recommendation: this.recommendation,
         round_number: 1,
-        reviewed_at: new Date()
+        // Send date as string YYYY-MM-DD to match java.sql.Date
+        due_date: new Date().toISOString().split('T')[0] 
       },
-      // Part 2: Individual Scores for the review_score table
       scores: [
         { criterion_id: 1, score: this.scoreCriteria.originality },
         { criterion_id: 2, score: this.scoreCriteria.relevance },
@@ -91,15 +106,17 @@ export class Grading implements OnInit {
     };
 
     this.isSubmitting = true;
-    // Send to a new unified endpoint
+    
     this.http.post('http://localhost:8080/api/reviews/submit-full', reviewPayload).subscribe({
       next: () => {
-        alert("✅ Review & Scores saved. Paper status updated!");
+        alert("✅ Review & Scores saved. Status updated!");
+        this.isSubmitting = false;
         this.router.navigate(['/dashboard/reviews']);
       },
       error: (err) => {
         this.isSubmitting = false;
-        console.error(err);
+        console.error('Backend Error:', err);
+        alert(`❌ Submission Failed: ${err.error?.message || 'Check backend logs'}`);
       }
     });
   }
@@ -110,25 +127,12 @@ export class Grading implements OnInit {
 
   getManuscriptUrl(fileName: string | undefined): string {
     if (!fileName) return '#';
-    // Point directly to the refined endpoint - No .split().pop() needed!
     return `http://localhost:8080/api/papers/download/${fileName}`;
   }
 
-  // Add a simple helper for the UI text
   getCleanFileName(fullPath: string | undefined): string {
     if (!fullPath) return 'Manuscript.pdf';
     const parts = fullPath.split('_');
     return parts.length > 1 ? parts.slice(1).join('_') : fullPath;
-  }
-
-  validateScore(category: string) {
-    let value = this.scoreCriteria[category];
-
-    // Logic: if input exceeds 100, reset it to 100 automatically
-    if (value > 100) {
-      this.scoreCriteria[category] = 100;
-    } else if (value < 0 || value === null) {
-      this.scoreCriteria[category] = 0;
-    }
   }
 }

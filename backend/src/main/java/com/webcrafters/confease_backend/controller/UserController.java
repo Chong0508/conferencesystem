@@ -8,6 +8,7 @@ import com.webcrafters.confease_backend.repository.ReviewerApplicationRepository
 import com.webcrafters.confease_backend.repository.RoleRepository;
 import com.webcrafters.confease_backend.repository.UserRepository;
 import com.webcrafters.confease_backend.repository.UserRoleRepository;
+import com.webcrafters.confease_backend.service.ReviewerService;
 
 // Correct Spring Framework Imports
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,9 @@ public class UserController {
 
     @Autowired
     private ReviewerApplicationRepository applicationRepository;
+
+    @Autowired
+    private ReviewerService reviewerService;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -225,44 +229,58 @@ public class UserController {
 
     @PostMapping("/applications/{appId}/process")
     @Transactional
-    public ResponseEntity<?> processApplication(
-            @PathVariable Long appId,
-            @RequestParam String status
-    ) {
-        ReviewerApplication app = applicationRepository
-                .findById(appId)
+    public ResponseEntity<?> processApplication(@PathVariable Long appId, @RequestParam String status) {
+        ReviewerApplication app = applicationRepository.findById(appId)
                 .orElseThrow(() -> new RuntimeException("Application not found"));
 
         String normalizedStatus = status.toUpperCase();
         app.setStatus(normalizedStatus);
 
-        if ("APPROVED".equals(normalizedStatus)) {
+        // 1. Setup Kuala Lumpur Time (UTC+8)
+        java.time.ZonedDateTime klNow = java.time.ZonedDateTime.now(java.time.ZoneId.of("Asia/Kuala_Lumpur"));
+        java.sql.Timestamp klTimestamp = java.sql.Timestamp.from(klNow.toInstant());
 
-            userRepository.findById(app.getUserId())
+        if ("APPROVED".equals(normalizedStatus)) {
+            User user = userRepository.findById(app.getUserId())
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             Role reviewerRole = roleRepository.findByRoleName("Reviewer");
             if (reviewerRole == null) {
-                throw new RuntimeException("Reviewer role not found");
+                throw new RuntimeException("Reviewer role not found in system");
             }
-
-            // 🔥 FIX: delete old role mapping first
+            
+            // 2. Update Role Mappings (Remove old role, assign Reviewer role)
             UserRole existingLink = userRoleRepository.findByUserId(app.getUserId());
             if (existingLink != null) {
                 userRoleRepository.delete(existingLink);
             }
 
-            // ✅ Create NEW UserRole (do NOT reuse entity)
             UserRole newLink = new UserRole();
             newLink.setUser_id(app.getUserId());
             newLink.setRole_id(reviewerRole.getRole_id());
-            newLink.setAssigned_at(new Timestamp(System.currentTimeMillis()));
-
+            newLink.setAssigned_at(klTimestamp); // ✅ KL Time
             userRoleRepository.save(newLink);
 
-            userRepository.findById(app.getUserId()).ifPresent(user -> {
-                user.setCategory("Reviewer");
-            });
+            // 3. Update User Category
+            user.setCategory("Reviewer");
+            userRepository.save(user);
+
+            // 4. Create Reviewer Entry based on your specific Reviewer Model
+            com.webcrafters.confease_backend.model.Reviewer reviewerEntry = new com.webcrafters.confease_backend.model.Reviewer();
+            
+            reviewerEntry.setUser_id(user.getUser_id());
+            
+            // Use education level or a default for expertise_area based on application data
+            reviewerEntry.setExpertise_area(app.getEducationLevel() != null ? app.getEducationLevel() : "General");
+            
+            // Set a default maximum paper limit for new reviewers
+            reviewerEntry.setMax_papers(5); 
+            
+            reviewerService.create(reviewerEntry);
+            
+            // Optional: Update application reason to include approval log
+            app.setReason(app.getReason() + " | Approved at: " + 
+                klNow.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) + " (KL)");
         }
 
         return ResponseEntity.ok(app);
