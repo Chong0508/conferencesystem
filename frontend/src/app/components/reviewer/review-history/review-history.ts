@@ -85,7 +85,10 @@ export class ReviewHistory implements OnInit {
     this.router.navigate(['/dashboard/review', paperId]);
   }
 
-  getScoreColor(score: number): string {
+  getScoreColor(score: number, recommendation?: string): string {
+    // If the paper was deleted, the score is no longer relevant
+    if (recommendation === 'Deleted by Admin') return 'text-muted opacity-50';
+    
     if (score >= 320) return 'text-success fw-bold';
     if (score >= 240) return 'text-warning fw-bold';
     return 'text-danger fw-bold';
