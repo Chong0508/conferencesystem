@@ -31,8 +31,11 @@
 
     <div class="col-lg-7">
       <div class="card border-0 shadow rounded-4">
-        <div class="card-header bg-white border-0 pt-4 px-4">
+        <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
           <h5 class="fw-bold text-primary mb-0">Evaluation Form</h5>
+          <span *ngIf="isViewOnly" class="badge bg-info-subtle text-info border border-info px-3">
+            <i class="bi bi-eye-fill me-1"></i> View Only Mode
+          </span>
         </div>
         <div class="card-body p-4">
           <form (ngSubmit)="submitReview()">
@@ -48,7 +51,7 @@
               <label class="col-6 col-form-label">Originality</label>
               <div class="col-6">
                 <input type="number" class="form-control" [(ngModel)]="scoreCriteria.originality" 
-                       (input)="validateScore('originality')" name="orig" min="0" max="100">
+                       (input)="validateScore('originality')" name="orig" [disabled]="isViewOnly">
               </div>
             </div>
 
@@ -56,7 +59,7 @@
               <label class="col-6 col-form-label">Relevance</label>
               <div class="col-6">
                 <input type="number" class="form-control" [(ngModel)]="scoreCriteria.relevance" 
-                       (input)="validateScore('relevance')" name="rel" min="0" max="100">
+                       (input)="validateScore('relevance')" name="rel" [disabled]="isViewOnly">
               </div>
             </div>
 
@@ -64,7 +67,7 @@
               <label class="col-6 col-form-label">Quality</label>
               <div class="col-6">
                 <input type="number" class="form-control" [(ngModel)]="scoreCriteria.quality" 
-                       (input)="validateScore('quality')" name="qual" min="0" max="100">
+                       (input)="validateScore('quality')" name="qual" [disabled]="isViewOnly">
               </div>
             </div>
 
@@ -72,7 +75,7 @@
               <label class="col-6 col-form-label">Presentation</label>
               <div class="col-6">
                 <input type="number" class="form-control" [(ngModel)]="scoreCriteria.presentation" 
-                       (input)="validateScore('presentation')" name="pres" min="0" max="100">
+                       (input)="validateScore('presentation')" name="pres" [disabled]="isViewOnly">
               </div>
             </div>
 
@@ -86,7 +89,7 @@
 
             <div class="mb-4">
               <label class="form-label fw-bold">Recommendation</label>
-              <select class="form-select shadow-sm" [(ngModel)]="recommendation" name="recommendation">
+              <select class="form-select shadow-sm" [(ngModel)]="recommendation" name="recommendation" [disabled]="isViewOnly">
                 <option value="Accept">Accept</option>
                 <option value="Reject">Reject</option>
                 <option value="Revision">Major Revision</option>
@@ -96,10 +99,10 @@
             <div class="mb-4">
               <label class="form-label fw-bold">Comments to Author</label>
               <textarea class="form-control shadow-sm" rows="4" [(ngModel)]="comments" 
-                        name="comments" placeholder="Describe the strengths and weaknesses..."></textarea>
+                        name="comments" [disabled]="isViewOnly"></textarea>
             </div>
 
-            <div class="d-grid">
+            <div class="d-grid" *ngIf="!isViewOnly">
               <button type="submit" class="btn btn-primary py-3 fw-bold shadow-sm" [disabled]="isSubmitting">
                 <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
                 Submit Review

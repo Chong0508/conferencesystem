@@ -29,8 +29,8 @@ export class ReviewService {
   constructor(private http: HttpClient) {}
 
   // Get reviews by reviewer id
-  getReviewsByReviewer(reviewerId: number): Observable<Review[]> {
-    return this.http.get<Review[]>(`${this.apiUrl}/reviewer/${reviewerId}`, { withCredentials: true });
+  getReviewsByReviewer(reviewerId: number): Observable<any[]> {
+    return this.http.get<any[]>(`http://localhost:8080/api/reviews/reviewer/${reviewerId}`);
   }
 
   // Get all reviews (admin)

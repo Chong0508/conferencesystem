@@ -14,22 +14,21 @@ import { HttpClient } from '@angular/common/http';
   styleUrl: './grading.css'
 })
 export class Grading implements OnInit {
-
   paperId: any;
   paper: any = null;
   currentUser: any = {};
   isSubmitting: boolean = false;
+  isViewOnly: boolean = false; // Flag to disable form if already submitted
   errorMessage: string = '';
 
   comments: string = '';
   recommendation: string = 'Accept';
 
-  // Criteria IDs matched with Database Initializer
   scoreCriteria: any = {
-    originality: 0,   // ID: 1
-    relevance: 0,     // ID: 2
-    quality: 0,       // ID: 3
-    presentation: 0   // ID: 4
+    originality: 0,
+    relevance: 0,
+    quality: 0,
+    presentation: 0
   };
 
   constructor(
@@ -42,23 +41,47 @@ export class Grading implements OnInit {
 
   ngOnInit() {
     this.paperId = this.route.snapshot.paramMap.get('id');
-
     const userJson = localStorage.getItem('loggedUser');
     if (userJson) {
       this.currentUser = JSON.parse(userJson);
     }
 
     this.loadPaper();
+    this.loadExistingReview();
   }
 
   loadPaper() {
     this.paperService.getPaperById(this.paperId).subscribe({
-      next: (paperData) => {
-        this.paper = paperData;
-      },
-      error: (err) => {
-        console.error('Error loading paper:', err);
-        this.errorMessage = 'Failed to load paper';
+      next: (paperData) => { this.paper = paperData; },
+      error: (err) => { this.errorMessage = 'Failed to load paper'; }
+    });
+  }
+
+  loadExistingReview() {
+    const reviewerId = this.currentUser.userId || this.currentUser.user_id;
+    if (!reviewerId || !this.paperId) return;
+
+    this.reviewService.getReviewsByReviewer(reviewerId).subscribe({
+      next: (reviews: any[]) => {
+        // Find the review that matches this paper ID
+        const existing = reviews.find(r => (r.assignment_id || r.assignmentId) == this.paperId);
+        
+        if (existing) {
+          this.isViewOnly = true;
+          this.comments = existing.comments_to_author;
+          this.recommendation = existing.recommendation;
+          
+          // Populate scores (assuming backend includes them or you fetch them separately)
+          // For now, we use the overall_score as a reference if breakdown isn't available
+          if (existing.scores) {
+            existing.scores.forEach((s: any) => {
+              if (s.criterion_id === 1) this.scoreCriteria.originality = s.score;
+              if (s.criterion_id === 2) this.scoreCriteria.relevance = s.score;
+              if (s.criterion_id === 3) this.scoreCriteria.quality = s.score;
+              if (s.criterion_id === 4) this.scoreCriteria.presentation = s.score;
+            });
+          }
+        }
       }
     });
   }
@@ -71,21 +94,17 @@ export class Grading implements OnInit {
   }
 
   validateScore(category: string) {
+    if (this.isViewOnly) return; 
     let value = this.scoreCriteria[category];
-    if (value > 100) {
-      this.scoreCriteria[category] = 100;
-    } else if (value < 0 || value === null) {
-      this.scoreCriteria[category] = 0;
-    }
+    if (value > 100) this.scoreCriteria[category] = 100;
+    else if (value < 0 || value === null) this.scoreCriteria[category] = 0;
   }
 
   submitReview() {
+    if (this.isViewOnly) return;
     if (this.totalScore === 0) return alert("Please provide scores.");
-    if (!this.comments.trim()) return alert("Please add comments.");
-
-    // REFINEMENT: Ensure reviewer_id matches the key stored in your localStorage ('userId' or 'user_id')
+    
     const reviewerId = this.currentUser.userId || this.currentUser.user_id;
-
     const reviewPayload = {
       review: {
         assignment_id: this.paperId,
@@ -94,7 +113,6 @@ export class Grading implements OnInit {
         comments_to_author: this.comments,
         recommendation: this.recommendation,
         round_number: 1,
-        // Send date as string YYYY-MM-DD to match java.sql.Date
         due_date: new Date().toISOString().split('T')[0] 
       },
       scores: [
@@ -106,27 +124,18 @@ export class Grading implements OnInit {
     };
 
     this.isSubmitting = true;
-    
     this.http.post('http://localhost:8080/api/reviews/submit-full', reviewPayload).subscribe({
       next: () => {
-        alert("✅ Review & Scores saved. Status updated!");
-        this.isSubmitting = false;
+        alert("✅ Review saved!");
         this.router.navigate(['/dashboard/reviews']);
       },
-      error: (err) => {
-        this.isSubmitting = false;
-        console.error('Backend Error:', err);
-        alert(`❌ Submission Failed: ${err.error?.message || 'Check backend logs'}`);
-      }
+      error: () => { this.isSubmitting = false; }
     });
   }
 
-  cancel() {
-    this.router.navigate(['/dashboard/reviews']);
-  }
+  cancel() { this.router.navigate(['/dashboard/reviews']); }
 
   getManuscriptUrl(fileName: string | undefined): string {
-    if (!fileName) return '#';
     return `http://localhost:8080/api/papers/download/${fileName}`;
   }
 
