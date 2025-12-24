@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { NotificationService, AppNotification } from '../../../services/notification.service';
-import { AuthService } from '../../../services/auth';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-notifications',
@@ -13,7 +13,6 @@ import { AuthService } from '../../../services/auth';
 })
 export class Notifications implements OnInit {
   notifications: AppNotification[] = [];
-  currentUser: any = null;
   unreadCount: number = 0;
 
   constructor(
@@ -27,61 +26,58 @@ export class Notifications implements OnInit {
   }
 
   loadData() {
-    this.currentUser = this.authService.getLoggedUser();
-    if (this.currentUser) {
-      this.notificationService.getNotifications(this.currentUser.email, this.currentUser.role)
-        .subscribe((data: AppNotification[]) => {
-          this.notifications = data;
-        });
+    const user: any = this.authService.getLoggedUser();
 
-      this.notificationService.unreadCount$.subscribe(count => {
-        this.unreadCount = count;
-      });
+    if (user) {
+      const userId = user.id || user.user_id || user.userId;
+      const role = user.role || user.category || 'Author';
+
+      console.log('Current User ID:', userId); // Debug Log
+
+      if (userId) {
+        this.notificationService.getNotifications(userId, role).subscribe({
+          next: (data) => {
+            this.notifications = data;
+          },
+          error: (err) => console.error('Failed to load notifications:', err)
+        });
+      }
+    } else {
+      console.warn('No user logged in found.');
     }
+
+    this.notificationService.unreadCount$.subscribe(count => this.unreadCount = count);
   }
 
   markAsRead(notification: AppNotification): void {
     if (!notification.read) {
-      notification.read = true; 
-      this.notificationService.markAsRead(
-        notification.id,
-        this.currentUser.email,
-        this.currentUser.role
-      );
+      notification.read = true;
+      this.notificationService.markAsRead(notification).subscribe();
     }
-
     if (notification.link) {
       this.router.navigate([notification.link]);
     }
   }
 
   markAllAsRead(): void {
-    if (this.currentUser) {
+    if (this.notifications.length > 0) {
       this.notifications.forEach(n => n.read = true);
-      this.notificationService.markAllAsRead(
-        this.currentUser.email,
-        this.currentUser.role
-      );
+
+      this.notificationService.markAllAsRead(this.notifications);
     }
   }
 
-  // UPDATED: Added Registration and Payment Types
   getIconClass(type: string): string {
     switch (type) {
-      case 'payment': return 'bi-credit-card-fill text-success';
-      case 'registration': return 'bi-person-check-fill text-primary';
       case 'success': return 'bi-check-circle-fill text-success';
       case 'warning': return 'bi-exclamation-circle-fill text-warning';
       case 'error': return 'bi-x-circle-fill text-danger';
-      default: return 'bi-bell-fill text-secondary';
+      default: return 'bi-bell-fill text-primary';
     }
   }
 
-  // UPDATED: Added Registration and Payment Backgrounds
   getBgClass(type: string): string {
     switch (type) {
-      case 'payment': return 'bg-success-subtle';
-      case 'registration': return 'bg-primary-subtle';
       case 'success': return 'bg-success-subtle';
       case 'warning': return 'bg-warning-subtle';
       case 'error': return 'bg-danger-subtle';

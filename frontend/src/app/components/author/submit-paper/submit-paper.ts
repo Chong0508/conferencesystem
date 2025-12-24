@@ -4,6 +4,8 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+// 1. Import Notification Service
+import { NotificationService } from '../../../services/notification.service';
 
 @Component({
   selector: 'app-submit-paper',
@@ -15,15 +17,15 @@ import { AuthService } from '../../../services/auth.service';
 export class SubmitPaper implements OnInit {
   isEditMode: boolean = false;
   editPaperId: number | null = null;
-  
+
   tracks: any[] = [];
-  conferences: any[] = []; 
-  
+  conferences: any[] = [];
+
   paperObj: any = {
     title: '',
     abstract: '',
     trackId: '',
-    conferenceId: '', 
+    conferenceId: '',
     keywords: '',
     fileName: ''
   };
@@ -35,7 +37,9 @@ export class SubmitPaper implements OnInit {
     private route: ActivatedRoute,
     private http: HttpClient,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    // 2. Inject Notification Service
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit() {
@@ -43,7 +47,6 @@ export class SubmitPaper implements OnInit {
     this.loadConferences();
 
     this.route.queryParams.subscribe(params => {
-      // Auto-select conference if the user clicked 'Submit' from a specific conference page
       if (params['confId']) {
         this.paperObj.conferenceId = Number(params['confId']);
       }
@@ -65,14 +68,14 @@ export class SubmitPaper implements OnInit {
   }
 
   loadPaperData(id: number) {
-    this.http.get<any>(`http://localhost:8080/api/papers/${id}`).subscribe(res => { 
+    this.http.get<any>(`http://localhost:8080/api/papers/${id}`).subscribe(res => {
       this.paperObj = {
         title: res.title,
         abstract: res.abstractText,
         trackId: res.trackId,
         conferenceId: res.conferenceId,
         keywords: res.keywords ? res.keywords.join(', ') : '',
-        fileName: res.submissionFile 
+        fileName: res.submissionFile
       };
     });
   }
@@ -80,57 +83,84 @@ export class SubmitPaper implements OnInit {
   onFileSelected(event: any) {
     const file = event.target.files?.[0];
     if (file) {
-      this.selectedFile = file; 
+      this.selectedFile = file;
       this.paperObj.fileName = file.name;
     }
   }
 
   onSubmit() {
-    const user = this.authService.getCurrentUser();
-    const finalUserId = user?.userId || user?.user_id || user?.id;
+      const user = this.authService.getCurrentUser();
+      console.log("🔍 DEBUG: Full User Object:", user);
 
-    if (!this.paperObj.conferenceId) {
-      alert("Please select a conference to participate in.");
-      return;
-    }
+      const finalUserId = user?.userId || user?.user_id || user?.id;
+      console.log("🔍 DEBUG: Detected User ID:", finalUserId);
 
-    const paperData = {
-      paperId: this.editPaperId,
-      conferenceId: Number(this.paperObj.conferenceId), 
-      trackId: Number(this.paperObj.trackId),
-      title: this.paperObj.title,
-      abstract: this.paperObj.abstract,
-      authorId: Number(finalUserId),
-      keywords: this.paperObj.keywords ? this.paperObj.keywords.split(',').map((k: any) => k.trim()) : [],
-      status: 'Pending Review' 
-    };
-
-    const formData = new FormData();
-    formData.append('paperData', new Blob([JSON.stringify(paperData)], { type: 'application/json' }));
-    
-    if (this.selectedFile) {
-      formData.append('file', this.selectedFile);
-    } else if (!this.isEditMode) {
-      alert('Please upload your manuscript.');
-      return;
-    }
-
-    this.isLoading = true;
-    const request = this.isEditMode 
-      ? this.http.put(`http://localhost:8080/api/papers/${this.editPaperId}`, formData)
-      : this.http.post('http://localhost:8080/api/papers', formData);
-
-    request.subscribe({
-      next: () => {
-        this.isLoading = false;
-        alert('Paper submitted successfully for review!');
-        this.router.navigate(['/dashboard/my-submissions']);
-      },
-      error: (err) => {
-        this.isLoading = false;
-        console.error('Submission Error:', err);
+      if (!this.paperObj.conferenceId) {
+        alert("Please select a conference to participate in.");
+        return;
       }
-    });
+
+      const authorIdToSend = finalUserId ? Number(finalUserId) : null;
+
+      const paperData = {
+        paperId: this.editPaperId,
+        conferenceId: Number(this.paperObj.conferenceId),
+        trackId: Number(this.paperObj.trackId),
+        title: this.paperObj.title,
+        abstract: this.paperObj.abstract,
+        authorId: authorIdToSend,
+        keywords: this.paperObj.keywords ? this.paperObj.keywords.split(',').map((k: any) => k.trim()) : [],
+        status: 'Pending Review'
+      };
+
+      const formData = new FormData();
+      formData.append('paperData', new Blob([JSON.stringify(paperData)], { type: 'application/json' }));
+
+      if (this.selectedFile) {
+        formData.append('file', this.selectedFile);
+      } else if (!this.isEditMode) {
+        alert('Please upload your manuscript.');
+        return;
+      }
+
+      this.isLoading = true;
+      const request = this.isEditMode
+        ? this.http.put(`http://localhost:8080/api/papers/${this.editPaperId}`, formData)
+        : this.http.post('http://localhost:8080/api/papers', formData);
+
+      request.subscribe({
+        next: (res) => {
+          console.log("✅ DEBUG: Paper Submission Successful", res);
+          this.isLoading = false;
+
+          // ============================================================
+          // TRIGGER NOTIFICATION DEBUGGING
+          // ============================================================
+          if (finalUserId) {
+            console.log("🚀 DEBUG: Attempting to send notification...");
+            const msg = this.isEditMode
+              ? `Paper "${this.paperObj.title}" updated successfully.`
+              : `Paper "${this.paperObj.title}" submitted successfully.`;
+
+            // Call the service
+            this.notificationService.createNotification(
+              Number(finalUserId),
+              msg,
+              'success'
+            );
+          } else {
+            console.error("❌ DEBUG: Notification SKIPPED because User ID is missing!");
+          }
+
+          alert('Paper submitted successfully for review!');
+          this.router.navigate(['/dashboard/my-submissions']);
+        },
+        error: (err) => {
+          this.isLoading = false;
+          console.error('❌ DEBUG: Submission Failed:', err);
+        }
+      });
+
   }
 
   resetForm() {
