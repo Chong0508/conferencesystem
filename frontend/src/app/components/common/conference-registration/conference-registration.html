@@ -1,74 +1,32 @@
 <div class="container mt-5 animate__animated animate__fadeIn">
   <div class="row justify-content-center">
     <div class="col-lg-6">
-      
       <button class="btn btn-link text-decoration-none text-muted mb-3 p-0" [routerLink]="['/dashboard/conference-detail', registrationData.conference_id]">
-        <i class="bi bi-arrow-left me-1"></i> Back to Conference
+        <i class="bi bi-arrow-left me-1"></i> Back to Details
       </button>
 
-      <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-        <div class="bg-primary py-3 text-center text-white fw-bold">
-          CONFERENCE REGISTRATION
-        </div>
-        
-        <div class="card-body p-4 p-md-5" *ngIf="conference">
-          <div class="text-center mb-4">
-            <span class="badge bg-primary-subtle text-primary mb-2">{{ conference.acronym }}</span>
-            <h3 class="fw-bold">{{ conference.title }}</h3>
-            <p class="text-muted small"><i class="bi bi-geo-alt me-1"></i>{{ conference.location }}</p>
-          </div>
-
+      <div class="card border-0 shadow-lg rounded-4">
+        <div class="bg-primary py-3 text-center text-white fw-bold">CONFERENCE REGISTRATION</div>
+        <div class="card-body p-4 p-md-5" *ngIf="!isLoading && conference">
           <form (ngSubmit)="onSubmit()">
+            <div class="mb-4 text-center">
+              <span class="badge bg-primary-subtle text-primary mb-2">{{ conference.acronym }}</span>
+              <h3 class="fw-bold">{{ conference.title }}</h3>
+            </div>
+
             <div class="mb-4">
-              <label class="form-label fw-bold small text-uppercase ls-1">Select Registration Type</label>
-              <select class="form-select form-select-lg rounded-3" [(ngModel)]="registrationData.registration_type" name="type">
-                <option value="Listener">Listener (General Entry)</option>
-                <option value="Presenter">Presenter (Author)</option>
-                <option value="Student">Student (Discounted)</option>
-                <option value="Virtual">Virtual Attendee</option>
+              <label class="form-label fw-bold small text-uppercase">Registration Type</label>
+              <select class="form-select form-select-lg" [(ngModel)]="registrationData.registration_type" name="type">
+                <option value="Listener">Listener</option>
+                <option value="Presenter">Presenter</option>
+                <option value="Student">Student</option>
               </select>
             </div>
 
-            <div class="p-3 rounded-4 mb-4" [ngClass]="registrationData.early_bird ? 'bg-success-subtle border border-success' : 'bg-light'">
-              <div class="d-flex align-items-center">
-                <i class="bi" [ngClass]="registrationData.early_bird ? 'bi-patch-check-fill text-success' : 'bi-info-circle text-muted'"></i>
-                <div class="ms-3">
-                  <h6 class="mb-0 fw-bold">{{ registrationData.early_bird ? 'Early Bird Active' : 'Standard Rate' }}</h6>
-                  <small class="text-muted">Prices are adjusted automatically based on Malaysia Time.</small>
-                </div>
-              </div>
-            </div>
-
-            <div class="bg-light rounded-4 p-3 mb-4">
-              <div class="d-flex justify-content-between mb-2">
-                <span class="text-muted">Category</span>
-                <span class="fw-bold">{{ registrationData.registration_type }}</span>
-              </div>
-              <div class="d-flex justify-content-between mb-2">
-                <span class="text-muted">Payment Status</span>
-                <span class="badge bg-warning text-dark">{{ registrationData.payment_status }}</span>
-              </div>
-              <hr>
-              <div class="d-flex justify-content-between">
-                <span class="fw-bold">Final Status</span>
-                <span class="text-primary fw-bold">PENDING APPROVAL</span>
-              </div>
-            </div>
-
-            <button type="submit" class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow transition-all hover-up" [disabled]="isSubmitting">
-              <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
-              Confirm & Register
+            <button type="submit" class="btn btn-primary w-100 rounded-pill py-3 fw-bold">
+              Proceed to Payment
             </button>
-            
-            <p class="text-center text-muted x-small mt-3">
-              By clicking confirm, you agree to the conference participation terms and conditions.
-            </p>
           </form>
-        </div>
-
-        <div class="card-body py-5 text-center" *ngIf="isLoading">
-          <div class="spinner-grow text-primary" role="status"></div>
-          <p class="text-muted mt-2">Preparing your registration...</p>
         </div>
       </div>
     </div>

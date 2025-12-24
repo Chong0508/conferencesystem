@@ -21,7 +21,7 @@ import { Grading } from './components/reviewer/grading/grading';
 import { ReviewHistory } from './components/reviewer/review-history/review-history';
 
 // 5. Admin Features
-import { ConferenceList } from './components/admin/conference-list/conference-list';
+import { ConferenceList } from './components/common/conference-list/conference-list';
 import { CreateConference } from './components/admin/create-conference/create-conference';
 import { ManageTracks } from './components/admin/manage-tracks/manage-tracks';
 import { PaperMaster } from './components/admin/paper-master/paper-master';
@@ -41,6 +41,7 @@ import { ApplyReviewerComponent } from './components/author/apply-reviewer/apply
 import { CreateAdminComponent } from './components/admin/create-admin/create-admin';
 import { SearchPapers } from './components/common/search-papers/search-papers';
 import { ConferenceRegistration } from './components/common/conference-registration/conference-registration';
+import { ConferencePayment } from './components/common/conference-payment/conference-payment';
 
 
 export const routes: Routes = [
@@ -62,6 +63,7 @@ export const routes: Routes = [
       { path: 'create-admin', component: CreateAdminComponent },
       { path: 'searchPapers', component: SearchPapers },
       { path: 'conference-registration/:id', component: ConferenceRegistration },
+      { path: 'conference-payment', component: ConferencePayment },
 
       // 3. Author Routes
       { path: 'submit-paper', component: SubmitPaper },

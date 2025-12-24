@@ -27,6 +27,14 @@
         </a>
       </li>
 
+      <ng-container *ngIf="loggedUser?.role === 'Reviewer' || loggedUser?.role === 'Author'">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/dashboard/conferences" routerLinkActive="active">
+            <i class="bi bi-calendar-event me-2"></i> Search Conferences
+          </a>
+        </li>
+      </ng-container>
+
       <ng-container *ngIf="loggedUser.role === 'Super Admin'">
         <li class="nav-item">
           <p class="text-muted small ms-3 mt-3 mb-2 fw-bold">SYSTEM CONTROL</p>
@@ -72,12 +80,6 @@
         <li class="nav-item">
           <a class="nav-link" routerLink="/dashboard/applications" routerLinkActive="active">
             <i class="bi bi-person-lines-fill me-2"></i> Reviewer Application
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/dashboard/schedule" routerLinkActive="active">
-            <i class="bi bi-clock-history me-2"></i> Schedule & Sessions
           </a>
         </li>
 

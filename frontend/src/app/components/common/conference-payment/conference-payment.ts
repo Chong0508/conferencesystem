@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute, RouterLink } from '@angular/router'; //
+import { Router, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../../services/auth.service';
 import { NotificationService } from '../../../services/notification.service';
@@ -9,14 +9,13 @@ import { NotificationService } from '../../../services/notification.service';
 @Component({
   selector: 'app-conference-payment',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink], // Fixed NG8002 error
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './conference-payment.html',
   styleUrl: './conference-payment.css'
 })
 export class ConferencePayment implements OnInit {
   registrationData: any;
-  conference: any;
-  selectedFile: File | null = null;
+  conferenceAcronym: string = '';
   isProcessing: boolean = false;
   amount: number = 250.00;
 
@@ -28,6 +27,7 @@ export class ConferencePayment implements OnInit {
   ) {
     const navigation = this.router.getCurrentNavigation();
     this.registrationData = navigation?.extras.state?.['data'];
+    this.conferenceAcronym = navigation?.extras.state?.['conferenceAcronym'];
   }
 
   ngOnInit(): void {
@@ -35,45 +35,51 @@ export class ConferencePayment implements OnInit {
       this.router.navigate(['/dashboard/conferences']);
       return;
     }
-    this.loadConference();
-  }
 
-  loadConference() {
-    this.http.get<any>(`http://localhost:8080/api/conferences/${this.registrationData.conference_id}`)
-      .subscribe(res => this.conference = res);
-  }
+    // 1. Get the user object from AuthService/LocalStorage
+    const user = this.authService.getLoggedUser();
+    
+    // 2. Map 'userId' from LocalStorage to 'user_id' for the Java Backend
+    if (user && user.userId) {
+      this.registrationData.user_id = user.userId; // Matches your localStorage key
+    } else if (user && user.user_id) {
+      this.registrationData.user_id = user.user_id;
+    }
 
-  onFileSelected(event: any) {
-    this.selectedFile = event.target.files[0];
+    console.log('Final Registration Data for Backend:', this.registrationData);
   }
 
   processPayment() {
-    if (!this.selectedFile) return alert("Please upload a receipt.");
+    if (!this.registrationData.user_id) {
+      alert("Error: User session not found. Please log in again.");
+      return;
+    }
+
     this.isProcessing = true;
 
-    this.http.post<any>('http://localhost:8080/api/registrations', this.registrationData).subscribe({
-      next: (reg) => {
-        const paymentData = {
-          registration_id: reg.registration_id,
-          amount: this.amount,
-          currency: 'MYR',
-          status: 'Completed',
-          receipt_file: this.selectedFile?.name 
-        };
+    // 3. Finalize data before sending to Java Registration model
+    this.registrationData.payment_status = 'Approved'; // Update status
+    this.registrationData.registered_at = new Date().toISOString(); // Timestamp for Java
 
-        this.http.post('http://localhost:8080/api/payments', paymentData).subscribe({
-          next: () => {
-            const user = this.authService.getLoggedUser();
-            this.notificationService.addNotification({
-              title: 'Payment Successful',
-              message: `Your payment for ${this.conference?.acronym} was received.`,
-              type: 'success',
-              recipientEmail: user.email,
-            });
-            this.isProcessing = false;
-            this.router.navigate(['/dashboard/conferences']);
-          }
+    // 4. Atomic Save: Only saves to DB now
+    this.http.post<any>('http://localhost:8080/api/registrations', this.registrationData).subscribe({
+      next: (res) => {
+        const user = this.authService.getLoggedUser();
+        
+        this.notificationService.addNotification({
+          title: 'Registration Successful',
+          message: `Your registration for ${this.conferenceAcronym} is now Approved.`,
+          type: 'success',
+          recipientEmail: user.email || 'user@example.com'
         });
+
+        this.isProcessing = false;
+        this.router.navigate(['/dashboard/conferences']);
+      },
+      error: (err) => {
+        this.isProcessing = false;
+        console.error("Backend Error:", err);
+        alert("Failed to save registration. Check if user_id " + this.registrationData.user_id + " exists in the user table.");
       }
     });
   }
