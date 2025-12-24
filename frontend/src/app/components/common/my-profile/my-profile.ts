@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router'; // 1. Import Router
+import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../../services/auth.service';
 
 @Component({
@@ -16,28 +17,56 @@ export class MyProfile implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private router: Router // 2. Inject Router
+    private router: Router,
+    private http: HttpClient
   ) {}
 
   ngOnInit() {
     this.loadUserProfile();
   }
 
+  // Function to combine names for display
+  getFullName(): string {
+    if (!this.loggedUser) return 'N/A';
+    const first = this.loggedUser.firstName || '';
+    const last = this.loggedUser.lastName || '';
+    const combined = `${first} ${last}`.trim();
+    return combined.length > 0 ? combined : 'N/A';
+  }
+
   loadUserProfile() {
     this.isLoading = true;
-    const user = this.authService.getLoggedUser();
-    if (user) {
-      this.loggedUser = user;
-      console.log('Profile loaded:', this.loggedUser);
+    const sessionUser = this.authService.getLoggedUser();
+    
+    // User ID logic remains unchanged as requested
+    if (sessionUser && sessionUser.userId) {
+      this.http.get<any>(`http://localhost:8080/users/${sessionUser.userId}`).subscribe({
+        next: (fullUser) => {
+          this.loggedUser = {
+            // Mapping keys to match what getFullName() expects
+            firstName: fullUser.firstName || fullUser.first_name || '',
+            lastName: fullUser.lastName || fullUser.last_name || '',
+            email: fullUser.email,
+            role: fullUser.role || fullUser.category,
+            userId: fullUser.userId || fullUser.user_id // Preserving ID logic
+          };
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Could not fetch full profile', err);
+          this.loggedUser = sessionUser;
+          this.isLoading = false;
+        }
+      });
+    } else {
+      this.isLoading = false;
     }
-    this.isLoading = false;
   }
 
   applyForReviewer() {
-    if (this.loggedUser?.role === 'Reviewer' ||
-      this.loggedUser?.role === 'Admin' ||
-      this.loggedUser?.role === 'Super Admin') {
-      alert('You already have Reviewer or Admin privileges!');
+    const role = this.loggedUser?.role;
+    if (role === 'Reviewer' || role === 'Admin' || role === 'Super Admin') {
+      alert('You already have advanced privileges!');
       return;
     }
     this.router.navigate(['/dashboard/apply-reviewer']);

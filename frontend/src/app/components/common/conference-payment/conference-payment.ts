@@ -35,51 +35,50 @@ export class ConferencePayment implements OnInit {
       this.router.navigate(['/dashboard/conferences']);
       return;
     }
-
-    // 1. Get the user object from AuthService/LocalStorage
     const user = this.authService.getLoggedUser();
-    
-    // 2. Map 'userId' from LocalStorage to 'user_id' for the Java Backend
-    if (user && user.userId) {
-      this.registrationData.user_id = user.userId; // Matches your localStorage key
-    } else if (user && user.user_id) {
-      this.registrationData.user_id = user.user_id;
+    if (user) {
+      this.registrationData.user_id = user.userId || user.user_id;
     }
-
-    console.log('Final Registration Data for Backend:', this.registrationData);
   }
 
   processPayment() {
     if (!this.registrationData.user_id) {
-      alert("Error: User session not found. Please log in again.");
+      alert("Error: User session not found.");
       return;
     }
 
     this.isProcessing = true;
 
-    // 3. Finalize data before sending to Java Registration model
-    this.registrationData.payment_status = 'Approved'; // Update status
-    this.registrationData.registered_at = new Date().toISOString(); // Timestamp for Java
+    // Finalize data for Database
+    this.registrationData.payment_status = 'Approved';
+    this.registrationData.registered_at = new Date().toISOString();
 
-    // 4. Atomic Save: Only saves to DB now
+    // STEP 1: Save to Database
     this.http.post<any>('http://localhost:8080/api/registrations', this.registrationData).subscribe({
       next: (res) => {
-        const user = this.authService.getLoggedUser();
-        
-        this.notificationService.addNotification({
-          title: 'Registration Successful',
-          message: `Your registration for ${this.conferenceAcronym} is now Approved.`,
-          type: 'success',
-          recipientEmail: user.email || 'user@example.com'
-        });
+        // STEP 2: Call Notification Service Safely
+        // We wrap this in try-catch so if the service crashes, the navigation still works
+        try {
+          const user = this.authService.getLoggedUser();
+          this.notificationService.addNotification({
+            title: 'Registration Finalized',
+            message: `You are now successfully registered for ${this.conferenceAcronym}.`,
+            type: 'success',
+            recipientEmail: user?.email
+          });
+        } catch (error) {
+          console.warn("Notification Service failed, but registration was saved:", error);
+        }
 
-        this.isProcessing = false;
-        this.router.navigate(['/dashboard/conferences']);
+        // STEP 3: Navigate and Stop Loading
+        this.router.navigate(['/dashboard/conferences']).then(() => {
+          this.isProcessing = false;
+        });
       },
       error: (err) => {
         this.isProcessing = false;
         console.error("Backend Error:", err);
-        alert("Failed to save registration. Check if user_id " + this.registrationData.user_id + " exists in the user table.");
+        alert("Payment confirmation failed. Data not saved.");
       }
     });
   }

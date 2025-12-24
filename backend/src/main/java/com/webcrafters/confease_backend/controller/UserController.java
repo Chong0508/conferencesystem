@@ -121,6 +121,8 @@ public class UserController {
         Map<String, Object> userData = new HashMap<>();
         userData.put("userId", user.getUser_id());
         userData.put("firstName", user.getFirst_name());
+        userData.put("lastName", user.getLast_name()); 
+        userData.put("email", user.getEmail());
         userData.put("role", user.getCategory());
         
         return ResponseEntity.ok(Map.of("message", "Login successful", "user", userData));
@@ -192,7 +194,7 @@ public class UserController {
         }
 
         // Create new admin user
-        user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
+        user.setPassword_hash(new BCryptPasswordEncoder().encode(user.getPassword_hash()));
         user.setCategory("Admin");
         user.setCreated_at(new Timestamp(System.currentTimeMillis()));
         User savedUser = userRepository.save(user);
