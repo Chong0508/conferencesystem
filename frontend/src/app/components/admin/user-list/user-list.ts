@@ -42,23 +42,21 @@ export class UserListComponent implements OnInit {
 
     this.userService.getAllUsers().subscribe({
       next: (data: any[]) => {
-        this.users = data.map((u: any) => ({
-          // Ensure keys match exactly what your Java Entity/DTO returns
-          id: u.user_id || u.id, 
-          firstName: u.first_name || u.firstName, 
-          lastName: u.last_name || u.lastName,
-          email: u.email,
-          // Check for 'category' or 'role' depending on your Java model
-          role: u.category || u.role || 'Author', 
-          joinDate: u.created_at || u.createdAt
+        this.users = (data || []).map((u: any) => ({
+          id: u.user_id || u.id,
+          firstName: u.first_name || u.firstName || '',
+          lastName: u.last_name || u.lastName || '',
+          email: u.email || '',
+          role: u.category || u.role || 'Author',
+          joinDate: u.created_at || u.createdAt || new Date()
         }));
         this.filteredUsers = [...this.users];
         this.isLoading = false;
-        console.log('✅ Users processed:', this.users);
+        console.log('Users loaded:', this.users);
       },
       error: (err) => {
-        console.error('❌ Error loading users:', err);
-        this.errorMessage = 'Failed to load users. Is the backend running?';
+        console.error('Error loading users:', err);
+        this.errorMessage = 'Failed to load users';
         this.isLoading = false;
       }
     });
@@ -104,7 +102,7 @@ export class UserListComponent implements OnInit {
       this.userService.deleteUser(userId!).subscribe({
         next: (response) => {
           alert('User deleted successfully.');
-          this.loadUsers(); 
+          this.loadUsers();
         },
         error: (err) => {
           console.error('❌ Delete failed:', err);
