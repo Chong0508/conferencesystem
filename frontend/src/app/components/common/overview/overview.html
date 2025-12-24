@@ -114,7 +114,6 @@
     </div>
   </div>
 
-
   <div *ngIf="loggedUser.role === 'Author' || loggedUser.role === 'Reviewer'">
     <div class="row g-4 mb-4">
       <div class="col-md-6">
@@ -142,20 +141,28 @@
     </div>
   </div>
 
-
   <div *ngIf="loggedUser.role === 'Reviewer'">
-    <div class="row g-4">
-      <div class="col-md-4">
-        <div class="card border-0 shadow-sm rounded-4 p-4">
-          <h5 class="text-muted mb-2">Pending Reviews</h5>
-          <h2 class="fw-bold text-warning">{{ stats.pendingReviews }}</h2>
+    <div class="row g-4 mb-4">
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 bg-warning text-white p-4 h-100">
+          <h3><i class="bi bi-info-circle me-2"></i>Reviewer Guidelines</h3>
+          <p>Please complete all assigned reviews before the deadline. Ensure your comments are constructive.</p>
+          <button class="btn btn-light text-warning fw-bold mt-auto" style="width: fit-content;" routerLink="/dashboard/reviews">
+            Go to Reviews
+          </button>
         </div>
       </div>
-      <div class="col-md-8">
-        <div class="card border-0 shadow-sm rounded-4 p-4 bg-light">
-          <h5><i class="bi bi-info-circle me-2"></i>Reviewer Guidelines</h5>
-          <p class="small text-muted mb-0">Please complete all assigned reviews before the deadline. Ensure your comments are constructive.</p>
-          <button class="btn btn-primary btn-sm mt-3" routerLink="/dashboard/reviews">Go to Reviews</button>
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+          <div class="d-flex align-items-center">
+            <div class="icon-box bg-light text-warning rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+              <i class="bi bi-file-earmark-text fs-3"></i>
+            </div>
+            <div>
+              <h2 class="fw-bold mb-0">{{ stats.pendingReviews }}</h2>
+              <p class="text-muted mb-0">Pending Reviews</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

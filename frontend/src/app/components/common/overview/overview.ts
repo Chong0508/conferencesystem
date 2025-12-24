@@ -83,5 +83,31 @@ export class OverviewComponent implements OnInit {
           error: () => this.recentLogs = []
         });
       }
+
+    // ===== AUTHOR =====
+         if (this.loggedUser.role?.toLowerCase() === 'author') {
+            const authorId = this.loggedUser.user_id ?? this.loggedUser.id;
+
+            this.paperService.getPapersByAuthor(authorId).subscribe({
+              next: papers => {
+                this.stats.mySubmissions = papers.length;
+              },
+              error: () => this.stats.mySubmissions = 0
+            });
+          }
+
+          // ===== REVIEWER =====
+          if (this.loggedUser.role === 'Reviewer') {
+            this.reviewService.getReviewsByReviewer(this.loggedUser.id).subscribe({
+              next: (reviews: any[]) => {
+                this.stats.pendingReviews = reviews.filter(
+                  r => r['overallScore'] == null
+                ).length;
+              },
+              error: () => this.stats.pendingReviews = 0
+            });
+          }
+
+        
     }
   }
