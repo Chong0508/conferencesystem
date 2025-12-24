@@ -44,12 +44,12 @@ export class UserListComponent implements OnInit {
       next: (data: any[]) => {
         this.users = data.map((u: any) => ({
           // Ensure keys match exactly what your Java Entity/DTO returns
-          id: u.user_id || u.id, 
-          firstName: u.first_name || u.firstName, 
+          id: u.user_id || u.id,
+          firstName: u.first_name || u.firstName,
           lastName: u.last_name || u.lastName,
           email: u.email,
           // Check for 'category' or 'role' depending on your Java model
-          role: u.category || u.role || 'Author', 
+          role: u.category || u.role || 'Author',
           joinDate: u.created_at || u.createdAt
         }));
         this.filteredUsers = [...this.users];
@@ -104,7 +104,7 @@ export class UserListComponent implements OnInit {
       this.userService.deleteUser(userId!).subscribe({
         next: (response) => {
           alert('User deleted successfully.');
-          this.loadUsers(); 
+          this.loadUsers();
         },
         error: (err) => {
           console.error('❌ Delete failed:', err);

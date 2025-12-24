@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
-// 1. Import Notification Service
 import { NotificationService } from '../../../services/notification.service';
 
 @Component({
@@ -38,7 +37,6 @@ export class SubmitPaper implements OnInit {
     private http: HttpClient,
     private router: Router,
     private authService: AuthService,
-    // 2. Inject Notification Service
     private notificationService: NotificationService
   ) {}
 
@@ -90,10 +88,7 @@ export class SubmitPaper implements OnInit {
 
   onSubmit() {
       const user = this.authService.getCurrentUser();
-      console.log("🔍 DEBUG: Full User Object:", user);
-
       const finalUserId = user?.userId || user?.user_id || user?.id;
-      console.log("🔍 DEBUG: Detected User ID:", finalUserId);
 
       if (!this.paperObj.conferenceId) {
         alert("Please select a conference to participate in.");
@@ -130,26 +125,19 @@ export class SubmitPaper implements OnInit {
 
       request.subscribe({
         next: (res) => {
-          console.log("✅ DEBUG: Paper Submission Successful", res);
           this.isLoading = false;
 
-          // ============================================================
-          // TRIGGER NOTIFICATION DEBUGGING
-          // ============================================================
+          // TRIGGER NOTIFICATION (SUBMIT/UPDATE)
           if (finalUserId) {
-            console.log("🚀 DEBUG: Attempting to send notification...");
             const msg = this.isEditMode
               ? `Paper "${this.paperObj.title}" updated successfully.`
               : `Paper "${this.paperObj.title}" submitted successfully.`;
 
-            // Call the service
             this.notificationService.createNotification(
               Number(finalUserId),
               msg,
               'success'
             );
-          } else {
-            console.error("❌ DEBUG: Notification SKIPPED because User ID is missing!");
           }
 
           alert('Paper submitted successfully for review!');
@@ -157,10 +145,46 @@ export class SubmitPaper implements OnInit {
         },
         error: (err) => {
           this.isLoading = false;
-          console.error('❌ DEBUG: Submission Failed:', err);
+          console.error('Submission Failed:', err);
         }
       });
+  }
 
+
+  // Delete Paper Method with Notification==
+  deletePaper() {
+    if (!this.editPaperId) return;
+
+    if (confirm('Are you sure you want to delete this submission? This action cannot be undone.')) {
+      this.isLoading = true;
+
+      this.http.delete(`http://localhost:8080/api/papers/${this.editPaperId}`).subscribe({
+        next: () => {
+          this.isLoading = false;
+
+          // 1. Get User ID to notify
+          const user = this.authService.getCurrentUser();
+          const finalUserId = user?.userId || user?.user_id || user?.id;
+
+          // 2. TRIGGER NOTIFICATION (DELETE)
+          if (finalUserId) {
+            this.notificationService.createNotification(
+              Number(finalUserId),
+              `Submission "${this.paperObj.title}" has been deleted.`,
+              'warning' // Use 'warning' type for deletions
+            );
+          }
+
+          alert('Submission deleted successfully.');
+          this.router.navigate(['/dashboard/my-submissions']);
+        },
+        error: (err) => {
+          this.isLoading = false;
+          console.error('Delete Failed:', err);
+          alert('Failed to delete submission.');
+        }
+      });
+    }
   }
 
   resetForm() {
