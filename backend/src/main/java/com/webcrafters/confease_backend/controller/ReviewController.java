@@ -92,17 +92,35 @@ public class ReviewController {
     }
 
     @PostMapping("/submit-full")
-    @Transactional // Ensures atomicity: all 3 tables update or none do
+    @Transactional 
     public ResponseEntity<?> submitFullReview(@RequestBody Map<String, Object> payload) {
         try {
             ObjectMapper mapper = new ObjectMapper();
-            mapper.findAndRegisterModules(); // For Date handling
+            mapper.findAndRegisterModules(); 
 
-            // 1. Save the Review
+            // 1. Setup KL Time (Asia/Kuala_Lumpur)
+            java.time.ZonedDateTime klTime = java.time.ZonedDateTime.now(java.time.ZoneId.of("Asia/Kuala_Lumpur"));
+            java.sql.Timestamp klTimestamp = java.sql.Timestamp.from(klTime.toInstant());
+
+            // 2. Map and Save the Review
             Review review = mapper.convertValue(payload.get("review"), Review.class);
+            
+            // Explicitly ensure the timestamp and metadata are locked in
+            review.setReviewed_at(klTimestamp); 
+            
+            // Logic to ensure reviewer_id is present (comes from payload.review.reviewer_id)
+            if (review.getReviewer_id() == null) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Reviewer ID is required."));
+            }
+
+            // Handle attachment if sent
+            if (payload.containsKey("attachment")) {
+                review.setAttachment((String) payload.get("attachment"));
+            }
+
             Review savedReview = reviewRepository.save(review);
 
-            // 2. Save the Review Scores (linking to the new review_id)
+            // 3. Save individual scores to review_score table
             @SuppressWarnings("unchecked")
             List<Map<String, Object>> scoresData = (List<Map<String, Object>>) payload.get("scores");
             for (Map<String, Object> s : scoresData) {
@@ -113,32 +131,24 @@ public class ReviewController {
                 reviewScoreService.create(rs);
             }
 
-            // 3. Update Paper Status based on Recommendation
+            // 4. Update Paper Status based on Recommendation
             paperRepository.findById(savedReview.getAssignment_id()).ifPresent(paper -> {
                 String recommendation = savedReview.getRecommendation();
-                String newStatus;
+                String newStatus = "Reviewed"; 
 
-                // Mapping logic based on your requirement
-                if ("Accept".equalsIgnoreCase(recommendation)) {
-                    newStatus = "Accepted";
-                } else if ("Reject".equalsIgnoreCase(recommendation)) {
-                    newStatus = "Rejected";
-                } else if ("Revision".equalsIgnoreCase(recommendation)) {
-                    newStatus = "Revised";
-                } else {
-                    newStatus = "Reviewed"; // Fallback default
-                }
+                if ("Accept".equalsIgnoreCase(recommendation)) newStatus = "Accepted";
+                else if ("Reject".equalsIgnoreCase(recommendation)) newStatus = "Rejected";
+                else if ("Revision".equalsIgnoreCase(recommendation)) newStatus = "Revised";
 
                 paper.setStatus(newStatus); 
                 paperRepository.save(paper);
             });
 
             return ResponseEntity.ok(Map.of(
-                "message", "Full review processed successfully",
-                "status", "Success"
+                "message", "Review submitted successfully by Reviewer #" + savedReview.getReviewer_id(),
+                "time", klTimestamp.toString()
             ));
         } catch (Exception e) {
-            e.printStackTrace();
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }

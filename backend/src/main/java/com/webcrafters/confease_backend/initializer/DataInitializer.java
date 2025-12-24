@@ -26,7 +26,10 @@ public class DataInitializer implements CommandLineRunner {
     private UserRoleRepository userRoleRepository;
 
     @Autowired
-    private ScoreCriterionRepository scoreCriterionRepository; // Ensure you create this Repository
+    private ScoreCriterionRepository scoreCriterionRepository;
+
+    @Autowired
+    private ReviewerRepository reviewerRepository; // Add this
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -49,12 +52,18 @@ public class DataInitializer implements CommandLineRunner {
                 userRepository.save(superUser);
                 userRepository.save(generalAdmin);
 
+                // Link Users to Roles
                 linkUserToRole(superUser.getUser_id(), superAdminRole.getRole_id());
                 linkUserToRole(generalAdmin.getUser_id(), adminRole.getRole_id());
-                System.out.println("✅ Roles and Admin Users Initialized.");
+
+                // 2. Make them also Reviewers in the reviewer table
+                makeUserReviewer(superUser.getUser_id(), "System Management", 10);
+                makeUserReviewer(generalAdmin.getUser_id(), "General Administration", 5);
+
+                System.out.println("✅ Roles, Admin Users, and Reviewer profiles Initialized.");
             }
 
-            // 2. Initialize Score Criteria (Matches your Frontend IDs 1, 2, 3, 4)
+            // 3. Initialize Score Criteria
             if (scoreCriterionRepository.count() == 0) {
                 ScoreCriterion c1 = new ScoreCriterion();
                 c1.setName("Originality");
@@ -87,6 +96,15 @@ public class DataInitializer implements CommandLineRunner {
         userRole.setRole_id(roleId);
         userRole.setAssigned_at(new Timestamp(System.currentTimeMillis()));
         userRoleRepository.save(userRole);
+    }
+
+    // Helper method to create Reviewer profile
+    private void makeUserReviewer(Long userId, String area, Integer maxPapers) {
+        Reviewer reviewer = new Reviewer();
+        reviewer.setUser_id(userId);
+        reviewer.setExpertise_area(area);
+        reviewer.setMax_papers(maxPapers);
+        reviewerRepository.save(reviewer);
     }
 
     private User createBaseUser(String first, String last, String email, String rawPassword, String category) {
