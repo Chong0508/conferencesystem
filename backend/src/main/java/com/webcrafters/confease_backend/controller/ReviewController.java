@@ -152,4 +152,14 @@ public class ReviewController {
             return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
+
+    @GetMapping("/reviewer/{reviewerId}")
+    public ResponseEntity<List<Review>> getReviewsByReviewer(@PathVariable Long reviewerId) {
+        // This assumes your repository has a method findByReviewerId (defined below)
+        // If not, you can use reviewRepository.findAll().stream().filter(...)
+        List<Review> reviews = reviewRepository.findAll().stream()
+                .filter(r -> r.getReviewer_id().equals(reviewerId))
+                .toList();
+        return ResponseEntity.ok(reviews);
+    }
 }

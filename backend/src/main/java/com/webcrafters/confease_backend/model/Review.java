@@ -3,6 +3,7 @@ package com.webcrafters.confease_backend.model;
 import jakarta.persistence.*;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @Table(name = "review")
@@ -23,6 +24,10 @@ public class Review {
     private Date due_date;
     private String attachment;
     private Timestamp reviewed_at;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "review_id") // Links to the review_id column in review_score table
+    private List<ReviewScore> scores;
 
     // Getters and Setters
     public Long getReview_id() { return review_id; }
@@ -57,4 +62,7 @@ public class Review {
 
     public Timestamp getReviewed_at() { return reviewed_at; }
     public void setReviewed_at(Timestamp reviewed_at) { this.reviewed_at = reviewed_at; }
+
+    public List<ReviewScore> getScores() { return scores; }
+    public void setScores(List<ReviewScore> scores) { this.scores = scores; }   
 }
