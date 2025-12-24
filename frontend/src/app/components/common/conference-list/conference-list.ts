@@ -56,44 +56,43 @@ export class ConferenceList implements OnInit {
     this.isLoading = true;
     this.confService.getAllConferences().subscribe({
       next: (data) => {
-        const todayStr = this.currentMalaysiaTime.toISOString().split('T')[0];
-
-        this.conferenceList = data
-          .map((conf: any) => ({
-            ...conf,
-            computedStatus: todayStr <= conf.start_date ? 'Active' : 'Inactive'
-          }))
-          .sort((a, b) => {
-            // 1️⃣ Active first
-            if (a.computedStatus === 'Active' && b.computedStatus === 'Inactive') {
-              return -1;
-            }
-            if (a.computedStatus === 'Inactive' && b.computedStatus === 'Active') {
-              return 1;
-            }
-
-            // 2️⃣ Optional: sort by start date (earlier first)
-            return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
-          });
-
+        this.conferenceList = data || [];
+        this.conferenceList.sort((a, b) => {
+          if (a.computedStatus === 'Active' && b.computedStatus === 'Inactive') return -1;
+          if (a.computedStatus === 'Inactive' && b.computedStatus === 'Active') return 1;
+          return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
+        });
         this.filteredList = [...this.conferenceList];
         this.isLoading = false;
+        console.log('Conferences loaded:', this.conferenceList);
       },
-      error: () => {
-        this.errorMessage = 'Could not load conferences.';
+      error: (err) => {
+        console.error('Error loading conferences:', err);
+        this.errorMessage = 'Failed to load conferences';
         this.isLoading = false;
       }
     });
   }
 
   filterConferences() {
-    const term = this.searchTerm.toLowerCase().trim();
-    this.filteredList = term
-      ? this.conferenceList.filter(conf =>
-          conf.title.toLowerCase().includes(term) ||
-          conf.acronym.toLowerCase().includes(term)
-        )
-      : [...this.conferenceList];
+    const term = (this.searchTerm || '').toLowerCase().trim();
+    if (!term) {
+      this.filteredList = [...this.conferenceList];
+      return;
+    }
+
+    this.filteredList = this.conferenceList.filter(conf =>
+      (conf.title || '').toLowerCase().includes(term) ||
+      (conf.acronym || '').toLowerCase().includes(term)
+    );
+
+    console.log('Filtered conferences:', this.filteredList);
+  }
+
+// Add click handler to view details
+  viewConferenceDetails(confId: number) {
+    console.log('Navigating to conference:', confId);
+    // Make sure route exists in app.routes.ts
   }
 
   deleteConference(id: number, event: Event) {
