@@ -54,71 +54,74 @@ export class OverviewComponent implements OnInit {
 
   // --- 1. STATISTICS LOGIC ---
   loadStatistics() {
-    // 1. Debug: Check what user data actsually exists
-    console.log('Current Logged User:', this.loggedUser);
+    const userStr = localStorage.getItem('loggedUser');
+    if (!userStr) return;
 
-    if (!this.loggedUser) return;
+    this.loggedUser = JSON.parse(userStr);
+    const currentUserId = this.loggedUser.user_id || this.loggedUser.userId || this.loggedUser.id;
+    const userRole = (this.loggedUser.category || this.loggedUser.role || '').toLowerCase();
 
-    // 2. Safe ID Extraction: Try all common variations
-    const currentUserId = this.loggedUser.user_id || this.loggedUser.id || this.loggedUser.userId;
+    console.log(`Loading stats for Role: ${userRole}, ID: ${currentUserId}`);
 
-    if (!currentUserId) {
-      console.error('❌ Error: Could not find a valid ID in loggedUser object');
-      return;
-    }
-
-    const userRole = (this.loggedUser.role || '').toLowerCase();
-    console.log(`Processing stats for Role: ${userRole}, ID: ${currentUserId}`);
-
-    // ===== ADMIN =====
+    // === ADMIN STATS ===
     if (userRole === 'admin' || userRole === 'super admin') {
       this.userService.getAllUsers().subscribe({
-        next: users => this.stats.totalUsers = users.length,
-        error: (err) => console.error('Error fetching users:', err)
+        next: (users) => {
+          this.stats.totalUsers = users ? users.length : 0;
+          console.log('Total users:', this.stats.totalUsers);
+        },
+        error: (err) => {
+          console.error('Error fetching users:', err);
+          this.stats.totalUsers = 0;
+        }
       });
 
       this.paperService.getAllPapers().subscribe({
-        next: papers => this.stats.totalPapers = papers.length,
-        error: (err) => console.error('Error fetching papers:', err)
+        next: (papers) => {
+          this.stats.totalPapers = papers ? papers.length : 0;
+          console.log('Total papers:', this.stats.totalPapers);
+        },
+        error: (err) => {
+          console.error('Error fetching papers:', err);
+          this.stats.totalPapers = 0;
+        }
       });
 
       this.conferenceService.getAllConferences().subscribe({
-        next: confs => this.stats.totalConferences = confs.length,
-        error: (err) => console.error('Error fetching conferences:', err)
+        next: (confs) => {
+          this.stats.totalConferences = confs ? confs.length : 0;
+          console.log('Total conferences:', this.stats.totalConferences);
+        },
+        error: (err) => {
+          console.error('Error fetching conferences:', err);
+          this.stats.totalConferences = 0;
+        }
       });
     }
 
-    // ===== AUTHOR =====
+    // === AUTHOR STATS ===
     if (userRole === 'author') {
-      console.log(`Fetching papers for Author ID: ${currentUserId}`);
-
-      this.paperService.getPapersByAuthor(currentUserId).subscribe({
+      this.paperService.getPapersByAuthor(Number(currentUserId)).subscribe({
         next: (papers) => {
-          console.log('Papers found for author:', papers);
-          this.stats.mySubmissions = papers.length;
+          this.stats.mySubmissions = papers ? papers.length : 0;
+          console.log('Author papers:', this.stats.mySubmissions);
         },
         error: (err) => {
-          console.error('❌ Failed to fetch author papers:', err);
+          console.error('Error fetching author papers:', err);
           this.stats.mySubmissions = 0;
         }
       });
     }
 
-    // ===== REVIEWER =====
+    // === REVIEWER STATS ===
     if (userRole === 'reviewer') {
-      console.log(`Fetching reviews for Reviewer ID: ${currentUserId}`);
-
-      // Ensure reviewService is imported and injected in constructor
-      this.reviewService.getReviewsByReviewer(currentUserId).subscribe({
-        next: (reviews: any[]) => {
-          console.log('Reviews found:', reviews);
-          // Filter checks if overallScore is null/undefined
-          this.stats.pendingReviews = reviews.filter(
-            r => r.overallScore === null || r.overallScore === undefined
-          ).length;
+      this.reviewService.getReviewsByReviewer(Number(currentUserId)).subscribe({
+        next: (reviews) => {
+          this.stats.pendingReviews = reviews ? reviews.filter(r => !r.overall_score || r.overall_score === null).length : 0;
+          console.log('Pending reviews:', this.stats.pendingReviews);
         },
         error: (err) => {
-          console.error('❌ Failed to fetch reviews:', err);
+          console.error('Error fetching reviews:', err);
           this.stats.pendingReviews = 0;
         }
       });
