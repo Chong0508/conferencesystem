@@ -13,7 +13,7 @@ import { OverviewComponent } from './components/common/overview/overview';
 import { SubmitPaper } from './components/author/submit-paper/submit-paper';
 import { MySubmissions } from './components/author/my-submissions/my-submissions';
 import { PaperDetails } from './components/common/paper-details/paper-details';
-import { ConferenceRegistration } from './components/author/conference-registration/conference-registration';
+import { PaperPayment } from './components/author/paper-payment/paper-payment';
 
 // 4. Reviewer Features
 import { ReviewList } from './components/reviewer/review-list/review-list';
@@ -38,6 +38,7 @@ import { MyProfile } from './components/common/my-profile/my-profile';
 import { ApplyReviewerComponent } from './components/author/apply-reviewer/apply-reviewer';
 
 import { CreateAdminComponent } from './components/admin/create-admin/create-admin';
+import { SearchPapers } from './components/common/search-papers/search-papers';
 
 export const routes: Routes = [
   // --- Public Routes ---
@@ -56,12 +57,13 @@ export const routes: Routes = [
       // 2. Overview Page
       { path: 'overview', component: OverviewComponent },
       { path: 'create-admin', component: CreateAdminComponent },
+      { path: 'searchPapers', component: SearchPapers },
 
       // 3. Author Routes
       { path: 'submit-paper', component: SubmitPaper },
       { path: 'my-submissions', component: MySubmissions },
       { path: 'paper-details/:id', component: PaperDetails },
-      { path: 'registration/:paperId', component: ConferenceRegistration },
+      { path: 'registration/:paperId', component: PaperPayment },
 
       // 4. Reviewer Routes
       { path: 'reviews', component: ReviewList },

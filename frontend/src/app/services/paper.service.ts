@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -10,11 +10,23 @@ export class PaperService {
 
   constructor(private http: HttpClient) { }
 
-  submitPaper(paperData: any): Observable<any> {
-    return this.http.post<any>(this.apiUrl, paperData, { withCredentials: true });
+  // Create/Submit Paper (FormData handles Multipart)
+  submitPaper(formData: FormData): Observable<any> {
+    return this.http.post<any>(this.apiUrl, formData, { withCredentials: true });
   }
 
-  getPaperById(id: number): Observable<any> {
+  // Update Paper
+  updatePaper(id: number, formData: FormData): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/${id}`, formData, { withCredentials: true });
+  }
+
+  // Admin/Payment: Update only the status of a paper
+  updatePaperStatus(id: number, status: string): Observable<any> {
+    // This calls the specific status update endpoint
+    return this.http.put<any>(`${this.apiUrl}/${id}/status`, { status }, { withCredentials: true });
+  }
+
+  getPaperById(id: number | string): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/${id}`, { withCredentials: true });
   }
 
@@ -26,14 +38,15 @@ export class PaperService {
     return this.http.get<any[]>(`${this.apiUrl}/author/${userId}`, { withCredentials: true });
   }
 
-  downloadPaper(paperId: number | string) {
-       return this.http.get(
-         `${this.apiUrl}/${paperId}/download`,
-         { responseType: 'blob' }
-       );
-     }
+  // Corrected Download Path based on your Controller: /api/papers/download/{fileName}
+  downloadPaper(fileName: string): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/download/${fileName}`, {
+      responseType: 'blob',
+      withCredentials: true
+    });
+  }
 
-    getReviewsByReviewer(reviewerId: number): Observable<any[]> {
-      return this.http.get<any[]>(`${this.apiUrl}?reviewerId=${reviewerId}`, { withCredentials: true });
-    }
+  deletePaper(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/${id}`, { withCredentials: true });
+  }
 }

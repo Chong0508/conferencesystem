@@ -1,0 +1,63 @@
+<div class="container mt-4 mb-5 animate__animated animate__fadeIn">
+  <button class="btn btn-link text-decoration-none text-muted mb-3 ps-0" (click)="goBack()">
+    <i class="bi bi-arrow-left me-1"></i> Cancel
+  </button>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-header bg-white border-0 pt-4 px-4">
+          <h4 class="fw-bold text-dark">Paper Publication Payment</h4>
+          <p class="text-muted small">Finalize your accepted manuscript for the conference proceedings.</p>
+        </div>
+        <div class="card-body p-4">
+          <div class="alert alert-success border-0 bg-success-subtle mb-4" *ngIf="paper">
+            <small class="text-uppercase fw-bold text-success-emphasis">Manuscript to be Published:</small>
+            <div class="fw-bold text-dark mt-1">{{ paper.title }}</div>
+            <small class="text-muted">Paper ID: #{{ paperId }}</small>
+          </div>
+
+          <h6 class="text-uppercase text-muted small fw-bold mb-3">Billing Information</h6>
+          <div class="mb-3">
+            <label class="form-label">Organization / University <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" [(ngModel)]="paymentForm.organization" name="org">
+          </div>
+
+          <h6 class="text-uppercase text-muted small fw-bold mt-4 mb-3">Select Payment Method</h6>
+          <div class="d-flex gap-3">
+            <div class="form-check border rounded p-3 flex-fill bg-white shadow-sm">
+              <input class="form-check-input" type="radio" name="payment" id="card" value="Credit Card" [(ngModel)]="paymentForm.paymentMethod">
+              <label class="form-check-label fw-bold" for="card"><i class="bi bi-credit-card me-2"></i>Card</label>
+            </div>
+            <div class="form-check border rounded p-3 flex-fill bg-white shadow-sm">
+              <input class="form-check-input" type="radio" name="payment" id="fpx" value="FPX" [(ngModel)]="paymentForm.paymentMethod">
+              <label class="form-check-label fw-bold" for="fpx"><i class="bi bi-bank me-2"></i>FPX</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card border-0 shadow rounded-4 bg-light">
+        <div class="card-body p-4">
+          <h6 class="fw-bold mb-3">Payment Summary</h6>
+          <div class="d-flex justify-content-between mb-2">
+            <span>Publication Fee</span>
+            <span class="fw-bold">${{ publicationFee }}</span>
+          </div>
+          <hr>
+          <div class="d-flex justify-content-between mb-4 align-items-center">
+            <span class="fs-5 fw-bold">Total</span>
+            <span class="fs-4 fw-bold text-success">${{ publicationFee }}</span>
+          </div>
+
+          <button class="btn btn-primary w-100 py-3 fw-bold shadow-sm rounded-pill" (click)="onPay()" [disabled]="isLoading">
+            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+            {{ isLoading ? 'Processing...' : 'Pay & Finalize' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
