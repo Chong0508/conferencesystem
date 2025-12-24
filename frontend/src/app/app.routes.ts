@@ -9,6 +9,7 @@ import { Dashboard } from './components/common/dashboard/dashboard';
 // 2. Overview (Dashboard Home)
 import { OverviewComponent } from './components/common/overview/overview';
 
+
 // 3. Author Features
 import { SubmitPaper } from './components/author/submit-paper/submit-paper';
 import { MySubmissions } from './components/author/my-submissions/my-submissions';
@@ -42,6 +43,7 @@ import { CreateAdminComponent } from './components/admin/create-admin/create-adm
 import { SearchPapers } from './components/common/search-papers/search-papers';
 import { ConferenceRegistration } from './components/common/conference-registration/conference-registration';
 import { ConferencePayment } from './components/common/conference-payment/conference-payment';
+import { MyConferences } from './components/common/my-conferences/my-conferences';
 
 
 export const routes: Routes = [
@@ -64,6 +66,7 @@ export const routes: Routes = [
       { path: 'searchPapers', component: SearchPapers },
       { path: 'conference-registration/:id', component: ConferenceRegistration },
       { path: 'conference-payment', component: ConferencePayment },
+      { path: 'my-participated', component: MyConferences },
 
       // 3. Author Routes
       { path: 'submit-paper', component: SubmitPaper },

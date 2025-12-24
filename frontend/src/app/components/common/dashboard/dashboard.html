@@ -1,170 +1,125 @@
 <div class="dashboard-container">
-
   <nav class="sidebar custom-card animate__animated animate__fadeInLeft">
-
     <div class="sidebar-header">
       <i class="bi bi-grid-1x2-fill brand-icon"></i>
       <h4 class="brand-text">G5ConfEase</h4>
     </div>
 
     <ul class="nav flex-column mt-4">
-
       <li class="nav-item">
+        <p class="text-muted small ms-3 mb-2 fw-bold">CORE</p>
         <a class="nav-link" routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-          <i class="bi bi-speedometer2 me-2"></i> Overview
+          <i class="bi bi-speedometer2 me-2"></i> Dashboard Overview
         </a>
-      </li>
-
-      <li class="nav-item">
         <a class="nav-link" routerLink="/dashboard/notifications" routerLinkActive="active">
-          <i class="bi bi-bell me-2"></i> Message Center
+          <i class="bi bi-chat-left-text me-2"></i> Message Center
         </a>
       </li>
 
-      <li class="nav-item">
+      <li class="nav-item mt-3">
+        <p class="text-muted small ms-3 mb-2 fw-bold">DISCOVERY</p>
         <a class="nav-link" routerLink="/dashboard/searchPapers" routerLinkActive="active">
-          <i class="bi bi-search me-2"></i> Search Papers
+          <i class="bi bi-search me-2"></i> Research Library
+        </a>
+        <ng-container *ngIf="loggedUser?.role === 'Reviewer' || loggedUser?.role === 'Author'">
+          <a class="nav-link" routerLink="/dashboard/conferences" routerLinkActive="active">
+            <i class="bi bi-browser-safari me-2"></i> Explore Conferences
+          </a>
+        </ng-container>
+        <a class="nav-link" routerLink="/dashboard/my-participated" routerLinkActive="active">
+          <i class="bi bi-journal-check me-2"></i> My Enrollments
         </a>
       </li>
 
-      <ng-container *ngIf="loggedUser?.role === 'Reviewer' || loggedUser?.role === 'Author'">
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/dashboard/conferences" routerLinkActive="active">
-            <i class="bi bi-calendar-event me-2"></i> Search Conferences
-          </a>
-        </li>
-      </ng-container>
-
-      <ng-container *ngIf="loggedUser.role === 'Super Admin'">
-        <li class="nav-item">
-          <p class="text-muted small ms-3 mt-3 mb-2 fw-bold">SYSTEM CONTROL</p>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/dashboard/create-admin" routerLinkActive="active">
-            <i class="bi bi-person-plus-fill me-2"></i> Create Admin Account
-          </a>
-        </li>
-      </ng-container>
-
-      <ng-container *ngIf="loggedUser.role === 'Admin' || loggedUser.role === 'Super Admin'">
-
-        <li class="nav-item">
-          <p class="text-muted small ms-3 mt-3 mb-2 fw-bold">ADMINISTRATION</p>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/dashboard/conferences" routerLinkActive="active">
-            <i class="bi bi-calendar-event me-2"></i> Manage Conferences
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/dashboard/tracks" routerLinkActive="active">
-            <i class="bi bi-list-check me-2"></i> Manage Tracks
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/dashboard/all-papers" routerLinkActive="active">
-            <i class="bi bi-files me-2"></i> All Papers
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/dashboard/user-management" routerLinkActive="active">
-            <i class="bi bi-people-fill me-2"></i> User Management
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/dashboard/applications" routerLinkActive="active">
-            <i class="bi bi-person-lines-fill me-2"></i> Reviewer Application
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/dashboard/activity-logs" routerLinkActive="active">
-            <i class="bi bi-activity me-2"></i> Activity Logs
-          </a>
-        </li>
-
-      </ng-container>
-
-      <ng-container *ngIf="loggedUser.role === 'Author' || loggedUser.role === 'Reviewer' || loggedUser.role === 'Admin'  || loggedUser.role === 'Super Admin'">
-
-        <li class="nav-item">
-          <p class="text-muted small ms-3 mt-3 mb-2 fw-bold">AUTHOR ZONE</p>
-        </li>
-
-        <li class="nav-item">
+      <ng-container *ngIf="['Author', 'Reviewer', 'Admin', 'Super Admin'].includes(loggedUser.role)">
+        <li class="nav-item mt-3">
+          <p class="text-muted small ms-3 mb-2 fw-bold">AUTHOR ZONE</p>
           <a class="nav-link" routerLink="/dashboard/submit-paper" routerLinkActive="active">
-            <i class="bi bi-file-earmark-arrow-up me-2"></i> Submit Paper
+            <i class="bi bi-file-earmark-plus me-2"></i> New Submission
           </a>
-        </li>
-
-        <li class="nav-item">
           <a class="nav-link" routerLink="/dashboard/my-submissions" routerLinkActive="active">
             <i class="bi bi-folder2-open me-2"></i> My Submissions
           </a>
         </li>
       </ng-container>
 
-      <ng-container *ngIf="loggedUser.role === 'Reviewer' || loggedUser.role === 'Admin' || loggedUser.role === 'Super Admin'">
-
-        <li class="nav-item">
-          <p class="text-muted small ms-3 mt-3 mb-2 fw-bold">REVIEWER ZONE</p>
-        </li>
-
-        <li class="nav-item">
+      <ng-container *ngIf="['Reviewer', 'Admin', 'Super Admin'].includes(loggedUser.role)">
+        <li class="nav-item mt-3">
+          <p class="text-muted small ms-3 mb-2 fw-bold">REVIEW ZONE</p>
           <a class="nav-link" routerLink="/dashboard/reviews" routerLinkActive="active">
-            <i class="bi bi-star me-2"></i> My Reviews
+            <i class="bi bi-clipboard-check me-2"></i> Pending Reviews
           </a>
-        </li>
-
-        <li class="nav-item">
           <a class="nav-link" routerLink="/dashboard/review-history" routerLinkActive="active">
             <i class="bi bi-clock-history me-2"></i> Review History
           </a>
         </li>
       </ng-container>
 
-      <li class="nav-item mt-4">
-        <p class="text-muted small ms-3 mb-2 fw-bold">SETTINGS</p>
+      <ng-container *ngIf="loggedUser.role === 'Admin' || loggedUser.role === 'Super Admin'">
+        <li class="nav-item mt-3">
+          <p class="text-muted small ms-3 mb-2 fw-bold">ADMIN PANEL</p>
+          <a class="nav-link" routerLink="/dashboard/conferences" routerLinkActive="active">
+            <i class="bi bi-calendar-range me-2"></i> Conference Management
+          </a>
+          <a class="nav-link" routerLink="/dashboard/tracks" routerLinkActive="active">
+            <i class="bi bi-diagram-3 me-2"></i> Manage Track
+          </a>
+          <a class="nav-link" routerLink="/dashboard/all-papers" routerLinkActive="active">
+            <i class="bi bi-files me-2"></i> All Paper
+          </a>
+          <a class="nav-link" routerLink="/dashboard/user-management" routerLinkActive="active">
+            <i class="bi bi-people me-2"></i> Manage User
+          </a>
+          <a class="nav-link" routerLink="/dashboard/applications" routerLinkActive="active">
+            <i class="bi bi-person-badge me-2"></i> Reviewer Application
+          </a>
+        </li>
+      </ng-container>
+
+      <ng-container *ngIf="loggedUser.role === 'Super Admin'">
+        <li class="nav-item mt-3">
+          <p class="text-muted small ms-3 mb-2 fw-bold">SYSTEM CONTROL</p>
+          <a class="nav-link" routerLink="/dashboard/create-admin" routerLinkActive="active">
+            <i class="bi bi-shield-lock me-2"></i> Access Provisioning
+          </a>
+          <a class="nav-link" routerLink="/dashboard/activity-logs" routerLinkActive="active">
+            <i class="bi bi-terminal me-2"></i> Audit Logs
+          </a>
+        </li>
+      </ng-container>
+
+      <li class="nav-item mt-4 border-top pt-2">
         <a class="nav-link" routerLink="/dashboard/profile" routerLinkActive="active">
-          <i class="bi bi-person-circle me-2"></i> My Profile
+          <i class="bi bi-gear me-2"></i> Profile
         </a>
       </li>
     </ul>
 
-    <div class="mt-auto mb-3">
-      <button class="btn btn-logout w-100" (click)="onLogout()">
-        <i class="bi bi-box-arrow-left me-2"></i> Logout
+    <div class="mt-auto mb-3 px-3">
+      <button class="btn btn-logout w-100 rounded-pill" (click)="onLogout()">
+        <i class="bi bi-power me-2"></i> Sign Out
       </button>
     </div>
   </nav>
 
   <main class="main-content">
-
     <header class="navbar custom-navbar shadow-sm mb-4 animate__animated animate__fadeInDown">
       <div class="container-fluid">
-        <span class="navbar-brand mb-0 h1 text-secondary">Dashboard</span>
+        <span class="navbar-brand mb-0 h1 text-secondary">
+          <i class="bi bi-chevron-right small me-2"></i> Workspace
+        </span>
 
         <div class="d-flex align-items-center">
 
-          <a routerLink="/dashboard/notifications" class="text-secondary me-4" style="font-size: 1.2rem; cursor: pointer;">
-            <i class="bi bi-bell-fill"></i>
-          </a>
 
-          <div class="text-end me-3">
-            <p class="mb-0 fw-bold text-dark">
-              {{ loggedUser.firstName }} {{ loggedUser.lastName }}
-            </p>
-            <small class="text-muted">{{ loggedUser.role }}</small>
+          <div class="text-end me-3 d-none d-md-block">
+            <p class="mb-0 fw-bold text-dark">{{ loggedUser.firstName }} {{ loggedUser.lastName }}</p>
+            <span class="badge bg-light text-primary border">{{ loggedUser.role }}</span>
           </div>
-          <img [src]="'https://ui-avatars.com/api/?name=' + loggedUser.firstName + '+' + loggedUser.lastName + '&background=' + (loggedUser.avatarColor || '11998e') + '&color=fff'"
-               class="rounded-circle avatar"
-               alt="Avatar">
+          
+          <img [src]="'https://ui-avatars.com/api/?name=' + loggedUser.firstName + '+' + loggedUser.lastName + '&background=0d6efd&color=fff'"
+               class="rounded-circle avatar border shadow-sm"
+               alt="User Profile">
         </div>
       </div>
     </header>
