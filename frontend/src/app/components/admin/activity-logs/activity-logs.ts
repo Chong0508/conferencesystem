@@ -73,17 +73,24 @@ export class ActivityLogsComponent implements OnInit {
   }
 
   processBackendData(data: LogActivity[]) {
-    this.logs = data.map(item => ({
-      id: item.log_id || 0,
-      user: this.userMap[item.user_id] || `User #${item.user_id}`,
-      role: 'User',
-      action: item.action || 'Unknown',
-      details: item.details || '',
-      timestamp: item.login_time ? new Date(item.login_time).toLocaleString() : '-',
-      type: this.determineLogType(item.action)
-    }));
+    this.logs = data.map(item => {
+      // 1. Get user info from map, fallback to Guest if user_id is null
+      const userName = item.user_id ? (this.userMap[item.user_id] || `User #${item.user_id}`) : 'Guest / System';
+      
+      return {
+        id: item.log_id || 0,
+        user: userName,
+        role: item.user_id ? 'Member' : 'Public', // You can refine this logic
+        action: item.action || 'Unknown',
+        details: item.details || '',
+        // Use login_time or current date as fallback
+        timestamp: item.login_time ? new Date(item.login_time).toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur' }) : '-',
+        type: this.determineLogType(item.action)
+      };
+    });
 
-    this.filteredLogs = [...this.logs].reverse();
+    // Sort by ID descending (newest first)
+    this.filteredLogs = [...this.logs].sort((a, b) => b.id - a.id);
   }
 
   determineLogType(action: string): 'info' | 'warning' | 'success' | 'danger' {
