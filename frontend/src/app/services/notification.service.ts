@@ -58,20 +58,26 @@ export class NotificationService {
   // ==============================================================
   // 2. Create Notification (Backend Call)
   // ==============================================================
-  createNotification(userId: number, message: string, type: string) {
-    const payload: BackendNotification = {
-      user_id: userId,
-      message: message,
-      type: type,
-      is_read: false
-    };
+  // ==============================================================
+    // 2. Create Notification (Backend Call)
+    // ==============================================================
+    createNotification(userId: number, message: string, type: string) {
+      const payload: BackendNotification = {
+        user_id: userId,
+        message: message,
+        type: type,
+        is_read: false,
+        // FIX: Send the timestamp so the database doesn't complain
+        sent_at: new Date().toISOString()
+      };
 
-    this.http.post(this.baseUrl, payload).subscribe({
-      next: (res) => console.log('Notification saved to DB', res),
-      // FIXED: Added ': any' to the error parameter
-      error: (err: any) => console.error('Failed to save notification', err)
-    });
-  }
+      console.log("📨 Sending Notification Payload:", payload); // Debug Log
+
+      this.http.post(this.baseUrl, payload).subscribe({
+        next: (res) => console.log('✅ Notification saved to DB', res),
+        error: (err: any) => console.error('❌ Failed to save notification', err)
+      });
+    }
 
   /// ==============================================================
      // 3. Get Notifications (FIXED FILTER LOGIC)
