@@ -99,33 +99,48 @@ export class OverviewComponent implements OnInit {
       });
     }
 
-    // === AUTHOR STATS ===
-    if (userRole === 'author') {
-      this.paperService.getPapersByAuthor(Number(currentUserId)).subscribe({
-        next: (papers) => {
-          this.stats.mySubmissions = papers ? papers.length : 0;
-          console.log('Author papers:', this.stats.mySubmissions);
-        },
-        error: (err) => {
-          console.error('Error fetching author papers:', err);
-          this.stats.mySubmissions = 0;
+        // === 1. AUTHOR STATS (My Submissions) ===
+        if (userRole === 'author' || userRole === 'reviewer') {
+          this.paperService.getPapersByAuthor(Number(currentUserId)).subscribe({
+            next: (papers) => {
+              this.stats.mySubmissions = papers ? papers.length : 0;
+              console.log('Author papers:', this.stats.mySubmissions);
+            },
+            error: (err) => {
+              console.error('Error fetching author papers:', err);
+              this.stats.mySubmissions = 0;
+            }
+          });
         }
-      });
-    }
 
-    // === REVIEWER STATS ===
-    if (userRole === 'reviewer') {
-      this.reviewService.getReviewsByReviewer(Number(currentUserId)).subscribe({
-        next: (reviews) => {
-          this.stats.pendingReviews = reviews ? reviews.filter(r => !r.overall_score || r.overall_score === null).length : 0;
-          console.log('Pending reviews:', this.stats.pendingReviews);
-        },
-        error: (err) => {
-          console.error('Error fetching reviews:', err);
-          this.stats.pendingReviews = 0;
-        }
-      });
-    }
+        // === REVIEWER STATS ===
+            if (userRole === 'reviewer') {
+
+              const idToCheck = Number(currentUserId);
+              if (!idToCheck || isNaN(idToCheck)) {
+                console.warn('Cannot load reviewer stats: Invalid User ID', currentUserId);
+                return;
+              }
+
+              this.reviewService.getReviewsByReviewer(idToCheck).subscribe({
+                next: (reviews) => {
+                  console.log(`Reviews found for User ${idToCheck}:`, reviews.length);
+
+                  if (reviews && reviews.length > 0) {
+                    this.stats.pendingReviews = reviews.filter((r: any) => {
+                       const score = (r.overallScore !== undefined) ? r.overallScore : r.overall_score;
+                       return score === null || score === undefined || score === '';
+                    }).length;
+                  } else {
+                    this.stats.pendingReviews = 0;
+                  }
+                },
+                error: (err) => {
+                  console.error('Failed to get reviews:', err);
+                  this.stats.pendingReviews = 0;
+                }
+              });
+            }
   }
 
   // --- 2. LOGIC FOR LOADING USERS & LOGS (Moved OUT of loadStatistics) ---
@@ -146,28 +161,44 @@ export class OverviewComponent implements OnInit {
   }
 
   fetchRecentLogs() {
-    // Get only 5 recent logs
-    this.logActivityService.getRecentLogs(5).subscribe({
-      next: (logs: LogActivity[]) => {
-        this.recentLogs = logs.map(log => {
-          let userName = 'Guest / System';
-          if (log.user_id) {
-            userName = this.userMap[log.user_id] || `User #${log.user_id}`;
+      // Request logs (Assuming service returns a list)
+      this.logActivityService.getRecentLogs(5).subscribe({
+        next: (logs: LogActivity[]) => {
+
+          if (!logs) {
+            this.recentLogs = [];
+            return;
           }
 
-          return {
-            action: log.action || 'Unknown',
-            user: userName,
-            type: this.determineLogType(log.action),
-            timestamp: log.login_time
-              ? new Date(log.login_time).toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur' })
-              : '-'
-          };
-        });
-      },
-      error: () => this.recentLogs = []
-    });
-  }
+          const sortedLogs = logs.sort((a: any, b: any) => {
+            const dateA = new Date(a.login_time || 0).getTime();
+            const dateB = new Date(b.login_time || 0).getTime();
+            return dateB - dateA;
+          }).slice(0, 5);
+          //
+
+          this.recentLogs = sortedLogs.map(log => {
+            let userName = 'Guest / System';
+            if (log.user_id) {
+              userName = this.userMap[log.user_id] || `User #${log.user_id}`;
+            }
+
+            return {
+              action: log.action || 'Unknown',
+              user: userName,
+              type: this.determineLogType(log.action),
+              timestamp: log.login_time
+                ? new Date(log.login_time).toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur' })
+                : '-'
+            };
+          });
+        },
+        error: (err) => {
+          console.error('Error fetching recent logs:', err);
+          this.recentLogs = [];
+        }
+      });
+    }
 
   // --- 3. HELPER ---
   determineLogType(action?: string): 'info' | 'warning' | 'success' | 'danger' {
