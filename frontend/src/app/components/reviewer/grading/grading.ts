@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ReviewService } from '../../../services/review.service';
 import { PaperService } from '../../../services/paper.service';
 import { HttpClient } from '@angular/common/http';
+import { NotificationService } from '../../../services/notification.service';
 
 @Component({
   selector: 'app-grading',
@@ -18,7 +19,7 @@ export class Grading implements OnInit {
   paper: any = null;
   currentUser: any = {};
   isSubmitting: boolean = false;
-  isViewOnly: boolean = false; // Flag to disable form if already submitted
+  isViewOnly: boolean = false;
   errorMessage: string = '';
 
   comments: string = '';
@@ -36,7 +37,8 @@ export class Grading implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private reviewService: ReviewService,
-    private paperService: PaperService
+    private paperService: PaperService,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit() {
@@ -63,16 +65,13 @@ export class Grading implements OnInit {
 
     this.reviewService.getReviewsByReviewer(reviewerId).subscribe({
       next: (reviews: any[]) => {
-        // Find the review that matches this paper ID
         const existing = reviews.find(r => (r.assignment_id || r.assignmentId) == this.paperId);
-        
+
         if (existing) {
           this.isViewOnly = true;
           this.comments = existing.comments_to_author;
           this.recommendation = existing.recommendation;
-          
-          // Populate scores (assuming backend includes them or you fetch them separately)
-          // For now, we use the overall_score as a reference if breakdown isn't available
+
           if (existing.scores) {
             existing.scores.forEach((s: any) => {
               if (s.criterion_id === 1) this.scoreCriteria.originality = s.score;
@@ -87,14 +86,14 @@ export class Grading implements OnInit {
   }
 
   get totalScore(): number {
-    return Number(this.scoreCriteria.originality) + 
-           Number(this.scoreCriteria.relevance) + 
-           Number(this.scoreCriteria.quality) + 
+    return Number(this.scoreCriteria.originality) +
+           Number(this.scoreCriteria.relevance) +
+           Number(this.scoreCriteria.quality) +
            Number(this.scoreCriteria.presentation);
   }
 
   validateScore(category: string) {
-    if (this.isViewOnly) return; 
+    if (this.isViewOnly) return;
     let value = this.scoreCriteria[category];
     if (value > 100) this.scoreCriteria[category] = 100;
     else if (value < 0 || value === null) this.scoreCriteria[category] = 0;
@@ -103,8 +102,9 @@ export class Grading implements OnInit {
   submitReview() {
     if (this.isViewOnly) return;
     if (this.totalScore === 0) return alert("Please provide scores.");
-    
+
     const reviewerId = this.currentUser.userId || this.currentUser.user_id;
+
     const reviewPayload = {
       review: {
         assignment_id: this.paperId,
@@ -113,7 +113,7 @@ export class Grading implements OnInit {
         comments_to_author: this.comments,
         recommendation: this.recommendation,
         round_number: 1,
-        due_date: new Date().toISOString().split('T')[0] 
+        due_date: new Date().toISOString().split('T')[0]
       },
       scores: [
         { criterion_id: 1, score: this.scoreCriteria.originality },
@@ -126,6 +126,20 @@ export class Grading implements OnInit {
     this.isSubmitting = true;
     this.http.post('http://localhost:8080/api/reviews/submit-full', reviewPayload).subscribe({
       next: () => {
+
+        // ============================================================
+        // 3. TRIGGER NOTIFICATION
+        // ============================================================
+        if (reviewerId) {
+          const paperTitle = this.paper ? this.paper.title : 'Paper';
+
+          this.notificationService.createNotification(
+            Number(reviewerId),
+            `Grading for "${paperTitle}" submitted successfully.`,
+            'success'
+          );
+        }
+
         alert("✅ Review saved!");
         this.router.navigate(['/dashboard/reviews']);
       },
