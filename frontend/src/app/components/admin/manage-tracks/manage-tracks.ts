@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
 import { TrackService, Track } from '../../../services/track.service';
+import { NotificationService } from '../../../services/notification.service';
 
 @Component({
   selector: 'app-manage-tracks',
@@ -14,18 +14,29 @@ import { TrackService, Track } from '../../../services/track.service';
 export class ManageTracks implements OnInit {
 
   tracks: any[] = [];
+  currentUserId: number | null = null;
 
-  // Model for adding a new track
   newTrackName: string = '';
   newTrackDescription: string = '';
 
-  // Model for editing
   editingTrack: any = null;
 
-  constructor(private trackService: TrackService) { }
+  constructor(
+    private trackService: TrackService,
+    private notificationService: NotificationService
+  ) { }
 
   ngOnInit() {
+    this.loadCurrentUser();
     this.loadTracks();
+  }
+
+  loadCurrentUser() {
+    const userStr = localStorage.getItem('loggedUser') || localStorage.getItem('user');
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      this.currentUserId = user.id || user.user_id || user.userId;
+    }
   }
 
   loadTracks() {
@@ -36,7 +47,6 @@ export class ManageTracks implements OnInit {
         },
         error: (err) => {
           console.error('❌ Error fetching tracks:', err);
-          // Fallback to empty array if backend fails
           this.tracks = [];
         }
       });
@@ -44,7 +54,7 @@ export class ManageTracks implements OnInit {
 
     processBackendData(data: Track[]) {
       this.tracks = data.map(item => ({
-        id: item.track_id, // Ensure this matches track.id used in HTML
+        id: item.track_id,
         name: item.name || 'Unnamed Track',
         description: item.description || '',
         conference_id: item.conference_id,
@@ -65,26 +75,46 @@ export class ManageTracks implements OnInit {
       this.trackService.createTrack(payload).subscribe({
         next: (savedTrack) => {
           console.log('✅ Track created:', savedTrack);
+
+          // 3. TRIGGER NOTIFICATION
+          if (this.currentUserId) {
+            this.notificationService.createNotification(
+              this.currentUserId,
+              `Track "${this.newTrackName}" added successfully.`,
+              'success'
+            );
+          }
+
           alert('✅ Track added successfully!');
           this.newTrackName = '';
           this.newTrackDescription = '';
           this.loadTracks();
         },
 
-        error: (err: any) => { // Fixed typo from 'eerror' to 'error'
-            console.error('Backend Error Details:', err); // This tells you WHY it failed
+        error: (err: any) => {
+            console.error('Backend Error Details:', err);
             alert('Failed to add track. Check console for errors.');
           }
       });
     }
 
   deleteTrack(id: number) {
-      if (confirm("Are you sure you want to delete this track? Authors won't be able to select it anymore.")) {
+      if (confirm("Are you sure you want to delete this track?")) {
         this.trackService.deleteTrack(id).subscribe({
           next: () => {
             console.log('✅ Track deleted');
+
+            // 3. TRIGGER NOTIFICATION
+            if (this.currentUserId) {
+              this.notificationService.createNotification(
+                this.currentUserId,
+                `Track deleted successfully.`,
+                'warning'
+              );
+            }
+
             alert('Track deleted successfully!');
-            this.loadTracks(); // Reload from backend
+            this.loadTracks();
           },
           error: (err) => {
             console.error('❌ Error deleting track:', err);
@@ -119,9 +149,19 @@ export class ManageTracks implements OnInit {
       this.trackService.updateTrack(this.editingTrack.id, payload).subscribe({
         next: (updatedTrack) => {
           console.log('✅ Track updated:', updatedTrack);
+
+          // 3. TRIGGER NOTIFICATION
+          if (this.currentUserId) {
+            this.notificationService.createNotification(
+              this.currentUserId,
+              `Track "${this.editingTrack.name}" updated successfully.`,
+              'success'
+            );
+          }
+
           alert('Track updated successfully!');
           this.editingTrack = null;
-          this.loadTracks(); // Reload from backend
+          this.loadTracks();
         },
         error: (err) => {
           console.error('❌ Error updating track:', err);
