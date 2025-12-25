@@ -35,11 +35,10 @@ export class UserService {
     });
   }
 
-  createUser(userData: any): Observable<any> {
-    return this.http.post<any>(this.baseUrl, userData, {
-      withCredentials: true
-    });
-  }
+  createAdmin(adminData: any) {
+  const url = 'http://localhost:8080/users/admin';
+  return this.http.post(url, adminData);
+}
 
   login(loginData: any): Observable<any> {
     return this.http.post<any>(`${this.baseUrl}/login`, loginData, {

@@ -12,12 +12,12 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./create-admin.css']
 })
 export class CreateAdminComponent {
-  adminData = {
+  // Form model
+  formData = {
     firstName: '',
     lastName: '',
     email: '',
-    password_hash: '', 
-    category: 'Admin'
+    password: ''
   };
 
   message = '';
@@ -30,20 +30,31 @@ export class CreateAdminComponent {
     this.isLoading = true;
     this.message = '';
     
-    // Using the specific admin creation endpoint
-    this.http.post('http://localhost:8080/users/admin', this.adminData)
+    // 1. Prepare payload to match Java Backend User model keys
+    const payload = {
+      first_name: this.formData.firstName,
+      last_name: this.formData.lastName,
+      email: this.formData.email,
+      password_hash: this.formData.password, // Backend will BCrypt encode this
+      category: 'Admin'
+    };
+
+    // 2. POST to the specific admin creation endpoint
+    this.http.post('http://localhost:8080/users/admin', payload, { withCredentials: true })
       .subscribe({
         next: (res: any) => {
           this.isLoading = false;
           this.isError = false;
-          this.message = 'Admin account created successfully!';
+          this.message = res.message || 'Admin account created successfully!';
+          // Redirect to user management after success
           setTimeout(() => this.router.navigate(['/dashboard/user-management']), 2000);
         },
         error: (err) => {
           this.isLoading = false;
           this.isError = true;
-          // Capture the clear error message from our backend
-          this.message = err.error.message || 'An error occurred during registration.';
+          // Capture 'Email already registered' or other backend errors
+          this.message = err.error?.message || err.error?.error || 'Registration failed.';
+          console.error('Admin Creation Error:', err);
         }
       });
   }

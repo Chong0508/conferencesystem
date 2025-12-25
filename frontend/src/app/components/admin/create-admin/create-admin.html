@@ -2,6 +2,7 @@
   <div class="row justify-content-center">
     <div class="col-md-6">
       <div class="card border-0 shadow-lg rounded-4">
+        
         <div class="card-header bg-white border-0 pt-4 ps-4">
           <h3 class="fw-bold text-secondary">
             <i class="bi bi-person-plus-fill me-2 text-primary"></i>
@@ -11,43 +12,70 @@
         </div>
 
         <div class="card-body p-4">
-          <div *ngIf="message" class="alert" [ngClass]="isError ? 'alert-danger' : 'alert-success'">
+          <div *ngIf="message" class="alert animate__animated animate__shakeX" 
+               [ngClass]="isError ? 'alert-danger' : 'alert-success'">
+            <i class="bi" [ngClass]="isError ? 'bi-exclamation-triangle-fill' : 'bi-check-circle-fill'"></i>
             {{ message }}
           </div>
 
-          <form (ngSubmit)="onSubmit()" #adminForm="ngForm">
+          <form (ngSubmit)="onSubmit()" #adminForm="ngForm" novalidate>
             <div class="row">
               <div class="col-md-6 mb-3">
                 <label class="form-label fw-bold small">First Name</label>
-                <input type="text" class="form-control shadow-sm" [(ngModel)]="adminData.firstName" name="firstName" required placeholder="Admin">
+                <input type="text" class="form-control shadow-sm" 
+                       [(ngModel)]="adminData.firstName" name="firstName" 
+                       #firstName="ngModel" required placeholder="Enter first name"
+                       [class.is-invalid]="firstName.invalid && firstName.touched">
               </div>
               <div class="col-md-6 mb-3">
                 <label class="form-label fw-bold small">Last Name</label>
-                <input type="text" class="form-control shadow-sm" [(ngModel)]="adminData.lastName" name="lastName" required placeholder="Confease">
+                <input type="text" class="form-control shadow-sm" 
+                       [(ngModel)]="adminData.lastName" name="lastName" 
+                       #lastName="ngModel" required placeholder="Enter last name"
+                       [class.is-invalid]="lastName.invalid && lastName.touched">
               </div>
             </div>
 
             <div class="mb-3">
               <label class="form-label fw-bold small">Email Address</label>
-              <input type="email" class="form-control shadow-sm" [(ngModel)]="adminData.email" name="email" required placeholder="admin@confease.com">
+              <input type="email" class="form-control shadow-sm" 
+                     [(ngModel)]="adminData.email" name="email" 
+                     #email="ngModel" required email placeholder="admin@confease.com"
+                     [class.is-invalid]="email.invalid && email.touched">
+              <div class="invalid-feedback">Please provide a valid email address.</div>
             </div>
 
             <div class="mb-4">
               <label class="form-label fw-bold small">Temporary Password</label>
-              <input type="password" class="form-control shadow-sm" [(ngModel)]="adminData.password_hash" name="password" required minlength="8" placeholder="Minimum 8 characters">
+              <div class="input-group shadow-sm">
+                <span class="input-group-text bg-white border-end-0"><i class="bi bi-lock"></i></span>
+                <input type="password" class="form-control border-start-0" 
+                       [(ngModel)]="adminData.password_hash" name="password" 
+                       #password="ngModel" required minlength="8" 
+                       placeholder="Minimum 8 characters"
+                       [class.is-invalid]="password.invalid && password.touched">
+              </div>
+              <div *ngIf="password.errors?.['minlength']" class="text-danger small mt-1">
+                Password must be at least 8 characters long.
+              </div>
             </div>
 
             <div class="d-grid gap-2">
-              <button type="submit" class="btn btn-primary py-2 fw-bold rounded-3" [disabled]="!adminForm.valid || isLoading">
+              <button type="submit" class="btn btn-primary py-2 fw-bold rounded-3 shadow-sm" 
+                      [disabled]="!adminForm.valid || isLoading">
                 <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
-                {{ isLoading ? 'Creating Account...' : 'Generate Admin Account' }}
+                <i *ngIf="!isLoading" class="bi bi-shield-check me-2"></i>
+                {{ isLoading ? 'Processing...' : 'Generate Admin Account' }}
               </button>
-              <button type="button" class="btn btn-light py-2 text-muted" routerLink="/dashboard/user-management">
+              
+              <button type="button" class="btn btn-light py-2 text-muted rounded-3" 
+                      routerLink="/dashboard/user-management">
                 Cancel
               </button>
             </div>
           </form>
         </div>
+
       </div>
     </div>
   </div>
