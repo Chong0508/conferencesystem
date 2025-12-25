@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { ManageTracks } from './manage-tracks';
 
@@ -8,9 +9,8 @@ describe('ManageTracks', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ManageTracks]
-    })
-    .compileComponents();
+      imports: [ManageTracks, HttpClientTestingModule]
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ManageTracks);
     component = fixture.componentInstance;
@@ -21,3 +21,4 @@ describe('ManageTracks', () => {
     expect(component).toBeTruthy();
   });
 });
+

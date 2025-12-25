@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 
 import { ConferenceList } from './conference-list';
 
@@ -8,9 +10,8 @@ describe('ConferenceList', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ConferenceList]
-    })
-    .compileComponents();
+      imports: [ConferenceList, HttpClientTestingModule, RouterTestingModule]
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ConferenceList);
     component = fixture.componentInstance;
@@ -21,3 +22,4 @@ describe('ConferenceList', () => {
     expect(component).toBeTruthy();
   });
 });
+

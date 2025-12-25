@@ -1,18 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 
-import { ConferenceRegistration } from './paper-payment';
+import { PaperPayment } from './paper-payment';
 
-describe('ConferenceRegistration', () => {
-  let component: ConferenceRegistration;
-  let fixture: ComponentFixture<ConferenceRegistration>;
+describe('PaperPayment', () => {
+  let component: PaperPayment;
+  let fixture: ComponentFixture<PaperPayment>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ConferenceRegistration]
-    })
-    .compileComponents();
+      imports: [PaperPayment, HttpClientTestingModule, RouterTestingModule]
+    }).compileComponents();
 
-    fixture = TestBed.createComponent(ConferenceRegistration);
+    fixture = TestBed.createComponent(PaperPayment);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -21,3 +22,4 @@ describe('ConferenceRegistration', () => {
     expect(component).toBeTruthy();
   });
 });
+

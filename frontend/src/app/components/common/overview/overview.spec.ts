@@ -1,18 +1,42 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { of } from 'rxjs';
 
-import { Overview } from './overview';
+import { OverviewComponent } from './overview';
 
-describe('Overview', () => {
-  let component: Overview;
-  let fixture: ComponentFixture<Overview>;
+import { AuthService } from '../../../services/auth.service';
+import { UserService } from '../../../services/user.service';
+import { PaperService } from '../../../services/paper.service';
+import { ReviewService } from '../../../services/review.service';
+import { ConferenceService } from '../../../services/conference.service';
+import { LogActivityService } from '../../../services/log-activity.service';
+
+describe('OverviewComponent', () => {
+  let component: OverviewComponent;
+  let fixture: ComponentFixture<OverviewComponent>;
+
+  const mockAuth = { getLoggedUser: () => ({ id: 1, role: 'Admin' }) };
+  const mockUserService = { getAllUsers: () => of([]) };
+  const mockPaperService = { getAllPapers: () => of([]), getPapersByAuthor: () => of([]) };
+  const mockReviewService = {};
+  const mockConferenceService = { getAllConferences: () => of([]) };
+  const mockLogService = { getRecentLogs: () => of([]) };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Overview]
-    })
-    .compileComponents();
+      imports: [OverviewComponent, RouterTestingModule, HttpClientTestingModule],
+      providers: [
+        { provide: AuthService, useValue: mockAuth },
+        { provide: UserService, useValue: mockUserService },
+        { provide: PaperService, useValue: mockPaperService },
+        { provide: ReviewService, useValue: mockReviewService },
+        { provide: ConferenceService, useValue: mockConferenceService },
+        { provide: LogActivityService, useValue: mockLogService }
+      ]
+    }).compileComponents();
 
-    fixture = TestBed.createComponent(Overview);
+    fixture = TestBed.createComponent(OverviewComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -21,3 +45,4 @@ describe('Overview', () => {
     expect(component).toBeTruthy();
   });
 });
+

@@ -1,18 +1,21 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-import { ReviewerApplications } from './reviewer-applications';
+import { ReviewerApplicationsComponent } from './reviewer-applications';
 
-describe('ReviewerApplications', () => {
-  let component: ReviewerApplications;
-  let fixture: ComponentFixture<ReviewerApplications>;
+describe('ReviewerApplicationsComponent', () => {
+  let component: ReviewerApplicationsComponent;
+  let fixture: ComponentFixture<ReviewerApplicationsComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ReviewerApplications]
-    })
-    .compileComponents();
+      imports: [
+        ReviewerApplicationsComponent,
+        HttpClientTestingModule
+      ]
+    }).compileComponents();
 
-    fixture = TestBed.createComponent(ReviewerApplications);
+    fixture = TestBed.createComponent(ReviewerApplicationsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -21,3 +24,4 @@ describe('ReviewerApplications', () => {
     expect(component).toBeTruthy();
   });
 });
+

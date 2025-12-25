@@ -4,8 +4,15 @@ import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
+@Component({
+  selector: 'app-create-admin',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterLink],
+  templateUrl: './create-admin.html',
+  styleUrls: ['./create-admin.css']
+})
 export class CreateAdminComponent {
-  // Add this block back or ensure the name matches perfectly
+
   adminData = {
     firstName: '',
     lastName: '',
@@ -21,8 +28,7 @@ export class CreateAdminComponent {
 
   onSubmit() {
     this.isLoading = true;
-    
-    // Map the adminData to the payload keys your Java backend expects
+
     const payload = {
       first_name: this.adminData.firstName,
       last_name: this.adminData.lastName,
@@ -31,18 +37,17 @@ export class CreateAdminComponent {
       category: 'Admin'
     };
 
-    this.http.post('http://localhost:8080/users/admin', payload)
-      .subscribe({
-        next: (res) => {
-          this.isLoading = false;
-          this.message = 'Admin created successfully!';
-          this.router.navigate(['/dashboard/user-management']);
-        },
-        error: (err) => {
-          this.isLoading = false;
-          this.isError = true;
-          this.message = err.error?.message || 'Error creating admin';
-        }
-      });
+    this.http.post('http://localhost:8080/users/admin', payload).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.message = 'Admin created successfully!';
+        this.router.navigate(['/dashboard/user-management']);
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.isError = true;
+        this.message = err.error?.message || 'Error creating admin';
+      }
+    });
   }
 }

@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-import { Schedule } from './schedule';
+import { ScheduleComponent } from './schedule';
 
-describe('Schedule', () => {
-  let component: Schedule;
-  let fixture: ComponentFixture<Schedule>;
+describe('ScheduleComponent', () => {
+  let component: ScheduleComponent;
+  let fixture: ComponentFixture<ScheduleComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Schedule]
-    })
-    .compileComponents();
+      imports: [ScheduleComponent, HttpClientTestingModule]
+    }).compileComponents();
 
-    fixture = TestBed.createComponent(Schedule);
+    fixture = TestBed.createComponent(ScheduleComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -21,3 +21,4 @@ describe('Schedule', () => {
     expect(component).toBeTruthy();
   });
 });
+

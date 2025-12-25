@@ -1,18 +1,22 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { CreateAdminComponent } from './create-admin';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 
-import { CreateAdmin } from './create-admin';
-
-describe('CreateAdmin', () => {
-  let component: CreateAdmin;
-  let fixture: ComponentFixture<CreateAdmin>;
+describe('CreateAdminComponent', () => {
+  let component: CreateAdminComponent;
+  let fixture: ComponentFixture<CreateAdminComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CreateAdmin]
-    })
-    .compileComponents();
+      imports: [
+        CreateAdminComponent,
+        HttpClientTestingModule,
+        RouterTestingModule
+      ]
+    }).compileComponents();
 
-    fixture = TestBed.createComponent(CreateAdmin);
+    fixture = TestBed.createComponent(CreateAdminComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -21,3 +25,5 @@ describe('CreateAdmin', () => {
     expect(component).toBeTruthy();
   });
 });
+
+

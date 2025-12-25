@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { PaperMaster } from './paper-master';
 
@@ -8,9 +9,8 @@ describe('PaperMaster', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PaperMaster]
-    })
-    .compileComponents();
+      imports: [PaperMaster, HttpClientTestingModule]
+    }).compileComponents();
 
     fixture = TestBed.createComponent(PaperMaster);
     component = fixture.componentInstance;
@@ -21,3 +21,4 @@ describe('PaperMaster', () => {
     expect(component).toBeTruthy();
   });
 });
+
