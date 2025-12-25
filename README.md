@@ -40,6 +40,7 @@ In conclusion, this project demonstrates the successful implementation of a mode
 
 ## Result/Output (Screenshot of the output)
 |  Operation | Picture | 
+
 | Default Super Admin & Admin | <img width="1239" height="727" alt="image" src="https://github.com/user-attachments/assets/fefdf5c4-6d33-41b8-afb8-7e8b3c3fab15" /> |
 | Landing Page | <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
 
