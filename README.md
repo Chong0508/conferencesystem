@@ -8,6 +8,10 @@
 1. Mention your group name for Assignment-1 and Assignment-2
 1. Other related info (if any)
 
+| Matric Number | Name | Photo | Phone Number | Previous Group |
+|----------------|----------------|----------------|----------------| ----------------|
+
+
 ## Title of your application (a unique title)
 ## Abstract (in 300 words)
   ## 1. Background 
@@ -35,6 +39,10 @@ In conclusion, this project demonstrates the successful implementation of a mode
 ## List of all the endpoints
 
 ## Result/Output (Screenshot of the output)
+|  Operation | Picture | 
+| Default Super Admin & Admin | <img width="1239" height="727" alt="image" src="https://github.com/user-attachments/assets/fefdf5c4-6d33-41b8-afb8-7e8b3c3fab15" /> |
+| Landing Page | <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
+
 
 ## References (Not less than 20)
 
