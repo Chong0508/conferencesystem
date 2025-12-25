@@ -179,8 +179,6 @@ public class UserController {
     }
 
     // Add this method inside UserController.java
-    @PostMapping("/admin")
-    @Transactional
     public ResponseEntity<Map<String, Object>> createAdmin(@RequestBody User user) {
         // Validate input
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
