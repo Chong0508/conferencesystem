@@ -9,11 +9,10 @@ module.exports = function (config) {
       require('karma-chrome-launcher'),
       require('karma-jasmine-html-reporter'),
       require('karma-coverage'),
-      require('karma-allure-reporter') // Ensure this is present
+      require('karma-allure-reporter') // <--- Make sure this is installed
     ],
     reporters: ['progress', 'kjhtml', 'allure'],
     allureReporter: {
-      // Use an absolute path to prevent the 'undefined path' error
       reportDir: path.join(__dirname, 'allure-results'),
       useTimestamp: false
     },
