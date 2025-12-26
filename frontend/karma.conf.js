@@ -10,6 +10,7 @@ module.exports = function (config) {
       require('karma-chrome-launcher'),
       require('karma-jasmine-html-reporter'),
       require('karma-coverage'),
+      require('karma-allure-reporter') // --- ADDED THIS ---
     ],
     client: {
       jasmine: {
@@ -27,7 +28,14 @@ module.exports = function (config) {
         { type: 'text-summary' }
       ]
     },
-    reporters: ['progress', 'kjhtml'],
+
+    // --- ADDED ALLURE REPORTER CONFIG ---
+    reporters: ['progress', 'kjhtml', 'allure'], 
+    allureReporter: {
+      reportDir: 'allure-results', // This generates results in frontend/allure-results
+      useTimestamp: false
+    },
+    // ------------------------------------
     
     // --- UPDATED FOR DOCKER/JENKINS ---
     browsers: ['ChromeHeadlessNoSandbox'],
