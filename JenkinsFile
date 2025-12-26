@@ -35,11 +35,11 @@ pipeline {
         stage('Frontend: Unit Tests') {
             tools { nodejs "node-v22" }
             steps {
-                echo "Running Angular Unit Tests (Karma/Jasmine)..."
+                echo "Running Angular Unit Tests..."
                 dir("${FRONTEND_DIR}") {
                     sh """
+                        rm -rf allure-results
                         npm install
-                        # Uses the custom launcher defined in karma.conf.js
                         npx ng test --watch=false --browsers=ChromeHeadlessNoSandbox
                     """
                 }
