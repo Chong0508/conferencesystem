@@ -7,6 +7,8 @@ pipeline {
         E2E_DIR = "e2e"
         // Ensures Playwright browsers are stored within the workspace for Jenkins to access
         PLAYWRIGHT_BROWSERS_PATH = "${WORKSPACE}/pw-browsers"
+        // FIX: Points Karma to the Chromium binary installed in your custom Docker image
+        CHROME_BIN = "/usr/bin/chromium"
     }
 
     stages {
@@ -29,7 +31,6 @@ pipeline {
             }
             post {
                 always {
-                    // Collects JUnit test results from the backend
                     junit "${BACKEND_DIR}/target/surefire-reports/*.xml"
                 }
             }
@@ -42,8 +43,8 @@ pipeline {
                 dir("${FRONTEND_DIR}") {
                     sh """
                         npm install
-                        # Executes the .spec.ts files (like submit-paper.spec.ts) in headless mode
-                        npx ng test --watch=false --browsers=ChromeHeadless
+                        # FIX: Added --no-sandbox which is required for Chrome to run inside Docker containers
+                        npx ng test --watch=false --browsers=ChromeHeadless --no-sandbox
                     """
                 }
             }
@@ -62,29 +63,23 @@ pipeline {
         stage('E2E: Playwright Tests') {
             tools { nodejs "node-v22" }
             steps {
-                echo "Running Playwright End-to-End Tests from the e2e folder..."
+                echo "Running Playwright End-to-End Tests..."
                 dir("${E2E_DIR}") {
                     sh """
-                        # Install dependencies for the E2E project
                         npm install
-                        
-                        # Install required browsers and system dependencies for Jenkins environment
                         npx playwright install --with-deps chromium
-                        
-                        # Execute the specific flow script
                         npx playwright test full-stack-flow.spec.ts
                     """
                 }
             }
             post {
                 always {
-                    // Publishes the Playwright HTML report to the Jenkins sidebar
                     publishHTML([allowMissing: false, 
-                                 alwaysLinkToLastBuild: true, 
-                                 keepAll: true, 
-                                 reportDir: "${E2E_DIR}/playwright-report", 
-                                 reportFiles: 'index.html', 
-                                 reportName: 'Playwright E2E Report'])
+                                  alwaysLinkToLastBuild: true, 
+                                  keepAll: true, 
+                                  reportDir: "${E2E_DIR}/playwright-report", 
+                                  reportFiles: 'index.html', 
+                                  reportName: 'Playwright E2E Report'])
                 }
             }
         }

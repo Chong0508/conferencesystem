@@ -14,3 +14,4 @@ RUN mkdir -p /app/uploads/papers
 
 # Run the jar from the current WORKDIR (/app/app.jar)
 ENTRYPOINT ["java", "-jar", "app.jar"]
+
