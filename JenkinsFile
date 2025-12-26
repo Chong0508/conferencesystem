@@ -5,9 +5,8 @@ pipeline {
         BACKEND_DIR = "backend"
         FRONTEND_DIR = "frontend"
         E2E_DIR = "e2e"
-        // Ensures Playwright browsers are stored within the workspace for Jenkins to access
         PLAYWRIGHT_BROWSERS_PATH = "${WORKSPACE}/pw-browsers"
-        // FIX: Points Karma to the Chromium binary installed in your custom Docker image
+        // Ensure this points to the Chromium installed in your Docker container
         CHROME_BIN = "/usr/bin/chromium"
     }
 
@@ -43,8 +42,7 @@ pipeline {
                 dir("${FRONTEND_DIR}") {
                     sh """
                         npm install
-                        # FIX: Added --no-sandbox which is required for Chrome to run inside Docker containers
-                        npx ng test --watch=false --browsers=ChromeHeadless --no-sandbox
+                        npx ng test --watch=false --browsers=ChromeHeadlessNoSandbox
                     """
                 }
             }
@@ -100,10 +98,10 @@ pipeline {
             cleanWs()
         }
         success {
-            echo "Build Success! You can view the reports on the left sidebar."
+            echo "Build Success!"
         }
         failure {
-            echo "Build Failed. Please check the Playwright and Allure reports for details."
+            echo "Build Failed."
         }
     }
 }
