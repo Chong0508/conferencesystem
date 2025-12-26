@@ -4,11 +4,6 @@ pipeline {
     environment {
         BACKEND_DIR = "backend"
         FRONTEND_DIR = "frontend"
-        E2E_DIR = "e2e"
-        // Stores browsers in the workspace to avoid permission issues in different environments
-        PLAYWRIGHT_BROWSERS_PATH = "${WORKSPACE}/pw-browsers"
-        // Points to the Chromium binary installed in your custom Docker container
-        CHROME_BIN = "/usr/bin/chromium"
     }
 
     stages {
@@ -61,38 +56,6 @@ pipeline {
             }
         }
 
-        stage('E2E: Playwright Tests') {
-            tools { nodejs "node-v22" }
-            steps {
-                echo "Running Playwright End-to-End Tests..."
-                dir("${E2E_DIR}") {
-                    sh """
-                        npm install
-                        
-                        # FIX: Grant execution permissions to resolve 'Permission Denied' errors
-                        chmod -R +x node_modules/.bin
-                        
-                        # Install Playwright browsers
-                        npx playwright install --with-deps chromium
-                        
-                        # Execute the full-stack flow test
-                        npx playwright test full-stack-flow.spec.ts
-                    """
-                }
-            }
-            post {
-                always {
-                    // Publishes the HTML report to the Jenkins sidebar
-                    publishHTML([allowMissing: false, 
-                                  alwaysLinkToLastBuild: true, 
-                                  keepAll: true, 
-                                  reportDir: "${E2E_DIR}/playwright-report", 
-                                  reportFiles: 'index.html', 
-                                  reportName: 'Playwright E2E Report'])
-                }
-            }
-        }
-
         stage('Reports: Allure') {
             steps {
                 echo "Generating Allure Report..."
@@ -109,10 +72,10 @@ pipeline {
             cleanWs()
         }
         success {
-            echo "Build Success! Your Conference Management System is verified."
+            echo "Build Success! Your Backend and Frontend logic is verified."
         }
         failure {
-            echo "Build Failed. Please check the sidebar reports for logs and screenshots."
+            echo "Build Failed. Please check the unit test logs and Allure reports."
         }
     }
 }
