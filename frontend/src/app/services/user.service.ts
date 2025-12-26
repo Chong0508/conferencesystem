@@ -29,11 +29,12 @@ export class UserService {
     });
   }
 
-  register(user: any): Observable<any> {
-    return this.http.post<any>(`${this.baseUrl}/register`, user, {
-      withCredentials: true
+register(user: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}`, user, { 
+        withCredentials: true
     });
-  }
+}
+
 
   createAdmin(adminData: any) {
   const url = 'http://localhost:8080/users/admin';

@@ -12,12 +12,13 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./create-admin.css']
 })
 export class CreateAdminComponent {
-
+  // Add this block back or ensure the name matches perfectly
   adminData = {
     firstName: '',
     lastName: '',
     email: '',
-    password_hash: ''
+    password_hash: '', 
+    category: 'Admin'
   };
 
   message = '';
@@ -28,7 +29,8 @@ export class CreateAdminComponent {
 
   onSubmit() {
     this.isLoading = true;
-
+    
+    // Map the adminData to the payload keys your Java backend expects
     const payload = {
       first_name: this.adminData.firstName,
       last_name: this.adminData.lastName,
@@ -37,17 +39,18 @@ export class CreateAdminComponent {
       category: 'Admin'
     };
 
-    this.http.post('http://localhost:8080/users/admin', payload).subscribe({
-      next: () => {
-        this.isLoading = false;
-        this.message = 'Admin created successfully!';
-        this.router.navigate(['/dashboard/user-management']);
-      },
-      error: (err) => {
-        this.isLoading = false;
-        this.isError = true;
-        this.message = err.error?.message || 'Error creating admin';
-      }
-    });
+    this.http.post('http://localhost:8080/users/admin', payload)
+      .subscribe({
+        next: (res) => {
+          this.isLoading = false;
+          this.message = 'Admin created successfully!';
+          this.router.navigate(['/dashboard/user-management']);
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.isError = true;
+          this.message = err.error?.message || 'Error creating admin';
+        }
+      });
   }
 }

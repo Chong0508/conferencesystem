@@ -55,7 +55,7 @@
         </li>
       </ng-container>
 
-      <ng-container *ngIf="loggedUser.role === 'Admin' || loggedUser.role === 'Super Admin'">
+      <ng-container *ngIf="loggedUser?.role === 'Admin' || loggedUser?.role === 'Super Admin'">
         <li class="nav-item mt-3">
           <p class="text-muted small ms-3 mb-2 fw-bold">ADMIN PANEL</p>
           <a class="nav-link" routerLink="/dashboard/conferences" routerLinkActive="active">
@@ -79,7 +79,7 @@
         </li>
       </ng-container>
 
-      <ng-container *ngIf="loggedUser.role === 'Super Admin'">
+      <ng-container *ngIf="loggedUser?.role === 'Super Admin'">
         <li class="nav-item mt-3">
           <p class="text-muted small ms-3 mb-2 fw-bold">SYSTEM CONTROL</p>
           <a class="nav-link" routerLink="/dashboard/create-admin" routerLinkActive="active">
