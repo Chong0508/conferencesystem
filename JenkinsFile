@@ -1,12 +1,17 @@
 pipeline {
     agent any
 
+    tools {
+        nodejs "node-18"
+    }
+
     environment {
         BACKEND_DIR = "backend"
         FRONTEND_DIR = "frontend"
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 checkout scm
@@ -20,25 +25,23 @@ pipeline {
                 dir("${BACKEND_DIR}") {
                     sh """
                         chmod +x mvnw
-                        ./mvnw clean test -B 
+                        ./mvnw clean test -B
                     """
                 }
             }
             post {
                 always {
-                    // Collects JUnit results for the Jenkins dashboard
                     junit "${BACKEND_DIR}/target/surefire-reports/*.xml"
                 }
             }
         }
 
         stage('Frontend: Unit Tests') {
-            tools { nodejs "node-v22" }
             steps {
                 echo "Running Angular Unit Tests..."
                 dir("${FRONTEND_DIR}") {
                     sh """
-                        rm -rf allure-results
+                        mkdir -p allure-results
                         npm install
                         npx ng test --watch=false --browsers=ChromeHeadlessNoSandbox
                     """
@@ -47,7 +50,6 @@ pipeline {
         }
 
         stage('Frontend: Build Check') {
-            tools { nodejs "node-v22" }
             steps {
                 echo "Verifying Angular Production Build..."
                 dir("${FRONTEND_DIR}") {
@@ -59,7 +61,6 @@ pipeline {
         stage('Reports: Allure') {
             steps {
                 echo "Generating Combined Allure Report..."
-                // Logic to point Allure to both result folders
                 allure includeProperties: false,
                        jdk: '',
                        results: [
@@ -76,10 +77,10 @@ pipeline {
             cleanWs()
         }
         success {
-            echo "Build Success! Your Backend and Frontend logic is verified."
+            echo "Build Success! Backend & Frontend verified."
         }
         failure {
-            echo "Build Failed. Please check the unit test logs and Allure reports."
+            echo "Build Failed. Check unit tests and Allure reports."
         }
     }
 }
