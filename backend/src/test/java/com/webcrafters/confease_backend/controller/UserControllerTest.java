@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.webcrafters.confease_backend.model.User;
 import com.webcrafters.confease_backend.model.UserRole;
 import com.webcrafters.confease_backend.model.Role;
-import com.webcrafters.confease_backend.repository.UserRepository;
-import com.webcrafters.confease_backend.repository.RoleRepository;
-import com.webcrafters.confease_backend.repository.UserRoleRepository;
+import com.webcrafters.confease_backend.model.LogActivity;
+import com.webcrafters.confease_backend.repository.*;
+import com.webcrafters.confease_backend.service.ReviewerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -38,6 +38,15 @@ class UserControllerTest {
     private UserRoleRepository userRoleRepository;
 
     @Mock
+    private LogActivityRepository logActivityRepository; // ADDED: To fix NullPointerException
+
+    @Mock
+    private ReviewerApplicationRepository applicationRepository; // ADDED: Required by UserController
+
+    @Mock
+    private ReviewerService reviewerService; // ADDED: Required by UserController
+
+    @Mock
     private BCryptPasswordEncoder passwordEncoder;
 
     @InjectMocks
@@ -54,6 +63,7 @@ class UserControllerTest {
     @Test
     void testCreateUser_Success() throws Exception {
         User user = new User();
+        user.setUser_id(1L);
         user.setEmail("test@example.com");
         user.setPassword_hash("password123"); 
         user.setCategory("Author");
@@ -62,11 +72,15 @@ class UserControllerTest {
         role.setRole_id(1);
         role.setRole_name("Author");
 
+        // Mocking the flows in UserController.createUser()
         when(userRepository.count()).thenReturn(1L);
         when(userRepository.findByEmail(anyString())).thenReturn(null);
         when(passwordEncoder.encode(anyString())).thenReturn("hashed_pass");
         when(userRepository.saveAndFlush(any(User.class))).thenReturn(user);
         when(roleRepository.findByRoleName("Author")).thenReturn(role);
+        
+        // Mocking the LogActivity save to prevent NPE
+        when(logActivityRepository.save(any(LogActivity.class))).thenReturn(new LogActivity());
 
         mockMvc.perform(post("/users")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -84,8 +98,10 @@ class UserControllerTest {
         user.setCategory("Admin");
 
         when(userRepository.findByEmail("login@test.com")).thenReturn(user);
-        // Mock the password match logic 
         when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
+        
+        // Mocking the LogActivity save for login
+        when(logActivityRepository.save(any(LogActivity.class))).thenReturn(new LogActivity());
 
         UserController.LoginRequest loginRequest = new UserController.LoginRequest();
         loginRequest.setEmail("login@test.com");
@@ -103,12 +119,13 @@ class UserControllerTest {
         Long userId = 1L;
         User user = new User();
         user.setUser_id(userId);
+        user.setEmail("delete@test.com");
 
-        // Mock finding the user
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        
-        // Mock finding the role mapping (so deleteUser logic doesn't fail)
         when(userRoleRepository.findByUserId(userId)).thenReturn(new UserRole());
+        
+        // Mocking the LogActivity save for deletion
+        when(logActivityRepository.save(any(LogActivity.class))).thenReturn(new LogActivity());
 
         mockMvc.perform(delete("/users/" + userId))
                 .andExpect(status().isOk())
