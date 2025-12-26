@@ -73,31 +73,31 @@
           "builder": "@angular/build:extract-i18n"
         },
         "test": {
-  "builder": "@angular/build:karma",
-  "options": {
-    "polyfills": [
-      "zone.js",
-      "zone.js/testing"
-    ],
-    "tsConfig": "tsconfig.spec.json",
-    "karmaConfig": "karma.conf.js",
-    "inlineStyleLanguage": "css",
-    "assets": [
-      {
-        "glob": "**/*",
-        "input": "public"
-      }
-    ],
-    "styles": [
-      "src/styles.css",
-      "node_modules/bootstrap/dist/css/bootstrap.min.css",
-      "node_modules/bootstrap-icons/font/bootstrap-icons.css"
-    ],
-    "scripts": [
-      "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
-    ]
-  }
-}
+          "builder": "@angular/build:karma",
+          "options": {
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ],
+            "tsConfig": "tsconfig.spec.json",
+            "karmaConfig": "karma.conf.js",
+            "inlineStyleLanguage": "css",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
+            ],
+            "styles": [
+              "src/styles.css",
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "node_modules/bootstrap-icons/font/bootstrap-icons.css"
+            ],
+            "scripts": [
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+            ]
+          }
+        }
       }
     }
   },

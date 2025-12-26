@@ -32,7 +32,6 @@ pipeline {
         }
 
         stage('Frontend: Unit Tests') {
-            // Corrected tool name from node-22 to node-v22
             tools { nodejs "node-v22" }
             steps {
                 echo "Running Angular Unit Tests (Karma/Jasmine)..."
@@ -46,7 +45,6 @@ pipeline {
         }
 
         stage('Frontend: Build Check') {
-            // Corrected tool name from node-22 to node-v22
             tools { nodejs "node-v22" }
             steps {
                 echo "Verifying Angular Production Build..."
@@ -59,7 +57,6 @@ pipeline {
         stage('Reports: Allure') {
             steps {
                 echo "Generating Backend Allure Report..."
-                // Modified to remove [path: "${FRONTEND_DIR}/allure-results"]
                 allure includeProperties: false,
                        jdk: '',
                        results: [
