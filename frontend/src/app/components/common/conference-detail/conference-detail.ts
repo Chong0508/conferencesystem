@@ -65,10 +65,12 @@ export class ConferenceDetail implements OnInit {
   loadConferencePapers(confId: number) {
     this.paperService.getAllPapers().subscribe({
       next: (allPapers) => {
+        // Filter for specific conference ID AND strictly 'Registered' status
         this.relatedPapers = allPapers.filter((p: any) => 
-          p.conferenceId === confId && (p.status === 'Registered' || p.status === 'Pending Review')
+          p.conferenceId === confId && p.status === 'Registered'
         );
-      }
+      },
+      error: (err) => console.error("Error loading papers", err)
     });
   }
 }
