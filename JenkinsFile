@@ -37,18 +37,19 @@ pipeline {
             }
         }
 
-        stage('Frontend: Unit Tests') {
-            steps {
-                dir("${FRONTEND_DIR}") {
-                    sh """
-                        echo "Node version: $(node -v)"
-                        rm -rf allure-results
-                        npm install
-                        npx ng test --watch=false --browsers=ChromeHeadlessNoSandbox
-                    """
-                }
-            }
-        }
+          stage('Frontend: Unit Tests') {
+              steps {
+                  dir("${FRONTEND_DIR}") {
+                      sh '''
+                          echo "Node version: $(node -v)"
+                          rm -rf allure-results
+                          npm install
+                          npx ng test --watch=false --browsers=ChromeHeadlessNoSandbox
+                      '''
+                  }
+              }
+          }
+
 
         stage('Frontend: Build Check') {
             steps {
