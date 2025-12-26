@@ -2,6 +2,7 @@ package com.webcrafters.confease_backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.webcrafters.confease_backend.model.Payment;
+import com.webcrafters.confease_backend.model.LogActivity;
 import com.webcrafters.confease_backend.model.Paper;
 import com.webcrafters.confease_backend.repository.PaymentRepository;
 import com.webcrafters.confease_backend.repository.PaperRepository;
@@ -49,18 +50,26 @@ public class PaymentControllerTest {
 
     @Test
     void testCreatePayment() throws Exception {
+        // 1. Prepare the Payment object
         Payment payment = new Payment();
+        payment.setPayment_id(1L);
         payment.setAmount(200.0);
         payment.setCurrency("USD");
-        payment.setRegistration_id(1L); // Using correct model field name
+        payment.setRegistration_id(1L); // This ID is used to find the paper
         payment.setStatus("Completed");
 
-        // Mocking the PaperRepository find to prevent NPE in controller
-        when(paperRepository.findById(1L)).thenReturn(Optional.of(new Paper()));
+        // 2. Mock the PaperRepository to return a Paper object (to avoid internal logic failure)
+        Paper mockPaper = new Paper();
+        mockPaper.setPaperId(1L);
+        when(paperRepository.findById(1L)).thenReturn(Optional.of(mockPaper));
         
-        // Mocking the Payment save
+        // 3. Mock the PaymentRepository save
         when(paymentRepository.save(any(Payment.class))).thenReturn(payment);
+        
+        // 4. Mock the LogActivityRepository to prevent NPE
+        when(logActivityRepository.save(any(LogActivity.class))).thenReturn(new LogActivity());
 
+        // 5. Perform request and check for the specific message in your controller
         mockMvc.perform(post("/api/payments")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(payment)))
