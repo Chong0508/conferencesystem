@@ -29,7 +29,7 @@ public class DataInitializer implements CommandLineRunner {
     private ScoreCriterionRepository scoreCriterionRepository;
 
     @Autowired
-    private ReviewerRepository reviewerRepository; // Add this
+    private ReviewerRepository reviewerRepository;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -56,7 +56,7 @@ public class DataInitializer implements CommandLineRunner {
                 linkUserToRole(superUser.getUser_id(), superAdminRole.getRole_id());
                 linkUserToRole(generalAdmin.getUser_id(), adminRole.getRole_id());
 
-                // 2. Make them also Reviewers in the reviewer table
+                // 2. Make them also Reviewers
                 makeUserReviewer(superUser.getUser_id(), "System Management", 10);
                 makeUserReviewer(generalAdmin.getUser_id(), "General Administration", 5);
 
@@ -65,28 +65,18 @@ public class DataInitializer implements CommandLineRunner {
 
             // 3. Initialize Score Criteria
             if (scoreCriterionRepository.count() == 0) {
-                ScoreCriterion c1 = new ScoreCriterion();
-                c1.setName("Originality");
-                c1.setDescription("Novelty of the research and contribution to the field.");
-
-                ScoreCriterion c2 = new ScoreCriterion();
-                c2.setName("Relevance");
-                c2.setDescription("Alignment with the conference tracks and themes.");
-
-                ScoreCriterion c3 = new ScoreCriterion();
-                c3.setName("Quality");
-                c3.setDescription("Technical soundness and rigor of the methodology.");
-
-                ScoreCriterion c4 = new ScoreCriterion();
-                c4.setName("Presentation");
-                c4.setDescription("Clarity of writing, structure, and quality of figures/tables.");
+                ScoreCriterion c1 = createCriterion("Originality", "Novelty of the research.");
+                ScoreCriterion c2 = createCriterion("Relevance", "Alignment with themes.");
+                ScoreCriterion c3 = createCriterion("Quality", "Technical soundness.");
+                ScoreCriterion c4 = createCriterion("Presentation", "Clarity of writing.");
 
                 scoreCriterionRepository.saveAll(Arrays.asList(c1, c2, c3, c4));
-                System.out.println("✅ Score Criteria (1-4) Initialized.");
+                System.out.println("✅ Score Criteria Initialized.");
             }
 
         } catch (Exception e) {
             System.err.println("❌ Initialization Error: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -98,13 +88,19 @@ public class DataInitializer implements CommandLineRunner {
         userRoleRepository.save(userRole);
     }
 
-    // Helper method to create Reviewer profile
     private void makeUserReviewer(Long userId, String area, Integer maxPapers) {
         Reviewer reviewer = new Reviewer();
         reviewer.setUser_id(userId);
         reviewer.setExpertise_area(area);
         reviewer.setMax_papers(maxPapers);
         reviewerRepository.save(reviewer);
+    }
+
+    private ScoreCriterion createCriterion(String name, String desc) {
+        ScoreCriterion c = new ScoreCriterion();
+        c.setName(name);
+        c.setDescription(desc);
+        return c;
     }
 
     private User createBaseUser(String first, String last, String email, String rawPassword, String category) {
@@ -114,6 +110,12 @@ public class DataInitializer implements CommandLineRunner {
         user.setEmail(email);
         user.setPassword_hash(passwordEncoder.encode(rawPassword));
         user.setCategory(category); 
+        
+        // FIX: Provide non-null values for mandatory fields to satisfy DB Constraints
+        user.setAffiliation("WebCrafters Organization");
+        user.setCountry("Malaysia");
+        user.setOrcid("0000-0000-0000-0000");
+        
         user.setIs_email_verified(true);
         user.setCreated_at(new Timestamp(System.currentTimeMillis()));
         user.setUpdated_at(new Timestamp(System.currentTimeMillis()));

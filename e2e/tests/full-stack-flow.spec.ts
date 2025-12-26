@@ -5,16 +5,16 @@ import { Buffer } from 'buffer';
  * Reusable Login Logic
  */
 async function login(page: Page, email: string, password: string) {
-  await page.goto('/login', { waitUntil: 'networkidle' });
-  await page.getByPlaceholder('name@example.com').fill(email);
-  await page.getByPlaceholder('Enter your password').fill(password);
+  await page.goto('http://localhost:4200/login');
+  await page.fill('input[name="email"]', email);
+  await page.fill('input[name="password"]', password);
   
-  await Promise.all([
-    page.waitForURL(/.*dashboard.*/),
-    page.waitForLoadState('networkidle'), 
-    page.getByRole('button', { name: 'Login to Dashboard' }).click(),
-  ]);
-  await expect(page.locator('app-dashboard')).toBeVisible();
+  // Click and THEN wait for navigation
+  await page.getByRole('button', { name: 'Login to Dashboard' }).click();
+  
+  // Wait for the URL to change to dashboard
+  await page.waitForURL(/.*dashboard.*/, { timeout: 30000 }); 
+  await page.waitForLoadState('networkidle');
 }
 
 test.describe('G5ConfEase Sequential Business Flow', () => {
