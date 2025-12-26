@@ -26,20 +26,19 @@ pipeline {
             }
             post {
                 always {
-                    // Collects JUnit results for the Jenkins dashboard
                     junit "${BACKEND_DIR}/target/surefire-reports/*.xml"
                 }
             }
         }
 
         stage('Frontend: Unit Tests') {
+            // Corrected tool name from node-22 to node-v22
             tools { nodejs "node-v22" }
             steps {
                 echo "Running Angular Unit Tests (Karma/Jasmine)..."
                 dir("${FRONTEND_DIR}") {
                     sh """
                         npm install
-                        # Uses the custom launcher defined in karma.conf.js
                         npx ng test --watch=false --browsers=ChromeHeadlessNoSandbox
                     """
                 }
@@ -47,6 +46,7 @@ pipeline {
         }
 
         stage('Frontend: Build Check') {
+            // Corrected tool name from node-22 to node-v22
             tools { nodejs "node-v22" }
             steps {
                 echo "Verifying Angular Production Build..."
@@ -58,13 +58,12 @@ pipeline {
 
         stage('Reports: Allure') {
             steps {
-                echo "Generating Combined Allure Report..."
-                // Logic to point Allure to both result folders
+                echo "Generating Backend Allure Report..."
+                // Modified to remove [path: "${FRONTEND_DIR}/allure-results"]
                 allure includeProperties: false,
                        jdk: '',
                        results: [
-                           [path: "${BACKEND_DIR}/target/allure-results"],
-                           [path: "${FRONTEND_DIR}/allure-results"]
+                           [path: "${BACKEND_DIR}/target/allure-results"]
                        ]
             }
         }
