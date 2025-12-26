@@ -12,7 +12,6 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./create-admin.css']
 })
 export class CreateAdminComponent {
-  // Add this block back or ensure the name matches perfectly
   adminData = {
     firstName: '',
     lastName: '',
@@ -29,27 +28,22 @@ export class CreateAdminComponent {
 
   onSubmit() {
     this.isLoading = true;
+    this.message = '';
     
-    // Map the adminData to the payload keys your Java backend expects
-    const payload = {
-      first_name: this.adminData.firstName,
-      last_name: this.adminData.lastName,
-      email: this.adminData.email,
-      password_hash: this.adminData.password_hash,
-      category: 'Admin'
-    };
-
-    this.http.post('http://localhost:8080/users/admin', payload)
+    // Using the specific admin creation endpoint
+    this.http.post('http://localhost:8080/users/admin', this.adminData)
       .subscribe({
-        next: (res) => {
+        next: (res: any) => {
           this.isLoading = false;
-          this.message = 'Admin created successfully!';
-          this.router.navigate(['/dashboard/user-management']);
+          this.isError = false;
+          this.message = 'Admin account created successfully!';
+          setTimeout(() => this.router.navigate(['/dashboard/user-management']), 2000);
         },
         error: (err) => {
           this.isLoading = false;
           this.isError = true;
-          this.message = err.error?.message || 'Error creating admin';
+          // Capture the clear error message from our backend
+          this.message = err.error.message || 'An error occurred during registration.';
         }
       });
   }
