@@ -1,71 +1,114 @@
 pipeline {
-  agent any
+    agent any
 
-  environment {
-    BACKEND_DIR = "backend"
-    FRONTEND_DIR = "frontend"
-  }
-
-  stages {
-    stage('Checkout') {
-      steps {
-        checkout scm
-        echo "Source code checked out successfully."
-      }
+    environment {
+        BACKEND_DIR = "backend"
+        FRONTEND_DIR = "frontend"
+        E2E_DIR = "e2e"
+        // Ensures Playwright browsers are stored within the workspace for Jenkins to access
+        PLAYWRIGHT_BROWSERS_PATH = "${WORKSPACE}/pw-browsers"
     }
 
-    stage('Backend: Unit Tests') {
-      steps {
-        echo "Running Spring Boot Unit Tests..."
-        dir("${BACKEND_DIR}") {
-          sh """
-              chmod +x mvnw
-              ./mvnw clean test -B 
-          """
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+                echo "Source code checked out successfully."
+            }
         }
-      }
-      post {
+
+        stage('Backend: Unit Tests') {
+            steps {
+                echo "Running Spring Boot Unit Tests..."
+                dir("${BACKEND_DIR}") {
+                    sh """
+                        chmod +x mvnw
+                        ./mvnw clean test -B 
+                    """
+                }
+            }
+            post {
+                always {
+                    // Collects JUnit test results from the backend
+                    junit "${BACKEND_DIR}/target/surefire-reports/*.xml"
+                }
+            }
+        }
+
+        stage('Frontend: Unit Tests') {
+            tools { nodejs "node-v22" }
+            steps {
+                echo "Running Angular Unit Tests (Karma/Jasmine)..."
+                dir("${FRONTEND_DIR}") {
+                    sh """
+                        npm install
+                        # Executes the .spec.ts files (like submit-paper.spec.ts) in headless mode
+                        npx ng test --watch=false --browsers=ChromeHeadless
+                    """
+                }
+            }
+        }
+
+        stage('Frontend: Build Check') {
+            tools { nodejs "node-v22" }
+            steps {
+                echo "Verifying Angular Production Build..."
+                dir("${FRONTEND_DIR}") {
+                    sh "npm run build -- --configuration=production"
+                }
+            }
+        }
+
+        stage('E2E: Playwright Tests') {
+            tools { nodejs "node-v22" }
+            steps {
+                echo "Running Playwright End-to-End Tests from the e2e folder..."
+                dir("${E2E_DIR}") {
+                    sh """
+                        # Install dependencies for the E2E project
+                        npm install
+                        
+                        # Install required browsers and system dependencies for Jenkins environment
+                        npx playwright install --with-deps chromium
+                        
+                        # Execute the specific flow script
+                        npx playwright test full-stack-flow.spec.ts
+                    """
+                }
+            }
+            post {
+                always {
+                    // Publishes the Playwright HTML report to the Jenkins sidebar
+                    publishHTML([allowMissing: false, 
+                                 alwaysLinkToLastBuild: true, 
+                                 keepAll: true, 
+                                 reportDir: "${E2E_DIR}/playwright-report", 
+                                 reportFiles: 'index.html', 
+                                 reportName: 'Playwright E2E Report'])
+                }
+            }
+        }
+
+        stage('Reports: Allure') {
+            steps {
+                echo "Generating Allure Report..."
+                allure includeProperties: false,
+                       jdk: '',
+                       results: [[path: "${BACKEND_DIR}/target/allure-results"]]
+            }
+        }
+    }
+
+    post {
         always {
-          junit "${BACKEND_DIR}/target/surefire-reports/*.xml"
+            echo "Cleaning up workspace..."
+            cleanWs()
         }
-      }
-    }
-
-    stage('Frontend: Build Check') {
-      tools {
-        nodejs "node-v22" 
-      }
-      steps {
-        echo "Installing dependencies and verifying Angular build..."
-        dir("${FRONTEND_DIR}") {
-          sh """
-              npm install
-              npm run build -- --configuration=production
-          """
+        success {
+            echo "Build Success! You can view the reports on the left sidebar."
         }
-      }
+        failure {
+            echo "Build Failed. Please check the Playwright and Allure reports for details."
+        }
     }
-
-    stage('Reports: Allure') {
-      steps {
-        echo "Generating Allure Report..."
-        allure includeProperties: false,
-               jdk: '',
-               results: [[path: "${BACKEND_DIR}/target/allure-results"]]
-      }
-    }
-  }
-
-  post {
-    always {
-      echo "Cleaning up workspace..."
-      cleanWs()
-    }
-    success {
-      echo "Build Success! You can view the Allure Report on the left sidebar."
-    }
-    failure {
-      echo "Build Failed. Please check the 'Console Output' or 'Allure Report' for details."
-    }
-  }
 }
