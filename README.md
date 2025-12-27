@@ -42,30 +42,28 @@ In conclusion, this project demonstrates the successful implementation of a mode
 |  Operation | Picture | 
 |---------------|----------------|
 | Default Super Admin & Admin | http://localhost:8080/users <img width="1239" height="727" alt="image" src="https://github.com/user-attachments/assets/fefdf5c4-6d33-41b8-afb8-7e8b3c3fab15" /> |
-| Default Super Admin & Admin | http://localhost:8080/users <img width="1239" height="727" alt="image" src="https://github.com/user-attachments/assets/fefdf5c4-6d33-41b8-afb8-7e8b3c3fab15" /> |
 | Landing Page | http://localhost:4200 <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Login Page | http://localhost:4200/login <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Overview Page | http://localhost:4200/dashboard/overview <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Notifications Page | http://localhost:4200/dashboard/notifications <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Research Library Page | http://localhost:4200/searchPapers <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Conference Paper Page | http://localhost:4200/conferences <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Conference Paper Page | http://localhost:4200/dashboard/conferences-detail/{id} <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Previous Submitted Paper Page | http://localhost:4200/dashboard/my-participated <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Submission Page | http://localhost:4200/dashboard/registration/{id} <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Submission Page | http://localhost:4200/dashboard/submit-paper <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Submitted Paper Page | http://localhost:4200/dashboard/my-submissions <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Profile Page | http://localhost:4200/dashboard/profile <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Reviewer Apply Page | http://localhost:4200/dashboard/apply-reviewer <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Reviewer Apply Page | http://localhost:4200/dashboard/tracks <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Reviewer Apply Page | http://localhost:4200/dashboard/user-management <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Reviewer Apply Page | http://localhost:4200/dashboard/activity-logs <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Reviewer Apply Page | http://localhost:4200/dashboard/reviews <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Reviewer Apply Page | http://localhost:4200/dashboard/reviews/{id} <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Reviewer Apply Page | http://localhost:4200/dashboard/review-history <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Reviewer Apply Page | http://localhost:4200/dashboard/all-papers <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Reviewer Apply Page | http://localhost:4200/dashboard/applications <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Reviewer Apply Page | http://localhost:4200/dashboard/review-history <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Reviewer Apply Page | http://localhost:4200/dashboard/paper-details/{id} <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
+| Login Page | http://localhost:4200/login <img width="1920" height="1671" alt="image" src="https://github.com/STIWK2124-A251/assignment-3-g5/blob/c30cc7a777624328e29e4fdb9d2d93ef4d56d44c/images/login.png" /> |
+| Overview Page | http://localhost:4200/dashboard/overview <img width="1920" height="1671" alt="image" src="https://github.com/STIWK2124-A251/assignment-3-g5/blob/c30cc7a777624328e29e4fdb9d2d93ef4d56d44c/images/overview.png" /> |
+| Notifications Page | http://localhost:4200/dashboard/notifications <img width="1920" height="1671" alt="image" src="https://github.com/STIWK2124-A251/assignment-3-g5/blob/c30cc7a777624328e29e4fdb9d2d93ef4d56d44c/images/notifications.png" /> |
+| Research Library Page | http://localhost:4200/searchPapers <img width="1920" height="1671" alt="image" src="https://github.com/STIWK2124-A251/assignment-3-g5/blob/c30cc7a777624328e29e4fdb9d2d93ef4d56d44c/images/searchPapers.png" /> |
+| Conference Paper Page | http://localhost:4200/conferences <img width="1920" height="1671" alt="image" src="https://github.com/STIWK2124-A251/assignment-3-g5/blob/c30cc7a777624328e29e4fdb9d2d93ef4d56d44c/images/conferences.png" /> |
+| Conference Paper Page | http://localhost:4200/dashboard/conferences-detail/{id} <img width="1920" height="1671" alt="image" src="https://github.com/STIWK2124-A251/assignment-3-g5/blob/c30cc7a777624328e29e4fdb9d2d93ef4d56d44c/images/conference-detail.png" /> |
+| Previous Submitted Paper Page | http://localhost:4200/dashboard/my-participated <img width="1920" height="1671" alt="image" src="https://github.com/STIWK2124-A251/assignment-3-g5/blob/7e41aec0811a8ad0a2efde694aa306ac22f961b6/images/my-participated.png" /> |
+| Registration Page | http://localhost:4200/dashboard/registration/{id} <img width="1920" height="1671" alt="image" src="https://github.com/STIWK2124-A251/assignment-3-g5/blob/c30cc7a777624328e29e4fdb9d2d93ef4d56d44c/images/registration.png" /> |
+| Submission Page | http://localhost:4200/dashboard/submit-paper <img width="1920" height="1671" alt="image" src="https://github.com/STIWK2124-A251/assignment-3-g5/blob/c30cc7a777624328e29e4fdb9d2d93ef4d56d44c/images/submit-paper.png" /> |
+| Submitted Paper Page | http://localhost:4200/dashboard/my-submissions <img width="1920" height="1671" alt="image" src="https://github.com/STIWK2124-A251/assignment-3-g5/blob/c30cc7a777624328e29e4fdb9d2d93ef4d56d44c/images/my-submissions.png" /> |
+| Profile Page | http://localhost:4200/dashboard/profile <img width="1920" height="1671" alt="image" src="https://github.com/STIWK2124-A251/assignment-3-g5/blob/c30cc7a777624328e29e4fdb9d2d93ef4d56d44c/images/profile.png" /> |
+| Apply Reviewer Page | http://localhost:4200/dashboard/apply-reviewer <img width="1920" height="1671" alt="image" src="https://github.com/STIWK2124-A251/assignment-3-g5/blob/c30cc7a777624328e29e4fdb9d2d93ef4d56d44c/images/apply-reviewer.png" /> |
+| Manage Tracks Page | http://localhost:4200/dashboard/tracks <img width="1920" height="1671" alt="image" src="https://github.com/STIWK2124-A251/assignment-3-g5/blob/c30cc7a777624328e29e4fdb9d2d93ef4d56d44c/images/tracks.png" /> |
+| Manage User Page | http://localhost:4200/dashboard/user-management <img width="1920" height="1671" alt="image" src="https://github.com/STIWK2124-A251/assignment-3-g5/blob/c30cc7a777624328e29e4fdb9d2d93ef4d56d44c/images/user_management.png" /> |
+| Audit Logs Page | http://localhost:4200/dashboard/activity-logs <img width="1920" height="1671" alt="image" src="https://github.com/STIWK2124-A251/assignment-3-g5/blob/c30cc7a777624328e29e4fdb9d2d93ef4d56d44c/images/activity-logs.png" /> |
+| Review Page | http://localhost:4200/dashboard/reviews <img width="1920" height="1671" alt="image" src="https://github.com/STIWK2124-A251/assignment-3-g5/blob/c30cc7a777624328e29e4fdb9d2d93ef4d56d44c/images/reviews.png" /> |
+| Reviewer Details Page | http://localhost:4200/dashboard/reviews/{id} <img width="1920" height="1671" alt="image" src="https://github.com/STIWK2124-A251/assignment-3-g5/blob/c30cc7a777624328e29e4fdb9d2d93ef4d56d44c/images/review%7Bid%7D.png" /> |
+| Review History Page | http://localhost:4200/dashboard/review-history <img width="1920" height="1671" alt="image" src="https://github.com/STIWK2124-A251/assignment-3-g5/blob/c30cc7a777624328e29e4fdb9d2d93ef4d56d44c/images/review-history.png" /> |
+| All Papers Page | http://localhost:4200/dashboard/all-papers <img width="1920" height="1671" alt="image" src="https://github.com/STIWK2124-A251/assignment-3-g5/blob/c30cc7a777624328e29e4fdb9d2d93ef4d56d44c/images/all-papers.png" /> |
+| Reviewer Application Page | http://localhost:4200/dashboard/applications <img width="1920" height="1671" alt="image" src="https://github.com/STIWK2124-A251/assignment-3-g5/blob/c30cc7a777624328e29e4fdb9d2d93ef4d56d44c/images/applications.png" /> |
+| Paper Details Page | http://localhost:4200/dashboard/paper-details/{id} <img width="1920" height="1671" alt="image" src="https://github.com/STIWK2124-A251/assignment-3-g5/blob/c30cc7a777624328e29e4fdb9d2d93ef4d56d44c/images/paper-details.png" /> |
 
 
 
