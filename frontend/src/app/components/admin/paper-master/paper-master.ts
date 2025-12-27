@@ -104,16 +104,16 @@ export class PaperMaster implements OnInit {
 
   // PERSISTENCE: Save status change to the real MySQL Database
   updateStatusOnBackend(id: number, newStatus: string) {
-    // You can add a specific PATCH endpoint in your backend or use the existing update logic
-    this.http.put(`http://localhost:8080/api/papers/${id}/status`, { status: newStatus }).subscribe({
-      next: () => {
-        const index = this.allPapers.findIndex(p => p.paperId === id);
-        if (index !== -1) {
-          this.allPapers[index].status = newStatus;
-          this.applyFilter();
-        }
-      },
-      error: (err) => console.error("Failed to update status", err)
-    });
-  }
+  // Use your paperService instead of raw http to ensure the URL is correct
+  this.paperService.updatePaperStatus(id, newStatus).subscribe({
+    next: () => {
+      const index = this.allPapers.findIndex(p => p.paperId === id);
+      if (index !== -1) {
+        this.allPapers[index].status = newStatus;
+        this.applyFilter();
+      }
+    },
+    error: (err) => alert("Backend Error: " + err.message)
+  });
+}
 }

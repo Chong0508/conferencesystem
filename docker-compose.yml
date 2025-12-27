@@ -24,7 +24,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    image: confeasebackend
+    image: chong0508/confease-backend:latest
     container_name: assignment-2-webcrafters-backend-1
     restart: unless-stopped
     depends_on:
