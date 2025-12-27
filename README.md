@@ -77,13 +77,84 @@ Step 6: docker-compose up --build -d to run the system.
 
 ## List of all the endpoints
 
-Authentication 
+
+Authentication
 | Method | Endpoint   | Description              |
 | ------ | ---------- | ------------------------ |
-| POST   | `/users`   | Adds a valid user        |
-| POST   | `/users`   | Returns validation error |
-| PUT    | `/users/1` | Returns validation error |
-| DELETE | `/users/1` | Deletes successfully     |
+| POST   |	`/register`	 | Registers a new user   |
+| POST	  | `/register`	 | Returns validation error |
+| POST	  | `/login`	    | Authenticates user     |
+| POST	  | `/login`	    | Returns invalid credentials |
+| POST	  | `/logout`	   | Logs out user          |
+
+
+User
+| Method | Endpoint   | Description              |
+| ------ | ---------- | ------------------------ |
+| GET	   | `/user-management` | Returns user by Role     |
+| DELETE |	`/user-management` |	Deletes user by Role         |
+
+
+Submission
+| Method | Endpoint   | Description              |
+| ------ | ---------- | ------------------------ |
+| GET    |	`/my-submissions` |	Returns all submissions |
+| GET	   | `/paper-details/1` |	Returns paper details  |
+| POST   |	`/submit-paper` |	Creates new submission |
+| POST	  | `/submit-paper` |	Returns validation error |
+
+
+Conference
+| Method | Endpoint   | Description              |
+| ------ | ---------- | ------------------------ |
+| GET    | `/conferences` |	Returns all conferences |
+| GET	   | `/conferences/1` |	Returns conference by ID |
+| POST   |	`/create-conferences` |	Creates a conference   |
+| DELETE	| `/all-papers` |	Deletes conference   |
+
+
+Tracks
+| Method | Endpoint   | Description              |
+| ------ | ---------- | ------------------------ |
+| GET    |	`/tracks`  |	Returns all tracks       |
+| GET	   | `/tracks`  |	Returns track by ID      |
+| POST   |	`/tracks`	 | Creates new track        |
+| PUT	   | `/tracks`  | Updates track            |
+| DELETE	| `/tracks`  |	Deletes track            |
+
+
+Papers
+| Method | Endpoint   | Description              |
+| ------ | ---------- | ------------------------ |
+| GET	   | `/all-papers`    |	Returns all papers     |
+| GET	   | `/paper-details/1`  |	Returns paper by ID    |
+| PUT	   | `/papers/1`	 | Updates paper          |
+| DELETE	| `/papers/1`	 | Deletes paper          |
+
+
+Activity Log
+| Method | Endpoint   | Description              |
+| ------ | ---------- | ------------------------ |
+| GET	   | `/activity-logs` |	Returns all activity logs |
+| GET	   | `/activity-logs/1`	| Returns activity log by ID |
+| DELETE	   | `/activity-logs/1`	| Delete activity log by User |
+
+
+Reviewer Application
+| Method | Endpoint   | Description              |
+| ------ | ---------- | ------------------------ |
+| POST    |	`/apply-reviewer` |	Creates application |
+| GET	   | `/applications` |	Returns all applications |
+| DELETE   |	`/application` |	Rejects application |
+| PUT	  | `/application` |	Update application |
+
+
+Registration
+| Method | Endpoint   | Description              |
+| ------ | ---------- | ------------------------ |
+| POST	   | `/conference-registration` |	Create registration type |
+| POST	   | `/conference-payment`	| Create payment |
+
 
 
 ## Result/Output (Screenshot of the output)
