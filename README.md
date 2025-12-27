@@ -10,7 +10,7 @@
 
 | Matric Number | Name | Photo | Phone Number | Previous Group |
 |----------------|----------------|----------------|----------------| ----------------|
-| 298767 | Chong Mun Kei (LEADER) | <img width="100" alt="image" src="https://github.com/user-attachments/assets/5d31f41b-6099-41ec-906c-487650ba2c5b" />| 010-3090346 | Ass1: Hi5, Ass2: ItsHi5 |
+| 298767 | Chong Mun Kei (LEADER) |  <img width="120" height="150" alt="image" src="https://github.com/user-attachments/assets/eafc0704-c0a4-4136-adfc-92d4c3ad1592" /> | 010-3090346 | Ass1: Hi5, Ass2: ItsHi5 |
 | 299326 | Kok Hui Zhen           |<img src="https://github.com/user-attachments/assets/07fa9334-2967-4c1e-a38c-8257878c246c" width="150"> | 016-9356228 | Ass1: G1 ,Ass2:G2 |
 
 ## Title of your application (a unique title)
