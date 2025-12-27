@@ -40,6 +40,14 @@ The final outcome is a fully functional full-stack conference management web app
 
 In conclusion, this project demonstrates the successful implementation of a modern Conference Management System inspired by EasyChair. By integrating Angular, Spring Boot, MySQL, and Docker, the system offers a scalable, maintainable, and user-friendly solution for managing academic conferences. The project also enhances practical skills in full-stack development, DevOps practices, and cloud deployment, reflecting real-world software development workflows.
 
+## Screenshot of Allure Report
+Dashboard of G5ConfEase Pipeline
+<img width="1600" height="822" alt="image" src="https://github.com/user-attachments/assets/8eacb4be-e023-4a9d-a6c2-0ede7427eb01" />
+
+Allure Report
+<img width="1600" height="874" alt="image" src="https://github.com/user-attachments/assets/20534efd-81d1-4c07-9e15-cd9f82b8a021" />
+
+
 ## Link for Docker Image
 
 ## Instructions on how to run Docker.
