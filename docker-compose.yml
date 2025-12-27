@@ -22,8 +22,8 @@ services:
 
   backend:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ./backend
+      dockerfile: backend/Dockerfile
     image: confeasebackend
     container_name: assignment-2-webcrafters-backend-1
     restart: unless-stopped
@@ -42,8 +42,8 @@ services:
 
   jenkins:
     build:
-      context: .
-      dockerfile: jenkins.DockerFile
+      context: backend
+      dockerfile: backend/jenkins.DockerFile
     privileged: true
     user: root
     ports:
