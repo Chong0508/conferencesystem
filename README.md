@@ -10,7 +10,7 @@
 
 | Matric Number | Name | Photo | Phone Number | Previous Group |
 |----------------|----------------|----------------|----------------| ----------------|
-
+| 298767 | Chong Mun Kei (LEADER) | <img width="100" alt="image" src="https://github.com/user-attachments/assets/5d31f41b-6099-41ec-906c-487650ba2c5b" />| 010-3090346 | Ass1: Hi5, Ass2: ItsHi5 |
 
 ## Title of your application (a unique title)
 ## Abstract (in 300 words)
