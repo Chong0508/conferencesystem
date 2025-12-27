@@ -41,17 +41,30 @@ In conclusion, this project demonstrates the successful implementation of a mode
 ## Result/Output (Screenshot of the output)
 |  Operation | Picture | 
 |---------------|----------------|
-| Default Super Admin & Admin | <img width="1239" height="727" alt="image" src="https://github.com/user-attachments/assets/fefdf5c4-6d33-41b8-afb8-7e8b3c3fab15" /> |
+| Default Super Admin & Admin | http://localhost:8080/users <img width="1239" height="727" alt="image" src="https://github.com/user-attachments/assets/fefdf5c4-6d33-41b8-afb8-7e8b3c3fab15" /> |
+| Default Super Admin & Admin | http://localhost:8080/users <img width="1239" height="727" alt="image" src="https://github.com/user-attachments/assets/fefdf5c4-6d33-41b8-afb8-7e8b3c3fab15" /> |
 | Landing Page | http://localhost:4200 <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Landing Page | http://localhost:4200/dashboard/overview <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Landing Page | http://localhost:4200/dashboard/notifications <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Landing Page | http://localhost:4200/searchPapers <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Landing Page | http://localhost:4200/conferences <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Landing Page | http://localhost:4200/dashboard/my-participated <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Landing Page | http://localhost:4200/dashboard/submit-paper <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Landing Page | http://localhost:4200/dashboard/my-submissions <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Landing Page | http://localhost:4200/dashboard/profile <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
-| Landing Page | http://localhost:4200/dashboard/apply-reviewer <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
+| Login Page | http://localhost:4200/login <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
+| Overview Page | http://localhost:4200/dashboard/overview <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
+| Notifications Page | http://localhost:4200/dashboard/notifications <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
+| Research Library Page | http://localhost:4200/searchPapers <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
+| Conference Paper Page | http://localhost:4200/conferences <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
+| Conference Paper Page | http://localhost:4200/dashboard/conferences-detail/{id} <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
+| Previous Submitted Paper Page | http://localhost:4200/dashboard/my-participated <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
+| Submission Page | http://localhost:4200/dashboard/submit-paper <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
+| Submitted Paper Page | http://localhost:4200/dashboard/my-submissions <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
+| Profile Page | http://localhost:4200/dashboard/profile <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
+| Reviewer Apply Page | http://localhost:4200/dashboard/apply-reviewer <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
+| Reviewer Apply Page | http://localhost:4200/dashboard/tracks <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
+| Reviewer Apply Page | http://localhost:4200/dashboard/user-management <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
+| Reviewer Apply Page | http://localhost:4200/dashboard/activity-logs <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
+| Reviewer Apply Page | http://localhost:4200/dashboard/reviews <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
+| Reviewer Apply Page | http://localhost:4200/dashboard/review-history <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
+| Reviewer Apply Page | http://localhost:4200/dashboard/all-papers <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
+| Reviewer Apply Page | http://localhost:4200/dashboard/applications <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
+| Reviewer Apply Page | http://localhost:4200/dashboard/review-history <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
+
+
 
 ## References (Not less than 20)
 
