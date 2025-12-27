@@ -59,11 +59,16 @@ Docker image frontend
 https://hub.docker.com/r/hazimharon230/conf-frontend
 
 ## Instructions on how to run Docker.
-Step 1: git clone this repo to the local.
+Step 1: git clone this repo to the local desktop
+
 Step 2: open the terminal in the inteliiJ
+
 Step 3: on the terminal write "cd backend"
+
 Step 4: on the terminal, and write "docker-compose down" to tops all running containers defined in your docker-compose.yml file.
+
 Step 5: mvn write "mvn clean package -DskipTests".
+
 Step 6: docker-compose up --build -d to run the system.
 
 ## List of all the endpoints
