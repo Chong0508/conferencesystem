@@ -60,10 +60,13 @@ In conclusion, this project demonstrates the successful implementation of a mode
 | Reviewer Apply Page | http://localhost:4200/dashboard/user-management <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
 | Reviewer Apply Page | http://localhost:4200/dashboard/activity-logs <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
 | Reviewer Apply Page | http://localhost:4200/dashboard/reviews <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
+| Reviewer Apply Page | http://localhost:4200/dashboard/reviews/{id} <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
 | Reviewer Apply Page | http://localhost:4200/dashboard/review-history <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
 | Reviewer Apply Page | http://localhost:4200/dashboard/all-papers <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
 | Reviewer Apply Page | http://localhost:4200/dashboard/applications <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
 | Reviewer Apply Page | http://localhost:4200/dashboard/review-history <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
+| Reviewer Apply Page | http://localhost:4200/dashboard/paper-details/{id} <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
+
 
 
 
