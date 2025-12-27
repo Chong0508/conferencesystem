@@ -2,8 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { PaperService } from '../../../services/paper.service'; // Ensure this service is imported
-import { HttpClient } from '@angular/common/http';
+import { PaperService } from '../../../services/paper.service';
 
 @Component({
   selector: 'app-paper-master',
@@ -13,7 +12,6 @@ import { HttpClient } from '@angular/common/http';
   styleUrl: './paper-master.css'
 })
 export class PaperMaster implements OnInit {
-
   allPapers: any[] = [];
   filteredPapers: any[] = [];
   isLoading: boolean = true;
@@ -21,8 +19,7 @@ export class PaperMaster implements OnInit {
 
   constructor(
     private router: Router, 
-    private paperService: PaperService,
-    private http: HttpClient
+    private paperService: PaperService
   ) {}
 
   ngOnInit() {
@@ -31,7 +28,6 @@ export class PaperMaster implements OnInit {
 
   loadPapers() {
     this.isLoading = true;
-    // 1. Fetch from your Real Backend Controller
     this.paperService.getAllPapers().subscribe({
       next: (data) => {
         this.allPapers = data;
@@ -39,7 +35,7 @@ export class PaperMaster implements OnInit {
         this.isLoading = false;
       },
       error: (err) => {
-        console.error('Error fetching papers from backend:', err);
+        console.error('Error fetching papers:', err);
         this.isLoading = false;
       }
     });
@@ -47,9 +43,56 @@ export class PaperMaster implements OnInit {
 
   applyFilter() {
     if (this.statusFilter === 'All') {
-      this.filteredPapers = this.allPapers;
+      this.filteredPapers = [...this.allPapers];
     } else {
       this.filteredPapers = this.allPapers.filter(p => p.status === this.statusFilter);
+    }
+  }
+
+  // Admin Decision: Accept
+  acceptPaper(paper: any) {
+    if (confirm(`Accept "${paper.title}"?`)) {
+      this.updateStatus(paper.paperId, 'Accepted');
+    }
+  }
+
+  // Admin Decision: Reject
+  rejectPaper(paper: any) {
+    if (confirm(`Reject "${paper.title}"?`)) {
+      this.updateStatus(paper.paperId, 'Rejected');
+    }
+  }
+
+  private updateStatus(id: number, newStatus: string) {
+    this.paperService.updatePaperStatus(id, newStatus).subscribe({
+      next: () => {
+        const index = this.allPapers.findIndex(p => p.paperId === id);
+        if (index !== -1) {
+          this.allPapers[index].status = newStatus;
+          this.applyFilter();
+        }
+      },
+      error: (err) => {
+        // If this still gives "Unknown Error", it is a CORS issue in your Java Backend
+        alert("Backend Error: Status update failed. Check if Backend is running.");
+      }
+    });
+  }
+
+  deletePaper(paperId: number) {
+    if (confirm("⚠️ Permanently delete this paper?")) {
+      this.isLoading = true;
+      this.paperService.deletePaper(paperId).subscribe({
+        next: () => {
+          this.allPapers = this.allPapers.filter(p => p.paperId !== paperId);
+          this.applyFilter();
+          this.isLoading = false;
+        },
+        error: (err) => {
+          this.isLoading = false;
+          alert("Delete failed: " + err.message);
+        }
+      });
     }
   }
 
@@ -57,63 +100,12 @@ export class PaperMaster implements OnInit {
     switch (status) {
       case 'Accepted': return 'bg-success-subtle text-success border-success';
       case 'Rejected': return 'bg-danger-subtle text-danger border-danger';
-      case 'Revised': return 'bg-warning-subtle text-warning border-warning';
-      case 'Reviewed': return 'bg-info-subtle text-info border-info';
       case 'Registered': return 'bg-success text-white';
-      case 'Pending Review': return 'bg-secondary-subtle text-secondary border-secondary';
       default: return 'bg-light text-secondary border-secondary';
-    }
-  }
-
-  // Admin Decision: Accept
-  acceptPaper(paper: any) {
-    if (confirm(`Accept "${paper.title}"? This allows the author to pay the publication fee.`)) {
-      this.updateStatusOnBackend(paper.paperId, 'Accepted');
-    }
-  }
-
-  // Admin Decision: Reject
-  rejectPaper(paper: any) {
-    if (confirm(`Reject "${paper.title}"?`)) {
-      this.updateStatusOnBackend(paper.paperId, 'Rejected');
-    }
-  }
-
-  // Admin Decision: Delete
-  deletePaper(paperId: number) {
-    if (confirm("⚠️ Permanently delete this paper and its file? (Note: Review records will be preserved but marked as 'Deleted by Admin')")) {
-      this.isLoading = true;
-      this.paperService.deletePaper(paperId).subscribe({
-        next: () => {
-          this.allPapers = this.allPapers.filter(p => p.paperId !== paperId);
-          this.applyFilter();
-          this.isLoading = false;
-          alert("✅ Paper removed. Review history has been updated.");
-        },
-        error: (err) => {
-          this.isLoading = false;
-          alert("Delete failed: " + (err.error?.message || "Check backend logs"));
-        }
-      });
     }
   }
 
   viewDetails(paperId: number) {
     this.router.navigate(['/dashboard/paper-details', paperId]);
   }
-
-  // PERSISTENCE: Save status change to the real MySQL Database
-  updateStatusOnBackend(id: number, newStatus: string) {
-  // Use your paperService instead of raw http to ensure the URL is correct
-  this.paperService.updatePaperStatus(id, newStatus).subscribe({
-    next: () => {
-      const index = this.allPapers.findIndex(p => p.paperId === id);
-      if (index !== -1) {
-        this.allPapers[index].status = newStatus;
-        this.applyFilter();
-      }
-    },
-    error: (err) => alert("Backend Error: " + err.message)
-  });
-}
 }

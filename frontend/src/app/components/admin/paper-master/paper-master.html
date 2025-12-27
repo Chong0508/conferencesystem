@@ -66,19 +66,7 @@
               <button class="btn btn-sm btn-white border" (click)="viewDetails(paper.paperId)" title="View Manuscript">
                 <i class="bi bi-file-earmark-text text-primary"></i>
               </button>
-
-              <button *ngIf="paper.status !== 'Accepted' && paper.status !== 'Rejected' && paper.status !== 'Registered'"
-                      class="btn btn-sm btn-success text-white"
-                      (click)="acceptPaper(paper)" title="Approve for Registration">
-                <i class="bi bi-check-lg"></i>
-              </button>
-
-              <button *ngIf="paper.status !== 'Accepted' && paper.status !== 'Rejected' && paper.status !== 'Registered'"
-                      class="btn btn-sm btn-danger text-white"
-                      (click)="rejectPaper(paper)" title="Final Reject">
-                <i class="bi bi-x-lg"></i>
-              </button>
-
+              
               <button class="btn btn-sm btn-white border" (click)="deletePaper(paper.paperId)" title="Delete from DB">
                 <i class="bi bi-trash3 text-danger"></i>
               </button>

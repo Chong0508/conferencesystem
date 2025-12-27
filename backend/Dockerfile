@@ -10,7 +10,7 @@ WORKDIR /app
 COPY target/confease-backend-0.0.1-SNAPSHOT.jar app.jar
 
 # Create the directory for persistent papers
-RUN mkdir -p /app/uploads/papers 
+RUN mkdir -p /app/uploads/papers && chmod 777 /app/uploads/papers
 
 # Run the jar from the current WORKDIR (/app/app.jar)
 ENTRYPOINT ["java", "-jar", "app.jar"]
