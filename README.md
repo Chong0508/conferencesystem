@@ -13,7 +13,7 @@
 | 298767 | Chong Mun Kei (LEADER) |  <img width="120" height="150" alt="image" src="https://github.com/user-attachments/assets/eafc0704-c0a4-4136-adfc-92d4c3ad1592" /> | 010-3090346 | Ass1: Hi5, Ass2: ItsHi5 |
 | 299326 | Kok Hui Zhen           |<img src="https://github.com/user-attachments/assets/07fa9334-2967-4c1e-a38c-8257878c246c" width="150"> | 016-9356228 | Ass1: G1 ,Ass2:G2 |
 | 302755 | Nurul Maizatul Hasanah binti Noor Azlan | <img width="120" height="150" alt="NURUL MAIZATUL" src="https://github.com/user-attachments/assets/154da491-0543-4652-8bd9-ca0466615dd0" /> | 019-8402802 | Ass1: SyntaxError, Ass2: SyntaxError |
-| 302721 | Ahmad Hazim Bin Haron Arrashid | <img src=![GAMBAR PASSPORT](https://github.com/user-attachments/assets/1dd7e19e-244f-4b2d-80a7-a256f9ca3a57) width="120" height="150"> | 010-7764506 | Ass1: webboys, Ass2: webboys2 |
+| 302721 | Ahmad Hazim Bin Haron Arrashid | <img src="https://github.com/user-attachments/assets/9c5dac9b-45b5-4218-88c3-e8f62e77ad40" width="120" height="150"> | 010-7764506 | Ass1: webboys, Ass2: webboys2 |
 
 ## Title of your application (a unique title)
 G5ConfEase
