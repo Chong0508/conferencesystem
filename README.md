@@ -17,7 +17,7 @@
 | 302410 | Mohamed Abdul Karim bin Abdul Halim | <img src= "https://github.com/user-attachments/assets/561c090b-9a2e-4c53-9cbf-bbfb5b259098" width="120" height="150"> | 010-7700786 | Ass1: budaksurauu, Ass2: budaksurauu |
 | 299958 | Nurul Aini Binti Ahmad Nazli |  <img src="https://github.com/user-attachments/assets/e9652f90-518b-4b7f-9b35-539bad5e0da4" width="120"/> | 016-6102445 | Ass1: webcrafters, Ass2: webcrafters |
 | 292728 | Shantini D/O Selvam |<img width="120" height="150" alt="image-removebg-preview (24)" src="https://github.com/user-attachments/assets/3d0502a0-ff17-4e2f-b0b6-ca75008d5980" />| 017-3063540 | Ass1: 404, Ass2: 405 |
-| 291243 | Azrin Azwani Binti Redzuan |<img width="120" height="150" alt="image-removebg-preview (24)" src="https://github.com/user-attachments/assets/3d0502a0-ff17-4e2f-b0b6-ca75008d5980" />| 014-9249347 | Ass1: biscuIT, Ass2: biscuIT |
+| 291243 | Azrin Azwani Binti Redzuan |<img width="120" height="150" alt="image-removebg-preview (24)" src="https://github.com/STIWK2124-A251/assignment-3-g5/blob/1583a120b21e40bd0be7cfacabc77715e184abc0/images/azrin.png" />| 014-9249347 | Ass1: biscuIT, Ass2: biscuIT |
 
 ## Title of your application (a unique title)
 G5ConfEase
@@ -76,6 +76,15 @@ Step 5: mvn write "mvn clean package -DskipTests".
 Step 6: docker-compose up --build -d to run the system.
 
 ## List of all the endpoints
+
+Authentication 
+| Method | Endpoint   | Description              |
+| ------ | ---------- | ------------------------ |
+| POST   | `/users`   | Adds a valid user        |
+| POST   | `/users`   | Returns validation error |
+| PUT    | `/users/1` | Returns validation error |
+| DELETE | `/users/1` | Deletes successfully     |
+
 
 ## Result/Output (Screenshot of the output)
 |  Operation | Picture | 
