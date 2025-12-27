@@ -56,7 +56,7 @@ services:
     restart: unless-stopped
 
   frontend:
-    image: hazimharon230/conf-frontend:v0.1.0
+    image: hazimharon230/conf-frontend:v0.1.1
     container_name: assignment-3-frontend
     restart: unless-stopped
     ports:
