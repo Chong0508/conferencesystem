@@ -165,7 +165,7 @@ Registration
 | paper list | http://localhost:8080/api/papers <img width="1239" height="727" alt="image" src="https://github.com/STIWK2124-A251/assignment-3-g5/blob/1f7519a1ab4e00f8d2b609e7498fbd5fec8261a3/images/paper-list.png" /> |
 | review list | http://localhost:8080/api/reviews <img width="1239" height="727" alt="image" src="https://github.com/STIWK2124-A251/assignment-3-g5/blob/1f7519a1ab4e00f8d2b609e7498fbd5fec8261a3/images/review-list.png" /> |
 | track list | http://localhost:8080/api/tracks <img width="1239" height="727" alt="image" src="https://github.com/STIWK2124-A251/assignment-3-g5/blob/1f7519a1ab4e00f8d2b609e7498fbd5fec8261a3/images/tracks-list.png" /> |
-| payment list | http://localhost:8080/api/payments ![Uploading image.png…]() |
+| payment list | http://localhost:8080/api/payments <img width="1919" height="595" alt="image" src="https://github.com/user-attachments/assets/3bd8688d-2381-4f4b-b056-9a40f6c058f0" /> |
 | activity logs list | http://localhost:8080/api/log-activities <img width="1239" height="727" alt="image" src="https://github.com/STIWK2124-A251/assignment-3-g5/blob/913e4bca21a89c128878f12c74668e63507bc603/images/log-activities-list.png" /> |
 | notification list | http://localhost:8080/api/notifications <img width="1239" height="727" alt="image" src="https://github.com/STIWK2124-A251/assignment-3-g5/blob/1f7519a1ab4e00f8d2b609e7498fbd5fec8261a3/images/notification-list.png" /> |
 | Landing Page | http://localhost:4200 <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
@@ -240,4 +240,4 @@ Registration
 
 
 ## Link for the YouTube Presentation
-
+https://youtu.be/13-DyOVKRW8?si=a22ORy9jlCNzsqqw 
