@@ -11,9 +11,10 @@
 | Matric Number | Name | Photo | Phone Number | Previous Group |
 |----------------|----------------|----------------|----------------| ----------------|
 | 298767 | Chong Mun Kei (LEADER) |  <img width="120" height="150" alt="image" src="https://github.com/user-attachments/assets/eafc0704-c0a4-4136-adfc-92d4c3ad1592" /> | 010-3090346 | Ass1: Hi5, Ass2: ItsHi5 |
-| 299326 | Kok Hui Zhen           |<img src="https://github.com/user-attachments/assets/07fa9334-2967-4c1e-a38c-8257878c246c" width="150"> | 016-9356228 | Ass1: G1 ,Ass2:G2 |
+| 299326 | Kok Hui Zhen           |<img src="https://github.com/user-attachments/assets/07fa9334-2967-4c1e-a38c-8257878c246c" width="120"> | 016-9356228 | Ass1: G1 ,Ass2:G2 |
 | 302755 | Nurul Maizatul Hasanah binti Noor Azlan | <img width="120" height="150" alt="NURUL MAIZATUL" src="https://github.com/user-attachments/assets/154da491-0543-4652-8bd9-ca0466615dd0" /> | 019-8402802 | Ass1: SyntaxError, Ass2: SyntaxError |
 | 302721 | Ahmad Hazim Bin Haron Arrashid | <img src="https://github.com/user-attachments/assets/578d29de-e2ef-4b79-9f19-2113907fcfc9" width="120" height="150"> | 010-7764506 | Ass1: webboys, Ass2: webboys2 |
+| 302410 | Mohamed Abdul Karim bin Abdul Halim | ![WhatsApp Image 2025-10-24 at 00 01 34_255e27bc](https://github.com/user-attachments/assets/561c090b-9a2e-4c53-9cbf-bbfb5b259098) | 010-7700786 | Ass1: budaksurauu, Ass2: budaksurauu |
 
 ## Title of your application (a unique title)
 G5ConfEase
