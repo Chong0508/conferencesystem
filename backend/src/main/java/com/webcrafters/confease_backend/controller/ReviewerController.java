@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/reviewers")
+@CrossOrigin(origins = "http://localhost", allowCredentials = "true")
 public class ReviewerController {
 
     private final ReviewerService reviewerService;

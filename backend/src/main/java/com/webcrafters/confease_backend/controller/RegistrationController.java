@@ -12,6 +12,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/registrations")
+@CrossOrigin(origins = "http://localhost", allowCredentials = "true")
 public class RegistrationController {
 
     @Autowired

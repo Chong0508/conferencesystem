@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/sessions")
-
+@CrossOrigin(origins = "http://localhost", allowCredentials = "true")
 public class SessionController {
 
     private final SessionService service;

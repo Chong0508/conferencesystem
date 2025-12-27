@@ -12,6 +12,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/email-logs")
+@CrossOrigin(origins = "http://localhost", allowCredentials = "true")
 public class EmailLogController {
 
     @Autowired

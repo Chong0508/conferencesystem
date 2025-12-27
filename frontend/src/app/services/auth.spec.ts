@@ -1,17 +1,15 @@
-import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { AuthService } from './auth.service';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment'; //
 
-describe('AuthService', () => {
-  let service: AuthService;
+@Injectable({ providedIn: 'root' })
+export class AuthService {
+  // Use the environment variable for the base path
+  private apiUrl = `${environment.apiUrl}/users`; 
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({ imports: [HttpClientTestingModule] });
-    service = TestBed.inject(AuthService);
-  });
+  constructor(private http: HttpClient) {}
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
-  });
-});
-
+  login(credentials: any) {
+    return this.http.post(`${this.apiUrl}/login`, credentials);
+  }
+}

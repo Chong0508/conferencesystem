@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, map, tap } from 'rxjs';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
+
 
 export interface BackendNotification {
   notification_id?: number;
@@ -27,8 +29,8 @@ export interface AppNotification {
   providedIn: 'root'
 })
 export class NotificationService {
-
-  private baseUrl = 'http://localhost:8080/api/notifications';
+  private apiUrl = environment.apiUrl;
+  private baseUrl = `${this.apiUrl}/api/notifications`;
   public unreadCount$ = new BehaviorSubject<number>(0);
 
   constructor(

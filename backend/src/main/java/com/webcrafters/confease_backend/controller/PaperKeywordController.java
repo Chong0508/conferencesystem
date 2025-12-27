@@ -13,6 +13,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/paper-keywords")
+@CrossOrigin(origins = "http://localhost", allowCredentials = "true")
 public class PaperKeywordController {
 
     @Autowired

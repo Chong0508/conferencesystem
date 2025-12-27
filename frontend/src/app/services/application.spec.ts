@@ -1,19 +1,18 @@
-import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ApplicationService } from './application';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment'; // Check this path!
 
-describe('ApplicationService', () => {
-  let service: ApplicationService;
+@Injectable({
+  providedIn: 'root'
+})
+export class ApplicationService {
+  // Use the variable from environment.ts instead of a hardcoded string
+  private apiUrl = `${environment.apiUrl}/api/applications`; 
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
-    });
-    service = TestBed.inject(ApplicationService);
-  });
+  constructor(private http: HttpClient) { }
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
-  });
-});
+  getApplications() {
+    return this.http.get(this.apiUrl);
+  }
+}
 

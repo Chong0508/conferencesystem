@@ -12,6 +12,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/rooms")
+@CrossOrigin(origins = "http://localhost", allowCredentials = "true")
 public class RoomController {
 
     @Autowired

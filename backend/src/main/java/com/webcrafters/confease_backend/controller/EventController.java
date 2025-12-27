@@ -12,6 +12,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/events")
+@CrossOrigin(origins = "http://localhost", allowCredentials = "true")
 public class EventController {
 
     @Autowired

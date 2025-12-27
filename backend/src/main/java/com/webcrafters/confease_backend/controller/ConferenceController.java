@@ -12,6 +12,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/conferences")
+@CrossOrigin(origins = "http://localhost", allowCredentials = "true")
 public class ConferenceController {
 
     @Autowired

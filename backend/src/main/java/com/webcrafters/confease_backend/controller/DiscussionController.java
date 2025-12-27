@@ -12,6 +12,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping
+@CrossOrigin(origins = "http://localhost", allowCredentials = "true")
 public class DiscussionController {
 
     @Autowired

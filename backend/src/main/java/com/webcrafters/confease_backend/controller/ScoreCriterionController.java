@@ -12,6 +12,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/score-criteria")
+@CrossOrigin(origins = "http://localhost", allowCredentials = "true")
 public class ScoreCriterionController {
 
     @Autowired

@@ -30,7 +30,7 @@ import java.util.Map;
 
 @RequestMapping("/users")
 @RestController
-@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
+@CrossOrigin(origins = "http://localhost", allowCredentials = "true")
 public class UserController {
 
     @Autowired private UserRepository userRepository;

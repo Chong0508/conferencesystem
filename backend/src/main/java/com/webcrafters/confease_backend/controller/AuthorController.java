@@ -9,6 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/author")
+@CrossOrigin(origins = "http://localhost", allowCredentials = "true")
 public class AuthorController {
 
     @Autowired

@@ -23,7 +23,7 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: backend/Dockerfile
+      dockerfile: Dockerfile
     image: confeasebackend
     container_name: assignment-2-webcrafters-backend-1
     restart: unless-stopped
@@ -63,6 +63,7 @@ services:
       - "80:80"
     volumes:
       - ./frontend/dist/frontend/browser:/usr/share/nginx/html
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       - backend
 

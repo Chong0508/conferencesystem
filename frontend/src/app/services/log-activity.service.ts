@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface LogActivity {
   log_id?: number;
@@ -15,7 +16,8 @@ export interface LogActivity {
   providedIn: 'root'
 })
 export class LogActivityService {
-  private apiUrl = 'http://localhost:8080/api/log-activities';
+  private baseUrl = environment.apiUrl;
+  private apiUrl = `${this.baseUrl}/api/log-activities`;
 
   constructor(private http: HttpClient) { }
 

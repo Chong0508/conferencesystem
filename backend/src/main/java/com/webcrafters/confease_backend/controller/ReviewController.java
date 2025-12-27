@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@CrossOrigin(origins = {"http://localhost:4200", "http://frontend:4200", "http://host.docker.internal:4200"}, allowCredentials = "true")
+@CrossOrigin(origins = "http://localhost", allowCredentials = "true")
 @RestController
 @RequestMapping("/api/reviews")
 public class ReviewController {

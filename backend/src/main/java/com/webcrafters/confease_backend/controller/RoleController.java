@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/roles")
+@CrossOrigin(origins = "http://localhost", allowCredentials = "true")
 public class RoleController {
 
     private final RoleService roleService; // use constructor injection

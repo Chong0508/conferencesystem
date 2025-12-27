@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { NotificationService } from './notification.service';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 // Interface matching your MySQL/Java Entity
 export interface ReviewerApplication {
@@ -23,7 +24,7 @@ export interface ReviewerApplication {
 })
 export class ApplicationService {
 
-  private baseUrl = 'http://localhost:8080/users';
+  private baseUrl = environment.apiUrl;
 
   constructor(
     private http: HttpClient,
@@ -36,7 +37,7 @@ export class ApplicationService {
   // ==========================================
   // Note: This matches the Multipart request required by your handleReviewerApplication method
   submitReviewerApplication(formData: FormData): Observable<any> {
-    return this.http.post(`${this.baseUrl}/apply-reviewer`, formData);
+    return this.http.post(`${this.baseUrl}/users/apply-reviewer`, formData);
   }
 
   // ==========================================
@@ -44,7 +45,7 @@ export class ApplicationService {
   // ==========================================
   getApplications(): Observable<ReviewerApplication[]> {
     // Fetches the actual records from the MySQL table
-    return this.http.get<ReviewerApplication[]>(`${this.baseUrl}/applications`);
+    return this.http.get<ReviewerApplication[]>(`${this.baseUrl}/users/applications`);
   }
 
   // ==========================================
@@ -53,7 +54,7 @@ export class ApplicationService {
   // This updates ReviewerApplication, User Category, and UserRole tables in one transaction
   processApplication(appId: number, status: 'Approved' | 'Rejected'): Observable<any> {
     // Use backticks for template literals and ensure status is passed as a query param
-    return this.http.post(`${this.baseUrl}/applications/${appId}/process?status=${status}`, {});
+    return this.http.post(`${this.baseUrl}/users/applications/${appId}/process?status=${status}`, {});
   }
 
   // ==========================================

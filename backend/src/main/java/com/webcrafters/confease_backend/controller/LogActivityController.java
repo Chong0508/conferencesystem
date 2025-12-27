@@ -14,6 +14,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/log-activities")
+@CrossOrigin(origins = "http://localhost", allowCredentials = "true")
 public class LogActivityController {
 
     @Autowired
