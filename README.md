@@ -51,6 +51,7 @@ In conclusion, this project demonstrates the successful implementation of a mode
 | Conference Paper Page | http://localhost:4200/conferences <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
 | Conference Paper Page | http://localhost:4200/dashboard/conferences-detail/{id} <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
 | Previous Submitted Paper Page | http://localhost:4200/dashboard/my-participated <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
+| Submission Page | http://localhost:4200/dashboard/registration/{id} <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
 | Submission Page | http://localhost:4200/dashboard/submit-paper <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
 | Submitted Paper Page | http://localhost:4200/dashboard/my-submissions <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
 | Profile Page | http://localhost:4200/dashboard/profile <img width="1920" height="1671" alt="image" src="https://github.com/user-attachments/assets/fccf74ff-9ea6-4b77-a08b-e026cc95cfdd" /> |
