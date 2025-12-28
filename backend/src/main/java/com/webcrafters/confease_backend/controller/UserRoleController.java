@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/user-roles")
-@CrossOrigin(origins = "http://localhost", allowCredentials = "true")
+@CrossOrigin(origins = "https://conferencesystem-six.vercel.app", allowCredentials = "true")
 public class UserRoleController {
 
     private final UserRoleService userRoleService;

@@ -22,7 +22,8 @@ public class CorsConfig {
                         .allowedOrigins(
                                 "http://localhost:4200",
                                 "http://frontend:4200",
-                                "http://host.docker.internal:4200"
+                                "http://host.docker.internal:4200",
+                                "https://conferencesystem-six.vercel.app"
                         )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")

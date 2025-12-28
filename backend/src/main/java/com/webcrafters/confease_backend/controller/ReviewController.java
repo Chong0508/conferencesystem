@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@CrossOrigin(origins = "http://localhost", allowCredentials = "true")
+@CrossOrigin(origins = "https://conferencesystem-six.vercel.app", allowCredentials = "true")
 @RestController
 @RequestMapping("/api/reviews")
 public class ReviewController {

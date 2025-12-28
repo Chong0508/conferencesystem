@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/papers")
-@CrossOrigin(origins = "http://localhost", allowCredentials = "true")
+@CrossOrigin(origins = "https://conferencesystem-six.vercel.app", allowCredentials = "true")
 public class PaperController {
 
     @Autowired private PaperRepository paperRepository;

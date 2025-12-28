@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/schedules")
-@CrossOrigin(origins = "http://localhost", allowCredentials = "true")
+@CrossOrigin(origins = "https://conferencesystem-six.vercel.app", allowCredentials = "true")
 public class ScheduleController {
 
     @Autowired

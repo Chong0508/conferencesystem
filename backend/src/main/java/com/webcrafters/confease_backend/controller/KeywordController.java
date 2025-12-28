@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/keywords")
-@CrossOrigin(origins = "http://localhost", allowCredentials = "true")
+@CrossOrigin(origins = "https://conferencesystem-six.vercel.app", allowCredentials = "true")
 public class KeywordController {
 
     @Autowired

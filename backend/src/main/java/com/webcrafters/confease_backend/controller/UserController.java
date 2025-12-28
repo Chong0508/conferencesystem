@@ -30,7 +30,7 @@ import java.util.Map;
 
 @RequestMapping("/users")
 @RestController
-@CrossOrigin(origins = "http://localhost", allowCredentials = "true")
+@CrossOrigin(origins = "https://conferencesystem-six.vercel.app", allowCredentials = "true")
 public class UserController {
 
     @Autowired private UserRepository userRepository;
