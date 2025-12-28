@@ -6,6 +6,7 @@ import { ReviewService } from '../../../services/review.service';
 import { PaperService } from '../../../services/paper.service';
 import { HttpClient } from '@angular/common/http';
 import { NotificationService } from '../../../services/notification.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-grading',
@@ -124,7 +125,7 @@ export class Grading implements OnInit {
     };
 
     this.isSubmitting = true;
-    this.http.post('http://localhost:8080/api/reviews/submit-full', reviewPayload).subscribe({
+    this.http.post(`${environment.apiUrl}/api/reviews/submit-full`, reviewPayload).subscribe({
       next: () => {
 
         // ============================================================
@@ -150,7 +151,7 @@ export class Grading implements OnInit {
   cancel() { this.router.navigate(['/dashboard/reviews']); }
 
   getManuscriptUrl(fileName: string | undefined): string {
-    return `http://localhost:8080/api/papers/download/${fileName}`;
+    return `${environment.apiUrl}/api/papers/download/${fileName}`;
   }
 
   getCleanFileName(fullPath: string | undefined): string {

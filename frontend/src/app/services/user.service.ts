@@ -38,7 +38,7 @@ register(user: any): Observable<any> {
 
 
   createAdmin(adminData: any) {
-  const url = 'http://localhost:8080/users/admin';
+  const url = `${environment.apiUrl}/users/admin`;
   return this.http.post(url, adminData);
 }
 

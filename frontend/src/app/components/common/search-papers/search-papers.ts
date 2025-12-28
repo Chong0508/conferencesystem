@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { PaperService } from '../../../services/paper.service';
 import { ConferenceService } from '../../../services/conference.service';
-import { forkJoin } from 'rxjs'; // Import forkJoin for cleaner code
+import { forkJoin } from 'rxjs'; 
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-search-papers',
@@ -36,8 +37,8 @@ export class SearchPapers implements OnInit {
     
     // Using forkJoin to fetch Tracks and Conferences in parallel before loading papers
     forkJoin({
-      tracks: this.http.get<any[]>('http://localhost:8080/api/tracks'),
-      conferences: this.http.get<any[]>('http://localhost:8080/api/conferences')
+      tracks: this.http.get<any[]>(`${environment.apiUrl}/api/tracks`),
+      conferences: this.http.get<any[]>(`${environment.apiUrl}/api/conferences`)
     }).subscribe({
       next: (results) => {
         this.tracks = results.tracks;
@@ -98,7 +99,7 @@ export class SearchPapers implements OnInit {
   }
 
   viewManuscript(fileName: string) {
-    const url = `http://localhost:8080/api/papers/download/${fileName}`;
+    const url = `${environment.apiUrl}/api/papers/download/${fileName}`;
     window.open(url, '_blank');
   }
 }

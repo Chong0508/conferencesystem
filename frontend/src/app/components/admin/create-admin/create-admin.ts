@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-create-admin',
@@ -31,7 +32,7 @@ export class CreateAdminComponent {
     this.message = '';
     
     // Using the specific admin creation endpoint
-    this.http.post('http://localhost:8080/users/admin', this.adminData)
+    this.http.post(`${environment.apiUrl}/users/admin`, this.adminData)
       .subscribe({
         next: (res: any) => {
           this.isLoading = false;

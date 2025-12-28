@@ -41,7 +41,7 @@ export class ReviewerApplicationsComponent implements OnInit {
   getEvidenceUrl(path: string | undefined): string {
     if (!path) return '#';
     const fileName = path.split('/').pop();
-    return `http://localhost:8080/users/applications/evidence/${fileName}`;
+    return `https://g5conferenceease.up.railway.app/users/applications/evidence/${fileName}`;
   }
 
   process(appId: number, status: 'Approved' | 'Rejected') {

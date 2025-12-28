@@ -8,7 +8,6 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class AuthService {
-  // baseUrl is http://localhost:8080
   private baseUrl = environment.apiUrl; 
 
   constructor(private http: HttpClient) { }

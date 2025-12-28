@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../../services/auth.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-my-profile',
@@ -40,7 +41,7 @@ export class MyProfile implements OnInit {
     
     // User ID logic remains unchanged as requested
     if (sessionUser && sessionUser.userId) {
-      this.http.get<any>(`http://localhost:8080/users/${sessionUser.userId}`).subscribe({
+      this.http.get<any>(`${environment.apiUrl}/users/${sessionUser.userId}`).subscribe({
         next: (fullUser) => {
           this.loggedUser = {
             // Mapping keys to match what getFullName() expects

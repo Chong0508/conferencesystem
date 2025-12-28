@@ -32,7 +32,7 @@ export class ReviewService {
 
   // Get reviews by reviewer id
   getReviewsByReviewer(reviewerId: number): Observable<any[]> {
-    return this.http.get<any[]>(`http://localhost:8080/api/reviews/reviewer/${reviewerId}`);
+    return this.http.get<any[]>(`${this.apiUrl}/reviewer/${reviewerId}`);
   }
 
   // Get all reviews (admin)

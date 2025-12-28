@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../../services/auth.service';
 import { NotificationService } from '../../../services/notification.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-conference-payment',
@@ -54,7 +55,7 @@ export class ConferencePayment implements OnInit {
     this.registrationData.registered_at = new Date().toISOString();
 
     // STEP 1: Save to Database
-    this.http.post<any>('http://localhost:8080/api/registrations', this.registrationData).subscribe({
+    this.http.post<any>(`${environment.apiUrl}/api/registrations`, this.registrationData).subscribe({
       next: (res) => {
         // STEP 2: Call Notification Service Safely
         // We wrap this in try-catch so if the service crashes, the navigation still works

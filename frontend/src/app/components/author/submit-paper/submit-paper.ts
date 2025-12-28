@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { NotificationService } from '../../../services/notification.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-submit-paper',
@@ -58,15 +59,15 @@ export class SubmitPaper implements OnInit {
   }
 
   loadTracks() {
-    this.http.get<any[]>('http://localhost:8080/api/tracks').subscribe(res => this.tracks = res);
+    this.http.get<any[]>(`${environment.apiUrl}/api/tracks`).subscribe(res => this.tracks = res);
   }
 
   loadConferences() {
-    this.http.get<any[]>('http://localhost:8080/api/conferences').subscribe(res => this.conferences = res);
+    this.http.get<any[]>(`${environment.apiUrl}/api/conferences`).subscribe(res => this.conferences = res);
   }
 
   loadPaperData(id: number) {
-    this.http.get<any>(`http://localhost:8080/api/papers/${id}`).subscribe(res => {
+    this.http.get<any>(`${environment.apiUrl}/api/papers/${id}`).subscribe(res => {
       this.paperObj = {
         title: res.title,
         abstract: res.abstractText,
@@ -120,8 +121,8 @@ export class SubmitPaper implements OnInit {
 
       this.isLoading = true;
       const request = this.isEditMode
-        ? this.http.put(`http://localhost:8080/api/papers/${this.editPaperId}`, formData)
-        : this.http.post('http://localhost:8080/api/papers', formData);
+        ? this.http.put(`${environment.apiUrl}/api/papers/${this.editPaperId}`, formData)
+        : this.http.post(`${environment.apiUrl}/api/papers`, formData);
 
       request.subscribe({
         next: (res) => {
@@ -158,7 +159,7 @@ export class SubmitPaper implements OnInit {
     if (confirm('Are you sure you want to delete this submission? This action cannot be undone.')) {
       this.isLoading = true;
 
-      this.http.delete(`http://localhost:8080/api/papers/${this.editPaperId}`).subscribe({
+      this.http.delete(`${environment.apiUrl}/api/papers/${this.editPaperId}`).subscribe({
         next: () => {
           this.isLoading = false;
 

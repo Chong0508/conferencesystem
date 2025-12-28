@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PaperService } from '../../../services/paper.service';
 import { ReviewService } from '../../../services/review.service';
-import { ConferenceService } from '../../../services/conference.service'; // Injected
+import { ConferenceService } from '../../../services/conference.service'; 
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-paper-details',
@@ -83,7 +84,7 @@ export class PaperDetails implements OnInit {
 
   getManuscriptUrl(fileName: string | undefined): string {
     if (!fileName) return '#';
-    return `http://localhost:8080/api/papers/download/${fileName}`;
+    return `${environment.apiUrl}/api/papers/download/${fileName}`;
   }
 
   getCleanFileName(fullPath: string | undefined): string {

@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { PaperService } from '../../../services/paper.service';
 import { NotificationService } from '../../../services/notification.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-paper-payment',
@@ -60,7 +61,7 @@ export class PaperPayment implements OnInit {
         currency: 'MYR'
       };
 
-      this.http.post('http://localhost:8080/api/payments', paymentPayload).subscribe({
+      this.http.post(`${environment.apiUrl}/api/payments`, paymentPayload).subscribe({
         next: (res: any) => {
           this.isLoading = false;
 

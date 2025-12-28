@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../../services/auth.service';
 import { ConferenceService } from '../../../services/conference.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-my-conferences',
@@ -35,7 +36,7 @@ export class MyConferences implements OnInit {
     this.isLoading = true;
 
     // 1. Fetch all registrations
-    this.http.get<any[]>('http://localhost:8080/api/registrations').subscribe({
+    this.http.get<any[]>(`${environment.apiUrl}/api/registrations`).subscribe({
       next: (registrations) => {
         // 2. Filter by User ID and 'Approved' status
         const myApprovedRegs = registrations.filter(reg => 
