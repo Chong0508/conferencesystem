@@ -47,12 +47,19 @@
               </span>
             </div>
             
-            <h5 class="fw-bold text-dark mb-2 text-truncate-custom-2" [title]="paper.title">
+            <h5 class="fw-bold text-dark mb-1 text-truncate-custom-2" [title]="paper.title">
               {{ paper.title }}
             </h5>
 
-            <p class="text-muted small mb-4 text-truncate-custom-3">
-              {{ paper.abstractText || paper.abstract || 'Abstract details for this archived manuscript are available upon opening the PDF.' }}
+            <div class="d-flex align-items-center mb-2">
+              <small class="text-muted">
+                <i class="bi bi-person-fill me-1"></i>
+                <span class="fw-medium">{{ paper.submitterName || 'Lead Author' }}</span>
+              </small>
+            </div>
+
+            <p class="text-muted small mb-3 text-truncate-custom-3">
+              {{ paper.abstractText || paper.abstract || 'Abstract details available in PDF.' }}
             </p>
 
             <div class="border-top pt-3 mt-auto">
