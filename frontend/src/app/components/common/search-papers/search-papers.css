@@ -1,21 +1,17 @@
-/* Truncate Title to exactly 2 lines */
 .text-truncate-custom-2 {
   display: -webkit-box;
-  -webkit-line-clamp: 2; /* Change this number to show more/less lines */
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  min-height: 3em; /* Ensures cards stay the same height even with short titles */
+  min-height: 2.8em; /* Slightly shorter */
 }
 
-/* Truncate Abstract to exactly 3 lines */
 .text-truncate-custom-3 {
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 3; 
   -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  height: 4.5em; /* Fixed height to keep card buttons aligned */
+  height: 4.2em;
 }
 
 /* Smooth transition for card hover */
