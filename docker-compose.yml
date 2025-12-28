@@ -33,9 +33,9 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/cmsdb?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root12345
+      SPRING_DATASOURCE_URL: jdbc:mysql://${MYSQLHOST:db}:${MYSQLPORT:3306}/${MYSQLDATABASE:cmsdb}?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: ${MYSQLUSER:root}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQLPASSWORD:root12345}
     command: java -jar /app.jar
     volumes:
       - ./uploads:/app/uploads
