@@ -1,17 +1,28 @@
-# Dockerfile
+# Stage 1: Build
+FROM maven:3.9.0-eclipse-temurin-21 AS build
 
-FROM eclipse-temurin:21-jdk
-
-# Set the working directory first
 WORKDIR /app
 
-# Copy the JAR file into the /app directory
-# We name it app.jar inside the container
-COPY target/confease-backend-0.0.1-SNAPSHOT.jar app.jar
+# Copy pom.xml and download dependencies (caching)
+COPY pom.xml .
+RUN mvn dependency:go-offline
 
-# Create the directory for persistent papers
-RUN mkdir -p /app/uploads/papers && chmod 777 /app/uploads/papers
+# Copy the source code
+COPY src ./src
 
-# Run the jar from the current WORKDIR (/app/app.jar)
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Build the JAR
+RUN mvn clean package -DskipTests
 
+# Stage 2: Run
+FROM eclipse-temurin:21-jre
+
+WORKDIR /app
+
+# Copy the built JAR
+COPY --from=build /app/target/backend-0.0.1-SNAPSHOT.jar app.jar
+
+# Expose port
+EXPOSE 8080
+
+# Start the app
+CMD ["java", "-jar", "app.jar"]
